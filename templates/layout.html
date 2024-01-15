@@ -1,0 +1,66 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{template "title" .}}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/assets/favicon.ico" type="image/x-icon">
+    <script src="https://kit.fontawesome.com/2268c379d5.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="Header">
+        <div class="Header-logo">
+            <img src="/static/assets/logo.svg" alt="logo" />
+        </div>
+        <div class="Header-title">
+            <h1>JbearP Blog</h1>
+            <span> Tecnología | Historias web</span>
+        </div>
+        <div class="Header-social">
+            <!-- <ul>
+                <li>
+                    <a href="https://github.com/Jeanpigi" target="_blank" rel="noreferrer">
+                        <i aria-hidden class="fab fa-github" />
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.instagram.com/jean_pierre_gio/" target="_blank" rel="noreferrer">
+                        <i aria-hidden class="fab fa-instagram" />
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/Jpgaobot/" target="_blank" rel="noreferrer">
+                        <i aria-hidden class="fab fa-facebook" />
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.youtube.com/channel/UCXNcM9LiqXfXgKU8HIwg9Xg" target="_blank" rel="noreferrer">
+                        <i aria-hidden class="fab fa-youtube" />
+                    </a>
+                </li>
+            </ul> -->
+        </div>
+    </div>
+
+    <div>
+        {{template "content"}}
+    </div>
+
+    <div class="Footer">
+        <div class="Footer-container">
+            <div class="Footer-content">
+                <div class="Footer-copy"> Hecho con 💜 por 🐻 JbearP </div>
+                <div class="Footer-svelte">
+                    Full Power by Go
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+{{end}}

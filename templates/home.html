@@ -1,0 +1,21 @@
+<!-- templates/home.html -->
+{{define "title"}}Home{{end}}
+
+{{ define "content" }}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/css/home.css">
+</head>
+
+<div class="container-home">
+    <h2>Posts Recientes</h2>
+
+    <!-- Contenedor para los posts -->
+    <div id="posts-container">
+        <!-- Los posts se cargarán aquí -->
+    </div>
+</div>
+
+<script src="/static/js/post.js"></script>
+
+{{ end }}

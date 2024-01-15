@@ -1,0 +1,99 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+
+.Header {
+    background-color: #24292e;
+    color: #ffffff;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Header-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+}
+
+.Header-title span {
+    font-size: 1.4rem;
+    font-weight: 300;
+    letter-spacing: normal;
+}
+
+.Header-social ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    gap: 1rem;
+}
+
+.Header-social a {
+    text-decoration: none;
+    font-weight: 300;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    color: white;
+}
+
+.Header-logo {
+    display: flex;
+    align-items: center;
+}
+
+.Header-logo img {
+    width: 7rem;
+    cursor: pointer;
+}
+
+.Header-social i {
+    width: 20px;
+}
+
+/* Estilos para el contenido principal */
+.content {
+    /* Ajusta el tamaño del contenido principal para dejar espacio para el footer */
+    min-height: calc(100% - 80px);
+}
+
+
+.Footer {
+    background: #24292e;
+    color: white;
+    padding-top: 1.5rem;
+    margin-top: 0.2rem;
+    position: absolute;
+    bottom: 0;
+    /* Ajusta el ancho del footer al 100% para ocupar todo el ancho de la página */
+    width: 100%;
+    /* Establece aquí la altura que desees para el footer */
+    height: 80px;
+}
+
+.Footer-content {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-family: 'Great Vibes', cursive;
+}
+
+.Footer-copy::after {
+    content: " 🇨🇴  ";
+}
+
+.Footer-svelte {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}

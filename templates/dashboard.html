@@ -1,0 +1,40 @@
+{{define "title"}}Dashboard{{end}}
+
+{{ define "content" }}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css">
+</head>
+
+<div class="container-dashboard">
+    <h1>Dashboard</h1>
+
+    <!-- Formulario para agregar un nuevo post -->
+    <div class="new-post-form">
+        <h2>Agregar nuevo post</h2>
+        <form action="/api/create-post" method="POST">
+            <input type="text" name="title" placeholder="Título del post" required>
+            <textarea name="content" placeholder="Contenido del post" required></textarea>
+            <button type="submit">Agregar Post</button>
+        </form>
+    </div>
+
+    <!-- Sección para mostrar los posts existentes -->
+    <div class="posts-list">
+        <h2>Posts Existentes</h2>
+        <!-- Aquí se iterarán los posts existentes -->
+        <!-- Ejemplo de un post (en la práctica, se generará dinámicamente) -->
+        <div class="post">
+            <h3>Título del Post</h3>
+            <p class="post-content">Resumen del contenido...</p>
+            <p class="post-info">Publicado por Usuario el Fecha</p>
+        </div>
+        <!-- Repetir para cada post -->
+    </div>
+
+    <form action="/logout" method="POST">
+        <button type="submit">Logout</button>
+    </form>
+</div>
+
+{{ end }}

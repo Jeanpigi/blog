@@ -1,0 +1,10 @@
+PUT http://localhost:8080/api/update-post/1 HTTP/1.1
+content-type: application/json
+
+{
+    "title": "el nuevo post con cambio",
+    "description": "realizando cambios para probar",
+    "content": "cambio de contenido para post.",
+    "author_id": 1,
+    "categoria": "Tecnologia prueba"
+}

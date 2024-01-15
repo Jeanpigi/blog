@@ -1,0 +1,28 @@
+{{define "title"}}Signup{{end}}
+
+{{ define "content" }}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/css/form.css">
+</head>
+
+<div class="container">
+    <form action="/signup" method="POST" class="form">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <input type="submit" value="Signup">
+        </div>
+    </form>
+
+    <div class="SignupPrompt">
+        <p>Already have an account? <a href="/login">Login</a></p>
+    </div>
+</div>
+{{ end }}
