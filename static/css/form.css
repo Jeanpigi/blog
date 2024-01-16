@@ -47,3 +47,9 @@
     font-size: 15px;
     margin-top: 10px;
 }
+
+.SignupPrompt a {
+    color: #22215b;
+    text-decoration: none;
+    transition: box-shadow 0.25s;
+}

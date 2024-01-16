@@ -1,4 +1,14 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  Swal.fire({
+    title: "Cargando...",
+    text: "Por favor espera mientras se cargan los posts.",
+    showConfirmButton: false,
+    allowOutsideClick: false,
+    willOpen: () => {
+      Swal.showLoading();
+    },
+  });
+
   try {
     const response = await fetch("/api/posts");
     if (!response.ok) {
@@ -20,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const postTitle = document.createElement("h2");
       const postTitleLink = document.createElement("a");
       postTitleLink.setAttribute("rel", "prefetch");
-      postTitleLink.href = "/"; // Ajusta el href según sea necesario
+      postTitleLink.href = "/";
       postTitleLink.className = "post-title";
       postTitle.textContent = randomEmoji();
       postTitleLink.textContent = post.title;
@@ -57,10 +67,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error fetching posts:", error);
     const postsContainer = document.getElementById("posts-container");
     postsContainer.innerHTML = "<p>Error al cargar los posts.</p>";
+  } finally {
+    // Cerrar la alerta de carga una vez que los posts se han cargado o ha ocurrido un error
+    Swal.close();
   }
 });
 
-// Función para calcular el tiempo de lectura
 // Function to calculate the reading time
 const readingTime = (text) => {
   const wordsPerMinute = 200;

@@ -42,6 +42,11 @@ func main() {
 	router.HandleFunc("/signup", handlers.SignupHandler)
 	router.HandleFunc("/dashboard", handlers.DashboardHandler)
 	router.HandleFunc("/logout", handlers.LogoutHandler)
+	router.HandleFunc("/about", handlers.AboutHandler)
+	router.HandleFunc("/portafolio", handlers.PortafolioHandler)
+	router.HandleFunc("/blog", handlers.BlogHandler)
+	router.HandleFunc("/historias", handlers.HistoriasHandler)
+	router.HandleFunc("/tecnologias", handlers.TecnologiasHandler)
 
 	// rutas de post en api
 	router.HandleFunc("/api/posts", handlers.GetAllPostsHandler).Methods("GET")

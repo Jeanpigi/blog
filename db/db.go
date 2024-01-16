@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/Jeanpigi/blog/internal/models"
 	_ "github.com/go-sql-driver/mysql"
@@ -38,6 +39,12 @@ func InitDB() {
 	if err != nil {
 		log.Fatal("Error al conectar a la base de datos:", err)
 	}
+
+	// Configura el pool de conexiones
+	Db.SetMaxOpenConns(25)
+	Db.SetMaxIdleConns(25)
+	Db.SetConnMaxLifetime(5 * time.Minute)
+
 	log.Println("Conexión a la base de datos establecida.")
 }
 

@@ -8,42 +8,67 @@
     <title>{{template "title" .}}</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="shortcut icon" href="/static/assets/favicon.ico" type="image/x-icon">
-    <script src="https://kit.fontawesome.com/2268c379d5.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 
 <body>
     <div class="Header">
         <div class="Header-logo">
-            <img src="/static/assets/logo.svg" alt="logo" />
+            <a href="/login">
+                <img src="/static/assets/logo.svg" alt="logo" />
+            </a>
         </div>
         <div class="Header-title">
             <h1>JbearP Blog</h1>
             <span> Tecnología | Historias web</span>
         </div>
         <div class="Header-social">
-            <!-- <ul>
+            <ul>
                 <li>
-                    <a href="https://github.com/Jeanpigi" target="_blank" rel="noreferrer">
-                        <i aria-hidden class="fab fa-github" />
+                    <a href="http://github.com/Jeanpigi" target="_blank" rel="noreferrer">
+                        <i class="fa-brands fa-github"></i>
                     </a>
                 </li>
                 <li>
-                    <a href="https://www.instagram.com/jean_pierre_gio/" target="_blank" rel="noreferrer">
-                        <i aria-hidden class="fab fa-instagram" />
+                    <a href="https://www.instagram.com/jean_pierre_gio/" target="_blank">
+                        <i class="fa-brands fa-instagram"></i>
                     </a>
                 </li>
                 <li>
-                    <a href="https://www.facebook.com/Jpgaobot/" target="_blank" rel="noreferrer">
-                        <i aria-hidden class="fab fa-facebook" />
+                    <a href="https://www.facebook.com/Jpgaobot/" target="_blank">
+                        <i class="fa-brands fa-facebook"></i>
                     </a>
                 </li>
                 <li>
-                    <a href="https://www.youtube.com/channel/UCXNcM9LiqXfXgKU8HIwg9Xg" target="_blank" rel="noreferrer">
-                        <i aria-hidden class="fab fa-youtube" />
+                    <a href="https://www.youtube.com/channel/UCXNcM9LiqXfXgKU8HIwg9Xg" target="_blank">
+                        <i class="fa-brands fa-youtube"></i>
                     </a>
                 </li>
-            </ul> -->
+            </ul>
         </div>
+    </div>
+
+    <div class="Nav-container">
+        <ul>
+            <li>
+                <a href="/">Inicio</a>
+            </li>
+            <li>
+                <a href="/about">About</a>
+            </li>
+            <li>
+                <a href="/portafolio">Portafolio</a>
+            </li>
+            <li>
+                <a href="/historias">Historias</a>
+            </li>
+            <li>
+                <a href="/tecnologias">Tecnología</a>
+            </li>
+            <li>
+                <a href="/blog">Blog</a>
+            </li>
+        </ul>
     </div>
 
     <div>
@@ -54,7 +79,7 @@
         <div class="Footer-container">
             <div class="Footer-content">
                 <div class="Footer-copy"> Hecho con 💜 por 🐻 JbearP </div>
-                <div class="Footer-svelte">
+                <div class="Footer-go">
                     Full Power by Go
                 </div>
             </div>
