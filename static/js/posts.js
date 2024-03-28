@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const postTitle = document.createElement("h2");
       const postTitleLink = document.createElement("a");
       postTitleLink.setAttribute("rel", "prefetch");
-      postTitleLink.href = "/";
+      postTitleLink.href = `/post/${post.id}`;
       postTitleLink.className = "post-title";
       postTitle.textContent = randomEmoji();
       postTitleLink.textContent = post.title;

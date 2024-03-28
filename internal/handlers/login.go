@@ -8,7 +8,7 @@ import (
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		// Mostrar el formulario de inicio de sesión
-		utils.RenderTemplate(w, "templates/login.html")
+		utils.RenderTemplate(w, "templates/login.html", nil)
 	} else if r.Method == "POST" {
 		// Procesar el formulario de inicio de sesión
 		username := r.FormValue("username")
@@ -20,7 +20,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			utils.StartSession(w, r, username)
 			http.Redirect(w, r, "/dashboard", http.StatusFound)
 		} else {
-			utils.RenderTemplate(w, "templates/login.html")
+			utils.RenderTemplate(w, "templates/login.html", nil)
 
 		}
 	}

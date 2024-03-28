@@ -11,7 +11,7 @@ import (
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		utils.RenderTemplate(w, "templates/signup.html")
+		utils.RenderTemplate(w, "templates/signup.html", nil)
 	} else if r.Method == "POST" {
 		// Procesar el formulario de registro
 		username := r.FormValue("username")

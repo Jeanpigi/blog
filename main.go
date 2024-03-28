@@ -10,12 +10,10 @@ import (
 
 	"github.com/Jeanpigi/blog/db"
 	"github.com/Jeanpigi/blog/internal/handlers"
-	myHandler "github.com/gorilla/handlers" // Importa el paquete handlers
-	"github.com/gorilla/sessions"
+	"github.com/Jeanpigi/blog/session"
+	myHandler "github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 )
-
-var store *sessions.CookieStore
 
 func main() {
 	// Inicializar la conexión a la base de datos
@@ -28,8 +26,7 @@ func main() {
 	}
 
 	sessionKey := []byte(os.Getenv("SESSION_KEY"))
-
-	store = sessions.NewCookieStore(sessionKey)
+	session.InitStore(sessionKey)
 
 	router := mux.NewRouter()
 
@@ -38,6 +35,7 @@ func main() {
 
 	// Rutas
 	router.HandleFunc("/", handlers.HomeHandler)
+	router.HandleFunc("/post/{id}", handlers.PostHandler).Methods("GET")
 	router.HandleFunc("/login", handlers.LoginHandler)
 	router.HandleFunc("/signup", handlers.SignupHandler)
 	router.HandleFunc("/dashboard", handlers.DashboardHandler)

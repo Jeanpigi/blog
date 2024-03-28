@@ -6,5 +6,5 @@ import (
 )
 
 func PortafolioHandler(w http.ResponseWriter, r *http.Request) {
-	utils.RenderTemplate(w, "templates/portafolio.html")
+	utils.RenderTemplate(w, "templates/portafolio.html", nil)
 }

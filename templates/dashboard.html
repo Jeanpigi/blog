@@ -7,14 +7,24 @@
 </head>
 
 <div class="container-dashboard">
+    <div id="username" data-username="{{.Username}}" style="display:none;"></div>
+
     <h1>Dashboard</h1>
 
     <!-- Formulario para agregar un nuevo post -->
     <div class="new-post-form">
         <h2>Agregar nuevo post</h2>
-        <form action="/api/create-post" method="POST">
+        <form id="newPostForm" action="/api/create-post" method="POST">
+            <input type="hidden" name="authorID" value="{{.ID}}">
             <input type="text" name="title" placeholder="Título del post" required>
+            <input type="text" name="description" placeholder="Description del Post" required>
             <textarea name="content" placeholder="Contenido del post" required></textarea>
+            <div class="categoria">
+                <select name="categoria" required>
+                    <option value="tech">Tech</option>
+                    <option value="historias">Historias</option>
+                </select>
+            </div>
             <button type="submit">Agregar Post</button>
         </form>
     </div>
@@ -33,8 +43,13 @@
     </div>
 
     <form action="/logout" method="POST">
-        <button type="submit">Logout</button>
+        <button id="logoutButton" type="submit">Logout</button>
     </form>
+
+    <script defer src="/static/js/localStorages.js"></script>
+    <script src="/static/js/createPost.js"></script>
+    <script defer src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </div>
 
 {{ end }}

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	db "github.com/Jeanpigi/blog/db"
+	"github.com/Jeanpigi/blog/session"
 	"github.com/gorilla/sessions"
 
 	"golang.org/x/crypto/bcrypt"
@@ -43,9 +44,19 @@ func AuthenticateUser(username, password string) bool {
 }
 
 func StartSession(w http.ResponseWriter, r *http.Request, username string) {
-	session, _ := store.Get(r, "session-name")
+	session, err := session.Store.Get(r, "session-name")
+	if err != nil {
+		// Manejar el error
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	session.Values["username"] = username
-	session.Save(r, w)
+	err = session.Save(r, w)
+	if err != nil {
+		// Manejar el error
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func IsAuthenticated(r *http.Request) bool {

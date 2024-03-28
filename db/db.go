@@ -115,6 +115,20 @@ func GetAllPosts() ([]*models.Post, error) {
 	return posts, nil
 }
 
+func FindPostByID(postID string) (*models.Post, error) {
+	query := "SELECT * FROM posts WHERE id = ?"
+	row := Db.QueryRow(query, postID)
+
+	var post models.Post
+	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Content, &post.AuthorID, &post.CreatedAt, &post.Categoria)
+	if err != nil {
+		log.Printf("Error al buscar el post con ID %s: %v", postID, err)
+		return nil, err
+	}
+
+	return &post, nil
+}
+
 func InsertPost(post *models.Post) error {
 	query := "INSERT INTO posts (title, description, content, author_id, created_at, categoria) VALUES (?, ?, ?, ?, ?, ?)"
 	_, err := Db.Exec(query, post.Title, post.Description, post.Content, post.AuthorID, post.CreatedAt, post.Categoria)

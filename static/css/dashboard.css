@@ -58,3 +58,37 @@
     font-size: 0.8em;
     color: #666;
 }
+
+.categoria {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f5f5f5;
+    /* Fondo ligeramente gris para destacar */
+    border-radius: 5px;
+    /* Bordes redondeados */
+    display: inline-block;
+    /* Ajustar el ancho al contenido */
+}
+
+.new-post-form select {
+    width: 100%;
+    /* Ocupar todo el ancho disponible */
+    padding: 10px;
+    /* Más espacio interior para mejorar la legibilidad */
+    border: 1px solid #ccc;
+    /* Borde sutil */
+    border-radius: 3px;
+    /* Bordes redondeados para coincidir con otros inputs */
+    background-color: white;
+    /* Fondo blanco */
+    cursor: pointer;
+    /* Cursor de mano al pasar por encima */
+}
+
+/* Estilo para el foco del elemento para mejorar la accesibilidad */
+.new-post-form select:focus {
+    outline: none;
+    /* Eliminar el contorno predeterminado */
+    border-color: #4A90E2;
+    /* Color de borde más visible al enfocar */
+}

@@ -6,5 +6,5 @@ import (
 )
 
 func HistoriasHandler(w http.ResponseWriter, r *http.Request) {
-	utils.RenderTemplate(w, "templates/historias.html")
+	utils.RenderTemplate(w, "templates/historias.html", nil)
 }
