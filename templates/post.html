@@ -10,12 +10,14 @@
     <article>
         <h1>{{.Post.Title}}</h1>
         <div>
-            <span>{{.Post.CreatedAt}}</span>
+            <span class="post-created-at" data-created-at="{{.Post.CreatedAt}}"></span>
             <span>{{.Post.Categoria}}</span>
         </div>
         <div class="content">{{.Post.Content}}</div>
 
     </article>
 </div>
+
+<script src="/static/js/createdAt.js"></script>
 
 {{end}}

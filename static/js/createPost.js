@@ -14,8 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
       author_id: parseInt(formData.get("authorID"), 10),
     };
 
-    console.log(post);
-
     // Verificar que todos los campos requeridos estén llenos
     if (!post.title || !post.description || !post.content || !post.categoria) {
       Swal.fire({
