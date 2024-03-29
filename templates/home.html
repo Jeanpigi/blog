@@ -4,17 +4,58 @@
 {{ define "content" }}
 
 <head>
-    <link rel="stylesheet" type="text/css" href="/static/css/home.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/inicio.css">
 </head>
 
 <div class="container-home">
-    <!-- Contenedor para los posts -->
-    <div id="posts-container">
-        <!-- Los posts se cargarán aquí -->
+    <div class="About">
+        <h1><strong>¿Qué es Jbearp Blog?</strong></h1>
+        <div class="About-parrafo">
+            <p>
+                Jbearp es un blog dondé encontrarás contenido sobre tecnología e historias
+                web, creado y desarrollado por mí, <strong>Jean Pierre Giovanni Arenas Ortiz</strong>
+                con el objetivo de compartir conocimientos y escribir series web. Espero que
+                te gusté y te doy la bienvenida.
+            </p>
+            <p>
+                El Jbearp Blog existen dos pestañas importantes; Historias dondé se
+                publican todo el contenido de series web y Technología dondé va todo el
+                contenido de programación, diseño, video juegos y tecnología.
+            </p>
+        </div>
+
+        <div class="About-content">
+            <picture class="About-content-picture">
+                <img src="https://i.ibb.co/kxzzXdt/imagen.jpg" alt="imagen" border="0" />
+            </picture>
+            <div class="content">
+                <span class="border">Freelancer</span>
+                <span class="wave">Freelancer</span>
+            </div>
+        </div>
+
+        <div class="About-parrafo">
+            <p>
+                <strong>¿Quién soy?</strong> Soy Especialista TIC para la Innovación Educativa,
+                Ingeniero de sistemas y Frontend Developer Caqueteño con experiencia en el
+                sector educativo. Busco colaborar en una posición en la creación de sitios
+                web debido a mis logros y trabajos implementados, además de los certificados
+                obtenidos de la plataforma Platzi.
+            </p>
+        </div>
+
+        <div class="About-span">
+            <span>
+                <strong>Conoce más sobre mi trabajo:</strong>
+            </span>
+
+            <a href="/portafolio">
+                <i class="fa fa-globe"></i>
+            </a>
+
+        </div>
+
     </div>
 </div>
-
-<script src="/static/js/posts.js"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 {{ end }}

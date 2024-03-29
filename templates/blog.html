@@ -4,11 +4,16 @@
 {{ define "content" }}
 
 <head>
-    <link rel="stylesheet" type="text/css" href="/static/css/blog.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/blogs.css">
 </head>
 
 <div class="container-blog">
-    <h1>Blog</h1>
+    <!-- Contenedor para los posts -->
+    <div id="posts-container">
+        <!-- Los posts se cargarán aquí -->
+    </div>
 </div>
 
+<script src="/static/js/posts.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {{ end }}

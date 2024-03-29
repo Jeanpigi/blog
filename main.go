@@ -40,7 +40,6 @@ func main() {
 	router.HandleFunc("/signup", handlers.SignupHandler)
 	router.HandleFunc("/dashboard", handlers.DashboardHandler)
 	router.HandleFunc("/logout", handlers.LogoutHandler)
-	router.HandleFunc("/about", handlers.AboutHandler)
 	router.HandleFunc("/portafolio", handlers.PortafolioHandler)
 	router.HandleFunc("/blog", handlers.BlogHandler)
 	router.HandleFunc("/historias", handlers.HistoriasHandler)
@@ -48,6 +47,7 @@ func main() {
 
 	// rutas de post en api
 	router.HandleFunc("/api/posts", handlers.GetAllPostsHandler).Methods("GET")
+	router.HandleFunc("/api/posts/{id}", handlers.GetPostsHandler).Methods("GET")
 	router.HandleFunc("/api/create-post", handlers.CreatePostHandler).Methods("POST")
 	router.HandleFunc("/api/update-post/{postID}", handlers.UpdatePostHandler).Methods("PUT", "PATCH")
 	router.HandleFunc("/api/delete-post/{postID}", handlers.DeletePostHandler).Methods("DELETE")

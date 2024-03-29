@@ -1,13 +1,21 @@
 {{define "title"}}{{.Post.Title}}{{end}}
 
 {{define "content"}}
-<article>
-    <h1>{{.Post.Title}}</h1>
-    <div>
-        <span>{{.Post.CreatedAt}}</span>
-        <span>{{.Post.Categoria}}</span>
-    </div>
-    <p>{{.Post.Description}}</p>
-    <div>{{.Post.Content}}</div>
-</article>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/css/post.css">
+</head>
+
+<div class="container-post">
+    <article>
+        <h1>{{.Post.Title}}</h1>
+        <div>
+            <span>{{.Post.CreatedAt}}</span>
+            <span>{{.Post.Categoria}}</span>
+        </div>
+        <div class="content">{{.Post.Content}}</div>
+
+    </article>
+</div>
+
 {{end}}

@@ -3,52 +3,53 @@
 {{ define "content" }}
 
 <head>
-    <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/dashboards.css">
 </head>
 
 <div class="container-dashboard">
-    <div id="username" data-username="{{.Username}}" style="display:none;"></div>
-
-    <h1>Dashboard</h1>
+    <div id="username" data-username="{{.Username}}">
+        <h1>Welcome {{.Username}}</h1>
+    </div>
 
     <!-- Formulario para agregar un nuevo post -->
     <div class="new-post-form">
-        <h2>Agregar nuevo post</h2>
+        <h2>Agregar un nuevo post</h2>
         <form id="newPostForm" action="/api/create-post" method="POST">
             <input type="hidden" name="authorID" value="{{.ID}}">
             <input type="text" name="title" placeholder="Título del post" required>
             <input type="text" name="description" placeholder="Description del Post" required>
-            <textarea name="content" placeholder="Contenido del post" required></textarea>
+            <textarea name="content" id="editor" placeholder="Contenido del post" required></textarea>
+
             <div class="categoria">
                 <select name="categoria" required>
                     <option value="tech">Tech</option>
                     <option value="historias">Historias</option>
                 </select>
             </div>
-            <button type="submit">Agregar Post</button>
+            <button class="button" type="submit">Agregar Post</button>
         </form>
     </div>
 
-    <!-- Sección para mostrar los posts existentes -->
-    <div class="posts-list">
-        <h2>Posts Existentes</h2>
-        <!-- Aquí se iterarán los posts existentes -->
-        <!-- Ejemplo de un post (en la práctica, se generará dinámicamente) -->
-        <div class="post">
-            <h3>Título del Post</h3>
-            <p class="post-content">Resumen del contenido...</p>
-            <p class="post-info">Publicado por Usuario el Fecha</p>
-        </div>
-        <!-- Repetir para cada post -->
+    <h3>Buscar Post</h3>
+    <!-- Después del formulario de agregar nuevo post -->
+    <div class="search-posts-form">
+        <input type="text" id="searchQuery" placeholder="Buscar posts...">
+        <button class="button" type="button" id="searchButton">Buscar</button>
     </div>
 
-    <form action="/logout" method="POST">
-        <button id="logoutButton" type="submit">Logout</button>
-    </form>
+    <div class="container-button-logout">
+        <form action="/logout" method="POST">
+            <button class="button" id="logoutButton" type="submit">Logout</button>
+        </form>
+    </div>
 
-    <script defer src="/static/js/localStorages.js"></script>
+
+
+    <script defer src="/static/js/localStorage.js"></script>
     <script src="/static/js/createPost.js"></script>
+    <script src="/static/js/searchPost.js"></script>
     <script defer src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js" defer></script>
 
 </div>
 

@@ -9,6 +9,14 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.CKEDITOR) {
+    CKEDITOR.replace("editor");
+  } else {
+    console.error("CKEDITOR no está definido.");
+  }
+});
+
 document.getElementById("logoutButton").addEventListener("click", () => {
   // Limpiar localStorage
   localStorage.clear();

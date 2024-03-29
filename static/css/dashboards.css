@@ -6,6 +6,23 @@
     padding: 20px;
 }
 
+h1 {
+    font-size: 2.8rem;
+}
+
+h1,
+h2,
+h3 {
+    text-align: center;
+    margin: 1rem auto;
+
+}
+
+h2,
+h3 {
+    font-size: 1.8rem;
+}
+
 .new-post-form,
 .posts-list {
     margin-bottom: 20px;
@@ -28,7 +45,7 @@
     border-radius: 3px;
 }
 
-.new-post-form button {
+.button {
     background-color: #24292e;
     color: white;
     padding: 10px 15px;
@@ -38,7 +55,7 @@
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.new-post-form button:hover {
+.button:hover {
     background-color: #24292e;
 }
 
@@ -91,4 +108,39 @@
     /* Eliminar el contorno predeterminado */
     border-color: #4A90E2;
     /* Color de borde más visible al enfocar */
+}
+
+.search-posts-form {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.search-posts-form input[type="text"] {
+    width: 70%;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.search-posts-form .button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+
+.container-button-logout {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

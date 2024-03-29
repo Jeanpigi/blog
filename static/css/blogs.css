@@ -1,5 +1,5 @@
 /* Estilos generales */
-.container-home {
+.container-blog {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
@@ -22,6 +22,8 @@
     font-weight: 300;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .post-date time::before {
@@ -30,9 +32,6 @@
 
 .post-head {
     margin-top: 1rem;
-    display: grid;
-    justify-content: center;
-    align-items: center;
 }
 
 .post-content {
@@ -93,7 +92,7 @@
 
 /* Estilos para hacer la página más responsiva */
 @media (max-width: 768px) {
-    .container-home {
+    .container-blog {
         padding: 10px;
     }
 
