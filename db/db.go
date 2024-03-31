@@ -129,6 +129,33 @@ func FindPostByID(postID string) (*models.Post, error) {
 	return &post, nil
 }
 
+func FindPostsByCategory(categoria string) ([]*models.Post, error) {
+	var posts []*models.Post
+	query := "SELECT * FROM posts WHERE categoria = ?"
+	rows, err := Db.Query(query, categoria)
+	if err != nil {
+		log.Printf("Error al buscar posts con la categoría %s: %v", categoria, err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var post models.Post
+		if err := rows.Scan(&post.ID, &post.Title, &post.Description, &post.Content, &post.AuthorID, &post.CreatedAt, &post.Categoria); err != nil {
+			log.Printf("Error al escanear post: %v", err)
+			return nil, err
+		}
+		posts = append(posts, &post)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Printf("Error post rows: %v", err)
+		return nil, err
+	}
+
+	return posts, nil
+}
+
 func InsertPost(post *models.Post) error {
 	query := "INSERT INTO posts (title, description, content, author_id, created_at, categoria) VALUES (?, ?, ?, ?, ?, ?)"
 	_, err := Db.Exec(query, post.Title, post.Description, post.Content, post.AuthorID, post.CreatedAt, post.Categoria)

@@ -8,6 +8,14 @@ html {
     font-size: 62.5%;
 }
 
+body {
+    /* Asegúrate de que el margin del body sea 0 */
+    margin: 0;
+    /* Ajusta el padding-bottom para igualar la altura del footer */
+    padding-bottom: 80px;
+    min-height: 100vh;
+    position: relative;
+}
 
 .Header {
     background-color: #24292e;
@@ -64,6 +72,16 @@ html {
 .content {
     /* Ajusta el tamaño del contenido principal para dejar espacio para el footer */
     min-height: calc(100% - 80px);
+}
+
+/* Estilo para el botón de hamburguesa */
+.hamburger {
+    display: none; /* Oculta por defecto */
+    font-size: 2.5rem;
+    background: none;
+    border: none;
+    color: #191a22; /* Cambia el color según tu diseño */
+    cursor: pointer;
 }
 
 .Nav-container {
@@ -193,6 +211,7 @@ html {
     width: 100%;
     /* Establece aquí la altura que desees para el footer */
     height: 80px;
+    position: absolute;
 }
 
 .Footer-content {
@@ -211,4 +230,58 @@ html {
     display: flex;
     justify-content: center;
     gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .Header {
+        flex-direction: column;
+        padding: 0.5rem;
+    }
+
+    .Header-logo img {
+        width: 5rem; /* Reduce el tamaño del logo */
+    }
+
+    .Header-title {
+        margin-top: 1rem;
+        font-size: 1.2rem; /* Ajusta el tamaño del título y la descripción */
+    }
+
+    .Header-title span {
+        font-size: 1rem;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .Nav-container ul {
+        display: none; /* Oculta el menú por defecto en pantallas pequeñas */
+        flex-direction: column;
+        width: 100%;
+    }
+
+    /* Muestra el menú cuando .Nav-container tiene la clase .is-active */
+    .Nav-container.is-active ul {
+        display: flex;
+    }
+
+    .Nav-container ul li {
+        width: 100%;
+    }
+
+    .Nav-container ul li a {
+        padding: 10px; /* Ajusta el padding para mejorar la tocabilidad */
+    }
+
+    .Footer {
+        padding-top: 1rem;
+        padding-bottom: 1rem; /* Ajusta el padding para reducir el espacio */
+        font-size: 1.2rem; /* Reduce el tamaño de la fuente en el footer */
+    }
+    
+    /* Ajusta el content para mejorar el espacio entre el contenido y el footer */
+    .content {
+        padding-bottom: 10rem; /* Aumenta el padding en la parte inferior */
+    }
 }

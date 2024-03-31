@@ -52,6 +52,10 @@ func main() {
 	router.HandleFunc("/api/update-post/{postID}", handlers.UpdatePostHandler).Methods("PUT", "PATCH")
 	router.HandleFunc("/api/delete-post/{postID}", handlers.DeletePostHandler).Methods("DELETE")
 
+	// rutas de categorias e historias en api
+	router.HandleFunc("/api/categories", handlers.GetPostsByCategoryHandler).Methods("GET")
+	router.HandleFunc("/api/histories", handlers.GetPostsByHistoryHandler).Methods("GET")
+
 	// Configuracion el middleware CORS
 	corsHandler := myHandler.CORS(
 		myHandler.AllowedOrigins([]string{"*"}), // Permite solicitudes desde cualquier origen
