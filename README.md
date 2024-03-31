@@ -1,6 +1,6 @@
 # Blog
 
-Blog is a personal blog by Jean Pierre Giovanni Arenas Ortiz where thoughts, experiences, and technical insights are shared. It serves as a digital garden, a place for growth and cultivation of ideas across various interests, primarily centered around technology, programming, and music.
+Blog is a personal blog by Jean Pierre Giovanni Arenas Ortiz where thoughts, experiences, and technical insights are shared. It serves as a digital garden, a place for growth and cultivation of ideas across various interests, primarily centered around technology, programming, and histories.
 
 ## Personal Project
 
@@ -21,7 +21,7 @@ To use this go Player, you need to have Go installed on your computer. If you do
 2. Go to the project directory:
 
    ```
-      cd go-player
+      cd blog
    ```
 
 ## Usage
