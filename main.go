@@ -63,7 +63,7 @@ func main() {
 		myHandler.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
 
-	addr := ":8080"
+	addr := ":80"
 	fmt.Printf("Servidor corriendo en http://localhost%s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, corsHandler(router))) // Utiliza el middleware CORS con el enrutador principal
 }
