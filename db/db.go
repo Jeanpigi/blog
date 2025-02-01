@@ -34,7 +34,7 @@ func InitDB() {
 	dbHost = os.Getenv("MYSQL_HOST")
 	dbName = os.Getenv("MYSQL_DATABASE")
 
-	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s", dbUser, dbPass, dbHost, dbName)
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?tls=false", dbUser, dbPass, dbHost, dbName)
 	Db, err = sql.Open("mysql", dataSourceName)
 	if err != nil {
 		log.Fatal("Error al conectar a la base de datos:", err)
