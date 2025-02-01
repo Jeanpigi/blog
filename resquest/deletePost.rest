@@ -1,1 +1,1 @@
-DELETE http://localhost:8080/api/delete-post/23 HTTP/1.1
+DELETE http://localhost:8080/api/delete-post/1 HTTP/1.1

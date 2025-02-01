@@ -60,7 +60,7 @@ func CloseDB() {
 }
 
 func GetUserByUsername(username string) (*models.User, error) {
-	query := "SELECT * FROM users WHERE username = ?"
+	query := "SELECT * FROM Users WHERE Username = ?"
 	row := Db.QueryRow(query, username)
 
 	user := &models.User{}
@@ -77,7 +77,7 @@ func GetUserByUsername(username string) (*models.User, error) {
 }
 
 func InsertUser(user *models.User) error {
-	query := "INSERT INTO users (username, password) VALUES (?, ?)"
+	query := "INSERT INTO Users (Username, Password) VALUES (?, ?)"
 	_, err := Db.Exec(query, user.Username, user.Password)
 	if err != nil {
 		log.Println("Error al insertar usuario en la base de datos:", err)
@@ -88,7 +88,7 @@ func InsertUser(user *models.User) error {
 }
 
 func GetAllPosts() ([]*models.Post, error) {
-	query := "SELECT * FROM posts"
+	query := "SELECT * FROM Posts"
 	rows, err := Db.Query(query)
 	if err != nil {
 		log.Println("Error al obtener posts de la base de datos:", err)
@@ -116,7 +116,7 @@ func GetAllPosts() ([]*models.Post, error) {
 }
 
 func FindPostByID(postID string) (*models.Post, error) {
-	query := "SELECT * FROM posts WHERE id = ?"
+	query := "SELECT * FROM Posts WHERE ID = ?"
 	row := Db.QueryRow(query, postID)
 
 	var post models.Post
@@ -131,7 +131,7 @@ func FindPostByID(postID string) (*models.Post, error) {
 
 func FindPostsByCategory(categoria string) ([]*models.Post, error) {
 	var posts []*models.Post
-	query := "SELECT * FROM posts WHERE categoria = ?"
+	query := "SELECT * FROM Posts WHERE categoria = ?"
 	rows, err := Db.Query(query, categoria)
 	if err != nil {
 		log.Printf("Error al buscar posts con la categoría %s: %v", categoria, err)
@@ -157,7 +157,7 @@ func FindPostsByCategory(categoria string) ([]*models.Post, error) {
 }
 
 func InsertPost(post *models.Post) error {
-	query := "INSERT INTO posts (title, description, content, author_id, created_at, categoria) VALUES (?, ?, ?, ?, ?, ?)"
+	query := "INSERT INTO Posts (Title, Description, Content, AuthorID, CreatedAt, Category) VALUES (?, ?, ?, ?, ?, ?)"
 	_, err := Db.Exec(query, post.Title, post.Description, post.Content, post.AuthorID, post.CreatedAt, post.Categoria)
 	if err != nil {
 		log.Println("Error al insertar el post en la base de datos:", err)
@@ -168,7 +168,7 @@ func InsertPost(post *models.Post) error {
 }
 
 func UpdatePost(postID int, post *models.Post) error {
-	query := "UPDATE posts SET title = ?, description = ?, content = ?, categoria = ?, author_id = ? WHERE id = ?"
+	query := "UPDATE Posts SET Title = ?, Description = ?, Content = ?, Category = ?, AuthorID = ? WHERE id = ?"
 	_, err := Db.Exec(query, post.Title, post.Description, post.Content, post.Categoria, post.AuthorID, postID)
 	if err != nil {
 		log.Println("Error al actualizar post en la base de datos:", err)
@@ -179,7 +179,7 @@ func UpdatePost(postID int, post *models.Post) error {
 }
 
 func DeletePost(postID int) error {
-	query := "DELETE FROM posts WHERE id = ?"
+	query := "DELETE FROM Posts WHERE ID = ?"
 	_, err := Db.Exec(query, postID)
 	if err != nil {
 		log.Println("Error al eliminar post en la base de datos:", err)

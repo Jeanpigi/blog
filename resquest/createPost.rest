@@ -2,9 +2,9 @@ POST http://localhost:8080/api/create-post HTTP/1.1
 content-type: application/json
 
 {
-    "title": "Npost",
-    "description": "Este es el contenido de mi nuevo post.",
-    "content": "La complejidad del caso amplió aún más la difusión de la historia en medios de todo el mundo, pues Clauddine, su madre, la educó en casa, monitoreó su uso de Internet y no solo la mantuvo en una silla de ruedas, sino que también la hizo usar una sonda de alimentación e hizo que le extirparan las glándulas salivales. La justificación era que su hija tenía una discapacidad mental y física, y que sufría de varias afecciones médicas graves. Sin embargo, Gypsy, hoy una mujer de 32 años, estaba sana y no tenía ningún retraso en su desarrollo como siempre habían creído sus amigos",
+    "title": "Post 1",
+    "description": "Este es el contenido de mi nuevo postmaosmoas.",
+    "content": "La complejidad del caso amplió aún más malsmoasmoasmoasmoas",
     "author_id": 1,
-    "categoria": "Tecnologia prueba"
+    "categoria": "tech"
 }

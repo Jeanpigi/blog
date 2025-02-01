@@ -21,7 +21,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/dashboard", http.StatusFound)
 		} else {
 			utils.RenderTemplate(w, "templates/login.html", nil)
-
 		}
 	}
 }
