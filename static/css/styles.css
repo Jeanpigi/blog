@@ -259,29 +259,39 @@ body {
         display: block;
     }
 
-
     .Nav-container ul {
-        display: none;
-        /* Oculta el menú por defecto en pantallas pequeñas */
+        /* quita display:none aquí si quieres usar .is-active para mostrarlo */
         flex-direction: column;
-
+        width: 80% !important;
+        /* o 100%, y usa !important si hace falta */
         background-color: rgba(25, 26, 34, 0.3);
-        width: 100%;
-    }
-
-    /* Muestra el menú cuando .Nav-container tiene la clase .is-active */
-    .Nav-container.is-active ul {
-        display: flex;
-
+        border-radius: 1rem;
+        margin: 1rem auto;
+        padding: 1.5rem;
+        text-align: center;
+        display: none;
+        /* si tu toggle lo muestra con la clase .is-active */
     }
 
     .Nav-container ul li {
-        width: 100%;
+        width: 100% !important;
+        /* sobrescribe los 70px de desktop */
+        height: auto;
+        /* para que crezca según el contenido */
+        margin: 0.5rem 0;
     }
 
     .Nav-container ul li a {
-        padding: 10px;
-        /* Ajusta el padding para mejorar la tocabilidad */
+        /* tamaño de letra mayor y color blanco para buena legibilidad */
+        font-size: 1.8rem;
+        color: #fff;
+        padding: 1rem;
+    }
+
+    /* y cuando esté activo: */
+    .Nav-container.is-active ul {
+        display: flex;
+        /* o block, si prefieres */
     }
 
     .Footer {

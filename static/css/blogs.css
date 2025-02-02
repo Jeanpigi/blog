@@ -7,12 +7,11 @@
 
 /* Estilos para los posts */
 #posts-container {
-    margin-top: 20px;
+    margin: 20px;
+    display: grid;
+    grid-gap: 4rem;
 }
 
-.posts-content {
-    padding-top: 1rem;
-}
 
 .post {
     display: grid;

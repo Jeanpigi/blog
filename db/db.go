@@ -26,7 +26,6 @@ var (
 func InitDB() {
 	// Verificar si existe un archivo .env antes de intentar cargarlo
 	if _, err := os.Stat(".env"); err == nil {
-		log.Println("📄 Cargando variables desde .env")
 		err := godotenv.Load()
 		if err != nil {
 			log.Println("⚠️ No se pudo cargar el archivo .env, se usarán las variables del sistema.")
@@ -40,9 +39,6 @@ func InitDB() {
 	dbPass = os.Getenv("MYSQL_ROOT_PASSWORD")
 	dbHost = os.Getenv("MYSQL_HOST")
 	dbName = os.Getenv("MYSQL_DATABASE")
-
-	// Imprimir las variables para debug (remover en producción)
-	log.Printf("🔧 Conectando a MySQL con: Host=%s, User=%s, DB=%s", dbHost, dbUser, dbName)
 
 	// Formatear la conexión
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?tls=false", dbUser, dbPass, dbHost, dbName)

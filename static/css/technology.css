@@ -6,7 +6,9 @@
 }
 
 #container-tecnologia {
-    margin-top: 20px;
+    margin: 20px;
+    display: grid;
+    grid-gap: 4rem;
 }
 
 #container-tecnologia h1 {

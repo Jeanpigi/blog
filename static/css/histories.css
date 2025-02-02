@@ -1,6 +1,14 @@
 /* Estilos para los posts */
+.container-blog {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 #container-historias {
-    margin-top: 20px;
+    margin: 20px;
+    display: grid;
+    grid-gap: 4rem;
 }
 
 #container-historias h1 {

@@ -22,7 +22,6 @@ func main() {
 
 	// Verificar si existe un archivo .env antes de intentar cargarlo
 	if _, err := os.Stat(".env"); err == nil {
-		log.Println("📄 Cargando variables desde .env")
 		err := godotenv.Load()
 		if err != nil {
 			log.Println("⚠️ No se pudo cargar el archivo .env, se usarán las variables del sistema.")
