@@ -6,11 +6,32 @@ import (
 	"strconv"
 
 	db "github.com/Jeanpigi/blog/db"
+	"github.com/Jeanpigi/blog/session"
 	"github.com/gorilla/mux"
 )
 
+// DeletePostHandler protege la eliminación de posts para que solo el autor pueda hacerlo
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
-	// Obtén el postID de la URL, por ejemplo, "/delete-post/123"
+	// Verificar si el usuario está autenticado
+	session, err := session.Store.Get(r, "session-name")
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	username, ok := session.Values["username"].(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	user, _ := db.GetUserByUsername(username)
+	if user == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Obtener el postID de la URL
 	vars := mux.Vars(r)
 	postID, err := strconv.Atoi(vars["postID"])
 	if err != nil {
@@ -18,7 +39,20 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Realiza la eliminación del post en la base de datos
+	// Buscar el post en la base de datos
+	post, err := db.FindPostByID(vars["postID"])
+	if err != nil || post == nil {
+		http.Error(w, "Post not found", http.StatusNotFound)
+		return
+	}
+
+	// Verificar si el usuario autenticado es el autor del post
+	if post.AuthorID != user.ID {
+		http.Error(w, "Forbidden: You can only delete your own posts", http.StatusForbidden)
+		return
+	}
+
+	// Si el usuario es el autor, eliminamos el post
 	err = db.DeletePost(postID)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
