@@ -20,12 +20,22 @@ func main() {
 	db.InitDB()
 	defer db.CloseDB()
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error al cargar el archivo .env:", err)
+	// Verificar si existe un archivo .env antes de intentar cargarlo
+	if _, err := os.Stat(".env"); err == nil {
+		log.Println("📄 Cargando variables desde .env")
+		err := godotenv.Load()
+		if err != nil {
+			log.Println("⚠️ No se pudo cargar el archivo .env, se usarán las variables del sistema.")
+		}
+	} else {
+		log.Println("⚠️ No se encontró el archivo .env, usando variables de entorno del sistema.")
 	}
 
+	// Obtener la clave de sesión (ya sea desde .env o el sistema)
 	sessionKey := []byte(os.Getenv("SESSION_KEY"))
+	if len(sessionKey) == 0 {
+		log.Fatal("❌ Error: SESSION_KEY no está definida. Verifica tus variables de entorno.")
+	}
 	session.InitStore(sessionKey)
 
 	router := mux.NewRouter()
@@ -56,7 +66,7 @@ func main() {
 	router.HandleFunc("/api/categories", handlers.GetPostsByCategoryHandler).Methods("GET")
 	router.HandleFunc("/api/histories", handlers.GetPostsByHistoryHandler).Methods("GET")
 
-	// Configuracion el middleware CORS
+	// Configuracion del middleware CORS
 	corsHandler := myHandler.CORS(
 		myHandler.AllowedOrigins([]string{"*"}), // Permite solicitudes desde cualquier origen
 		myHandler.AllowedMethods([]string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}),
@@ -64,6 +74,6 @@ func main() {
 	)
 
 	addr := ":8080"
-	fmt.Printf("Servidor corriendo en http://localhost%s\n", addr)
+	fmt.Printf("🚀 Servidor corriendo en http://localhost%s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, corsHandler(router))) // Utiliza el middleware CORS con el enrutador principal
 }
