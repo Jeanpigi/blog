@@ -207,3 +207,51 @@ func DeletePost(postID int) error {
 
 	return nil
 }
+
+// InsertVisit guarda una visita en la base de datos
+func InsertVisit(visit *models.Visit) error {
+	query := `
+	INSERT INTO Visits (ip, user_agent, page, country, region, city, latitude, longitude)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	_, err := Db.Exec(query, visit.IP, visit.UserAgent, visit.Page, visit.Country, visit.Region, visit.City, visit.Latitude, visit.Longitude)
+	if err != nil {
+		log.Println("❌ Error al registrar visita en la base de datos:", err)
+		return err
+	}
+	return nil
+}
+
+// GetAllVisits obtiene las últimas visitas
+func GetAllVisits() ([]models.Visit, error) {
+	query := "SELECT id, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i:%s'), ip, user_agent, page, country, region, city, latitude, longitude FROM Visits ORDER BY timestamp DESC LIMIT 20"
+	rows, err := Db.Query(query)
+	if err != nil {
+		log.Println("❌ Error al obtener visitas:", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var visits []models.Visit
+	for rows.Next() {
+		var visit models.Visit
+		var timestamp string // Cambiar de time.Time a string
+
+		// Escanear datos con timestamp como string
+		err := rows.Scan(&visit.ID, &timestamp, &visit.IP, &visit.UserAgent, &visit.Page, &visit.Country, &visit.Region, &visit.City, &visit.Latitude, &visit.Longitude)
+		if err != nil {
+			log.Println("❌ Error al escanear visita:", err)
+			continue
+		}
+
+		// Convertir timestamp string a time.Time
+		visit.Timestamp, err = time.Parse("2006-01-02 15:04:05", timestamp)
+		if err != nil {
+			log.Println("⚠️ Error al convertir timestamp:", err)
+			continue
+		}
+
+		visits = append(visits, visit)
+	}
+
+	return visits, nil
+}

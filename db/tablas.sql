@@ -15,3 +15,18 @@ CREATE TABLE Users (
     Password CHAR(64),
     PRIMARY KEY (ID)
 );
+
+CREATE TABLE Visits (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ip VARCHAR(45),
+    user_agent TEXT,
+    page VARCHAR(255),
+    country VARCHAR(100),
+    region VARCHAR(100),
+    city VARCHAR(100),
+    latitude DECIMAL(9,6),
+    longitude DECIMAL(9,6)
+);
+
+

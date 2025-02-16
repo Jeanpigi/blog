@@ -10,6 +10,7 @@ import (
 
 	"github.com/Jeanpigi/blog/db"
 	"github.com/Jeanpigi/blog/internal/handlers"
+	"github.com/Jeanpigi/blog/internal/middleware"
 	"github.com/Jeanpigi/blog/session"
 	myHandler "github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
@@ -43,16 +44,22 @@ func main() {
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
 	// Rutas
-	router.HandleFunc("/", handlers.HomeHandler)
-	router.HandleFunc("/post/{id}", handlers.PostHandler).Methods("GET")
+	//router.HandleFunc("/", handlers.HomeHandler)
+	//router.HandleFunc("/post/{id}", handlers.PostHandler).Methods("GET")
+	// Middleware para registrar visitas en rutas específicas
+	router.Handle("/", middleware.TrackVisitMiddleware(http.HandlerFunc(handlers.HomeHandler))).Methods("GET")
+	router.Handle("/blog", middleware.TrackVisitMiddleware(http.HandlerFunc(handlers.BlogHandler))).Methods("GET")
+	router.Handle("/post/{id}", middleware.TrackVisitMiddleware(http.HandlerFunc(handlers.PostHandler))).Methods("GET")
+
 	router.HandleFunc("/login", handlers.LoginHandler)
 	router.HandleFunc("/signup", handlers.SignupHandler)
 	router.HandleFunc("/dashboard", handlers.DashboardHandler)
 	router.HandleFunc("/logout", handlers.LogoutHandler)
 	router.HandleFunc("/portafolio", handlers.PortafolioHandler)
-	router.HandleFunc("/blog", handlers.BlogHandler)
+	//router.HandleFunc("/blog", handlers.BlogHandler)
 	router.HandleFunc("/historias", handlers.HistoriasHandler)
 	router.HandleFunc("/tecnologias", handlers.TecnologiasHandler)
+	router.HandleFunc("/visitas", handlers.VisitsPageHandler).Methods("GET")
 
 	// rutas de post en api
 	router.HandleFunc("/api/posts", handlers.GetAllPostsHandler).Methods("GET")
@@ -64,6 +71,9 @@ func main() {
 	// rutas de categorias e historias en api
 	router.HandleFunc("/api/categories", handlers.GetPostsByCategoryHandler).Methods("GET")
 	router.HandleFunc("/api/histories", handlers.GetPostsByHistoryHandler).Methods("GET")
+
+	//Ruta para ver las visitas
+	router.HandleFunc("/api/visits/location", handlers.GetVisitsWithLocationHandler).Methods("GET")
 
 	// Configuracion del middleware CORS
 	corsHandler := myHandler.CORS(
