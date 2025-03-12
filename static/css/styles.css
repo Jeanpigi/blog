@@ -101,6 +101,7 @@ body {
 .Nav-container ul {
     display: flex;
     width: 350px;
+    gap: 1.5rem; 
 }
 
 .Nav-container ul li {

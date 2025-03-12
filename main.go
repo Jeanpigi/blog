@@ -7,21 +7,21 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 
 	"github.com/Jeanpigi/blog/db"
 	"github.com/Jeanpigi/blog/internal/handlers"
 	"github.com/Jeanpigi/blog/internal/middleware"
 	"github.com/Jeanpigi/blog/session"
 	myHandler "github.com/gorilla/handlers"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Inicializar la conexión a la base de datos
+	// 🔹 Inicializar la conexión a la base de datos
 	db.InitDB()
 	defer db.CloseDB()
 
-	// Verificar si existe un archivo .env antes de intentar cargarlo
+	// 🔹 Cargar variables de entorno desde `.env` si existe
 	if _, err := os.Stat(".env"); err == nil {
 		err := godotenv.Load()
 		if err != nil {
@@ -31,58 +31,64 @@ func main() {
 		log.Println("⚠️ No se encontró el archivo .env, usando variables de entorno del sistema.")
 	}
 
-	// Obtener la clave de sesión (ya sea desde .env o el sistema)
-	sessionKey := []byte(os.Getenv("SESSION_KEY"))
-	if len(sessionKey) == 0 {
+	// 🔹 Obtener la clave de sesión
+	sessionKey := os.Getenv("SESSION_KEY")
+	if sessionKey == "" {
 		log.Fatal("❌ Error: SESSION_KEY no está definida. Verifica tus variables de entorno.")
 	}
-	session.InitStore(sessionKey)
 
+	// 🔹 Inicializar sesión (sin argumentos)
+	session.InitStore()
+
+	// 🔹 Configuración del router
 	router := mux.NewRouter()
 
-	// Ruta para servir archivos estáticos
+	// 🔹 Servir archivos estáticos
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
-	// Rutas
-	//router.HandleFunc("/", handlers.HomeHandler)
-	//router.HandleFunc("/post/{id}", handlers.PostHandler).Methods("GET")
-	// Middleware para registrar visitas en rutas específicas
+	// 🔹 Middleware para registrar visitas en rutas específicas
 	router.Handle("/", middleware.TrackVisitMiddleware(http.HandlerFunc(handlers.HomeHandler))).Methods("GET")
 	router.Handle("/blog", middleware.TrackVisitMiddleware(http.HandlerFunc(handlers.BlogHandler))).Methods("GET")
 	router.Handle("/post/{id}", middleware.TrackVisitMiddleware(http.HandlerFunc(handlers.PostHandler))).Methods("GET")
 
+	// 🔹 Rutas de autenticación y dashboard
 	router.HandleFunc("/login", handlers.LoginHandler)
 	router.HandleFunc("/signup", handlers.SignupHandler)
 	router.HandleFunc("/dashboard", handlers.DashboardHandler)
 	router.HandleFunc("/logout", handlers.LogoutHandler)
+
+	// 🔹 Otras rutas de contenido
 	router.HandleFunc("/portafolio", handlers.PortafolioHandler)
-	//router.HandleFunc("/blog", handlers.BlogHandler)
 	router.HandleFunc("/historias", handlers.HistoriasHandler)
 	router.HandleFunc("/tecnologias", handlers.TecnologiasHandler)
 	router.HandleFunc("/visitas", handlers.VisitsPageHandler).Methods("GET")
 
-	// rutas de post en api
+	// 🔹 Rutas API para posts
 	router.HandleFunc("/api/posts", handlers.GetAllPostsHandler).Methods("GET")
 	router.HandleFunc("/api/posts/{id}", handlers.GetPostsHandler).Methods("GET")
 	router.HandleFunc("/api/create-post", handlers.CreatePostHandler).Methods("POST")
 	router.HandleFunc("/api/update-post/{postID}", handlers.UpdatePostHandler).Methods("PUT", "PATCH")
 	router.HandleFunc("/api/delete-post/{postID}", handlers.DeletePostHandler).Methods("DELETE")
 
-	// rutas de categorias e historias en api
+	// 🔹 Rutas API para categorías e historias
 	router.HandleFunc("/api/categories", handlers.GetPostsByCategoryHandler).Methods("GET")
 	router.HandleFunc("/api/histories", handlers.GetPostsByHistoryHandler).Methods("GET")
 
-	//Ruta para ver las visitas
+	// 🔹 Rutas API para visitas
 	router.HandleFunc("/api/visits/location", handlers.GetVisitsWithLocationHandler).Methods("GET")
 
-	// Configuracion del middleware CORS
+	// 🔹 Configuración del middleware CORS
 	corsHandler := myHandler.CORS(
 		myHandler.AllowedOrigins([]string{"*"}), // Permite solicitudes desde cualquier origen
 		myHandler.AllowedMethods([]string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}),
 		myHandler.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
 
+	// 🔹 Iniciar el servidor
 	addr := ":8080"
 	fmt.Printf("🚀 Servidor corriendo en http://localhost%s\n", addr)
-	log.Fatal(http.ListenAndServe(addr, corsHandler(router))) // Utiliza el middleware CORS con el enrutador principal
+	if err := http.ListenAndServe(addr, corsHandler(router)); err != nil {
+		log.Fatalf("❌ Error al iniciar el servidor: %v", err)
+	}
 }
+

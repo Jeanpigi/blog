@@ -70,7 +70,7 @@ func CloseDB() {
 }
 
 func GetUserByUsername(username string) (*models.User, error) {
-	query := "SELECT * FROM Users WHERE Username = ?"
+	query := "SELECT ID, Username, Password FROM Users WHERE Username = ?"
 	row := Db.QueryRow(query, username)
 
 	user := &models.User{}
@@ -79,7 +79,7 @@ func GetUserByUsername(username string) (*models.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, nil // El usuario no existe
 		}
-		log.Println("Error al obtener usuario de la base de datos:", err)
+		log.Println("Error al obtener usuario:", err)
 		return nil, err
 	}
 
@@ -90,7 +90,7 @@ func InsertUser(user *models.User) error {
 	query := "INSERT INTO Users (Username, Password) VALUES (?, ?)"
 	_, err := Db.Exec(query, user.Username, user.Password)
 	if err != nil {
-		log.Println("Error al insertar usuario en la base de datos:", err)
+		log.Println("Error al insertar usuario:", err)
 		return err
 	}
 

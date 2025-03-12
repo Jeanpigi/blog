@@ -3,27 +3,66 @@
 {{ define "content" }}
 
 <head>
+    <meta charset="UTF-8">
+    <title>Login</title>
     <link rel="stylesheet" type="text/css" href="/static/css/form.css">
 </head>
 
 <div class="container">
     <form action="/login" method="POST" class="form">
+        <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
+
         <div>
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required aria-label="Username">
         </div>
+
         <div>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="off" aria-label="Password">
         </div>
+
         <div>
             <input type="submit" value="Login">
         </div>
     </form>
 
     <div class="SignupPrompt">
-        <p>Not have account? <a href="/signup">Signup</a></p>
+        <p>Not have an account? <a href="/signup">Signup</a></p>
     </div>
 
+    <script>
+        // Obtener el parámetro de error de la URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("error")) {
+            let errorMessage = "Ocurrió un error desconocido.";
+    
+            switch (params.get("error")) {
+                case "invalid_username":
+                    errorMessage = "El nombre de usuario solo puede contener letras, números y guion bajo (3-20 caracteres).";
+                    break;
+                case "invalid_credentials":
+                    errorMessage = "Usuario o contraseña incorrectos. Inténtalo de nuevo.";
+                    break;
+                case "csrf_invalid":
+                    errorMessage = "Error de seguridad (CSRF inválido). Recarga la página e intenta de nuevo.";
+                    break;
+                case "too_many_attempts":
+                    errorMessage = "Demasiados intentos fallidos. Intenta más tarde.";
+                    break;
+            }
+    
+            // Mostrar alerta con SweetAlert2
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage,
+                confirmButtonColor: "#d33",
+                confirmButtonText: "OK"
+            });
+        }
+    </script>
+    
 </div>
+
 {{ end }}

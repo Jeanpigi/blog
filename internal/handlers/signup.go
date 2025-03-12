@@ -10,54 +10,49 @@ import (
 	"github.com/Jeanpigi/blog/session"
 )
 
-// SignupHandler protege la ruta para que solo usuarios autenticados puedan acceder
+// SignupHandler maneja el registro de nuevos usuarios
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
-	// Verificar si el usuario está autenticado
-	session, err := session.Store.Get(r, "session-name")
-	if err != nil {
+	// 🚀 Verificar si el usuario ya ha iniciado sesión
+	if !session.IsAuthenticated(r) {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
 
-	username, ok := session.Values["username"].(string)
-	if !ok {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
-
-	user, _ := db.GetUserByUsername(username)
-	if user == nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
-
-	// Si la petición es GET, renderizar el formulario de registro
 	if r.Method == "GET" {
 		utils.RenderTemplate(w, "templates/signup.html", nil)
 		return
 	}
 
-	// Si la petición es POST, procesar el formulario de registro
-	username = r.FormValue("username")
+	// Si es un POST, procesar el formulario
+	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	// Crear un nuevo usuario
+	// Verificar si el usuario ya existe
+	existingUser, _ := db.GetUserByUsername(username)
+	if existingUser != nil {
+		http.Error(w, "El usuario ya existe", http.StatusConflict)
+		return
+	}
+
+	// Crear un nuevo usuario con la contraseña hasheada
 	newUser := models.User{
 		Username: username,
 		Password: utils.HashPassword(password),
 	}
 
 	// Guardar el usuario en la base de datos
-	err = db.InsertUser(&newUser)
+	err := db.InsertUser(&newUser)
 	if err != nil {
 		log.Println("Error al insertar el usuario en la base de datos:", err)
-		// Manejar error
+		http.Error(w, "Error al registrar el usuario", http.StatusInternalServerError)
 		return
 	}
 
 	// Iniciar sesión automáticamente después del registro
-	utils.StartSession(w, r, username)
+	session.StartSession(w, r, username)
 
 	// Redirigir al dashboard
 	http.Redirect(w, r, "/dashboard", http.StatusFound)
 }
+
+

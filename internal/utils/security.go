@@ -1,72 +1,83 @@
 package utils
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"log"
-	"net/http"
-	"os"
+	"sync"
 
-	db "github.com/Jeanpigi/blog/db"
-	"github.com/Jeanpigi/blog/session"
-	"github.com/gorilla/sessions"
-
+	"github.com/Jeanpigi/blog/db"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Obtener la clave secreta desde la variable de entorno
-var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+var csrfTokens = make(map[string]string)
+var csrfMutex sync.Mutex
 
-func HashPassword(password string) string {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+// 🔐 Genera un token CSRF aleatorio
+func GenerateCSRFToken(sessionID string) string {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
 	if err != nil {
-		panic(err)
+		log.Println("Error al generar token CSRF:", err)
+		return ""
 	}
-	return string(hashedPassword)
+
+	token := base64.StdEncoding.EncodeToString(b)
+
+	csrfMutex.Lock()
+	csrfTokens[sessionID] = token
+	csrfMutex.Unlock()
+
+	return token
 }
-func AuthenticateUser(username, password string) bool {
-	// Obtener el usuario de la base de datos
-	user, err := db.GetUserByUsername(username)
-	if err != nil {
-		log.Println("Error al obtener el usuario:", err)
-		return false
-	}
-	if user == nil {
+
+// ✅ Valida el token CSRF recibido
+func ValidateCSRF(sessionID, token string) bool {
+	csrfMutex.Lock()
+	defer csrfMutex.Unlock()
+
+	expectedToken, exists := csrfTokens[sessionID]
+	if !exists || expectedToken != token {
 		return false
 	}
 
-	// Verificar la contraseña
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil {
-		log.Println("Error al verificar la contraseña:", err)
-		return false
-	}
-
+	// Eliminar el token usado para evitar reutilización
+	delete(csrfTokens, sessionID)
 	return true
 }
 
-func StartSession(w http.ResponseWriter, r *http.Request, username string) {
-	session, err := session.Store.Get(r, "session-name")
+// 🔑 Hashea contraseñas de manera segura con bcrypt
+func HashPassword(password string) string {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		// Manejar el error
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Fatal("Error al generar hash de contraseña:", err)
+	}
+	return string(hashedPassword)
+}
+
+// 🔓 Autenticación segura de usuarios
+func AuthenticateUser(username, password string) bool {
+	user, err := db.GetUserByUsername(username)
+	if err != nil {
+		log.Println("❌ Error al obtener el usuario:", err)
+		return false
+	}
+	if user == nil {
+		log.Println("⚠️ Usuario no encontrado:", username)
+		return false
 	}
 
-	session.Values["username"] = username
-	err = session.Save(r, w)
+	// Comparar la contraseña hasheada almacenada con la ingresada
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		// Manejar el error
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println("⚠️ Error al verificar la contraseña:", err)
+		return false
 	}
+
+	log.Println("✅ Usuario autenticado correctamente:", username)
+	return true
 }
 
-func IsAuthenticated(r *http.Request) bool {
-	session, _ := store.Get(r, "session-name")
-	_, ok := session.Values["username"]
-	return ok
-}
 
-func EndSession(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "session-name")
-	session.Options.MaxAge = -1 // Establecer la edad máxima de la sesión a un valor negativo para eliminarla
-	session.Save(r, w)
-}
+
+
