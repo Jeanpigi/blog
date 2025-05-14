@@ -26,6 +26,6 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 		ID:       user.ID,
 	}
 
-	utils.RenderTemplate(w, "dashboard.html", data)
+	utils.RenderTemplate(w, "templates/dashboard.html", data)
 }
 
