@@ -16,9 +16,15 @@ var loginAttempts = make(map[string]int)
 
 // LoginHandler maneja el inicio de sesión
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	// 🔒 Redirigir si ya está autenticado
+	if session.IsAuthenticated(r) {
+		http.Redirect(w, r, "/dashboard", http.StatusFound)
+		return
+	}
+
 	ip := r.RemoteAddr
 
-	// Bloquear IP después de 5 intentos fallidos
+	// ⛔ Bloquear IP tras múltiples intentos
 	if loginAttempts[ip] >= 5 {
 		http.Error(w, "Demasiados intentos. Intenta más tarde.", http.StatusTooManyRequests)
 		return
@@ -26,50 +32,47 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessionID := session.GetSessionID(r)
 
-	if r.Method == "GET" {
-		// Generar token CSRF
+	// 📥 Mostrar formulario (GET)
+	if r.Method == http.MethodGet {
 		csrfToken := utils.GenerateCSRFToken(sessionID)
-
-		// Renderizar formulario con el token
 		utils.RenderTemplate(w, "templates/login.html", map[string]interface{}{
 			"CsrfToken": csrfToken,
 		})
 		return
 	}
 
-	// Validar token CSRF
+	// 🔐 Validar CSRF
 	csrfToken := r.FormValue("csrf_token")
 	if !utils.ValidateCSRF(sessionID, csrfToken) {
 		http.Error(w, "CSRF token inválido", http.StatusForbidden)
 		return
 	}
 
-	// Obtener datos del formulario
+	// 📄 Leer datos del formulario
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	// Validar el nombre de usuario
+	// ✅ Validar username
 	if !validUsername.MatchString(username) {
 		http.Error(w, "El nombre de usuario solo puede contener letras, números y guion bajo (3-20 caracteres)", http.StatusBadRequest)
 		return
 	}
 
-	// Verificar usuario y contraseña usando `AuthenticateUser()`
+	// 🔍 Verificar credenciales
 	if !utils.AuthenticateUser(username, password) {
-		loginAttempts[ip]++ // Incrementar intentos fallidos
+		loginAttempts[ip]++ // ❌ Aumentar contador
 		http.Error(w, "Credenciales incorrectas", http.StatusUnauthorized)
 		return
 	}
 
-	// Resetear intentos fallidos si el login es exitoso
+	// ✅ Autenticación exitosa
 	delete(loginAttempts, ip)
-
-	// Iniciar sesión
 	session.StartSession(w, r, username)
 
-	// Redirigir al dashboard
+	// 🎯 Redirigir al dashboard
 	http.Redirect(w, r, "/dashboard", http.StatusFound)
 }
+
 
 
 

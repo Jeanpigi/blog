@@ -90,6 +90,9 @@ func main() {
 	router.HandleFunc("/radio/stream", handlers.StreamHandler).Methods("GET")
 	router.HandleFunc("/radio/upload", middleware.RequireAuth(handlers.UploadHandler)).Methods("GET", "POST")
 
+	// 🔹 Handler para rutas inexistentes
+	router.NotFoundHandler = http.HandlerFunc(handlers.NotFoundHandler)
+
 	// 🔹 Middleware CORS
 	corsHandler := myHandler.CORS(
 		myHandler.AllowedOrigins([]string{"*"}),

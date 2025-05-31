@@ -1,0 +1,13 @@
+{{ define "title" }}Error{{ end }}
+
+{{ define "content" }}
+    <div class="container">
+        <h1>⚠️ Ocurrió un error</h1>
+        <p style="font-size: 1.2rem; margin-top: 1rem;">{{ .Message }}</p>
+
+        <div style="margin-top: 2rem;">
+            <a href="/radio/upload" class="button">Volver a Subida</a>
+        </div>
+    </div>
+{{ end }}
+

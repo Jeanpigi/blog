@@ -1,17 +1,33 @@
 {{ define "title" }}Upload Music{{ end }}
 
-{{ define "head" }}
-    <link rel="stylesheet" href="/static/css/upload.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-{{ end }}
-
 {{ define "content" }}
+
+
+<head>
+    <link rel="stylesheet" type="text/css"  href="/static/css/upload.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
 <div class="container">
+    <nav class="breadcrumbs">
+        <a href="/dashboard">Dashboard</a>
+        <span> / </span>
+        <span>Subir música</span>
+    </nav>
+
+
     <h1>Upload Music</h1>
     <form id="uploadForm" action="/radio/upload" method="post" enctype="multipart/form-data">
         <input id="musicFile" type="file" name="musicFiles" accept="audio/*" multiple required>
         <button id="submitButton" type="submit">Upload</button>
     </form>
+
+    <div class="container-button-logout">
+        <form action="/logout" method="POST">
+            <button class="button" id="logoutButton" type="submit">Salir</button>
+        </form>
+    </div>
+
 </div>
 <script defer src="/static/js/upload.js"></script>
 {{ end }}

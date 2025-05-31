@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/Jeanpigi/blog/db"
 	"github.com/Jeanpigi/blog/internal/models"
@@ -21,7 +23,27 @@ type GeoInfo struct {
 	Query     string  `json:"query"`
 }
 
-// Función para obtener la ubicación de la IP desde la API externa
+// getClientIP obtiene la IP real del visitante incluso detrás de Nginx y Cloudflare
+func getClientIP(r *http.Request) string {
+	ip := r.Header.Get("CF-Connecting-IP")
+	if ip == "" {
+		ip = r.Header.Get("X-Real-IP")
+	}
+	if ip == "" {
+		ip = r.Header.Get("X-Forwarded-For")
+	}
+	if ip == "" {
+		ip = r.RemoteAddr
+	}
+
+	// Si incluye puerto (por ejemplo 127.0.0.1:54321), quitarlo
+	if strings.Contains(ip, ":") {
+		ip = strings.Split(ip, ":")[0]
+	}
+	return ip
+}
+
+// getGeoInfo consulta la IP en ip-api.com
 func getGeoInfo(ip string) (GeoInfo, error) {
 	var geoInfo GeoInfo
 	apiURL := fmt.Sprintf("http://ip-api.com/json/%s", ip)
@@ -32,33 +54,30 @@ func getGeoInfo(ip string) (GeoInfo, error) {
 	}
 	defer resp.Body.Close()
 
-	// Decodificar respuesta de la API
 	err = json.NewDecoder(resp.Body).Decode(&geoInfo)
 	if err != nil {
 		log.Println("❌ Error al decodificar JSON de geolocalización:", err)
 		return geoInfo, err
 	}
 
-	// **Imprimir la respuesta de la API en la consola**
 	log.Println("📌 Datos de geolocalización recibidos:", geoInfo)
-
 	return geoInfo, nil
 }
 
-// Middleware para registrar visitas
+// TrackVisitMiddleware registra cada visita
 func TrackVisitMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip := r.RemoteAddr
+		ip := getClientIP(r)
 		userAgent := r.UserAgent()
 		page := r.URL.Path
 
-		// Obtener datos de geolocalización
+		// Obtener ubicación geográfica
 		geoInfo, err := getGeoInfo(ip)
 		if err != nil {
 			log.Println("⚠️ No se pudo obtener la geolocalización:", err)
 		}
 
-		// Crear objeto visita
+		// Crear el modelo Visit
 		visit := &models.Visit{
 			IP:        ip,
 			UserAgent: userAgent,
@@ -69,9 +88,10 @@ func TrackVisitMiddleware(next http.Handler) http.Handler {
 			Latitude:  geoInfo.Latitude,
 			Longitude: geoInfo.Longitude,
 			ISP:       geoInfo.ISP,
+			Timestamp: time.Now(), // si agregaste este campo en la tabla
 		}
 
-		// Guardar en la base de datos
+		// Guardar en base de datos
 		if err := db.InsertVisit(visit); err != nil {
 			log.Println("❌ Error registrando visita:", err)
 		}

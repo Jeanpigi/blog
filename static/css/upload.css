@@ -1,64 +1,160 @@
-/* Contenedor principal centrado */
+/* 🧱 Contenedor principal */
 .container {
-    max-width: 600px;
-    margin: 4rem auto;
-    padding: 2rem;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
+  max-width: 600px;
+  min-height: 60vh;
+  margin: 4rem auto;
+  padding: 3rem 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-/* Título */
+/* 🧭 Migas de pan */
+.breadcrumbs {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #555;
+  text-align: left;
+  flex-wrap: wrap;
+}
+
+.breadcrumbs a {
+  text-decoration: none;
+  color: #a10395;
+  font-weight: 500;
+}
+
+.breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbs span {
+  margin: 0 5px;
+  color: #888;
+}
+
+/* 📝 Título */
 .container h1 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    color: #24292e;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #24292e;
 }
 
-/* Estilo para el formulario */
+/* 🗂️ Formulario */
 #uploadForm {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 
-/* Input de archivo con estilo atractivo */
+/* 🎵 Selector de archivos */
 input[type="file"] {
-    display: block;
-    margin: 0 auto 20px auto;
-    padding: 10px;
-    border: 2px dashed #ccc;
-    border-radius: 6px;
-    background-color: #f5f5f5;
-    transition: border-color 0.3s ease;
-    width: 100%;
-    max-width: 400px;
-    font-size: 0.95rem;
+  display: block;
+  margin: 0 auto 1.5rem auto;
+  padding: 12px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  max-width: 400px;
+  font-size: 1rem;
 }
 
 input[type="file"]:hover {
-    border-color: #9b59b6;
+  border-color: #a10395;
 }
 
-/* Botón de subida con efecto */
+/* 🎯 Botón de subida */
 button {
-    padding: 12px 30px;
-    background: linear-gradient(45deg, #6f42c1, #007BFF);
-    color: #fff;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 12px 30px;
+  background: linear-gradient(45deg, #a10395, #007BFF);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-    background: linear-gradient(45deg, #5a32a3, #0056b3);
-    transform: translateY(-2px);
+  background: linear-gradient(45deg, #7a0378, #0056b3);
+  transform: translateY(-2px);
 }
 
 button:active {
-    transform: translateY(0);
+  transform: translateY(0);
+}
+
+/* 🔓 Logout */
+.container-button-logout {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+#logoutButton {
+  background: linear-gradient(45deg, #dc3545, #ff4b5c);
+  color: #fff;
+  font-weight: bold;
+  padding: 12px 30px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#logoutButton:hover {
+  background: linear-gradient(45deg, #b02a37, #e03145);
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .container {
+    margin: 2rem auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .container h1 {
+    font-size: 2rem;
+  }
+
+  input[type="file"] {
+    font-size: 0.95rem;
+  }
+
+  .breadcrumbs {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  .container h1 {
+    font-size: 1.6rem;
+  }
+
+  button,
+  #logoutButton {
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  input[type="file"] {
+    max-width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .breadcrumbs {
+    text-align: center;
+    font-size: 0.95rem;
+  }
 }
 

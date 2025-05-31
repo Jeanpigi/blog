@@ -19,6 +19,15 @@ func isMusicFile(header *multipart.FileHeader) bool {
 	return mimeType == "audio/mpeg"
 }
 
+// renderErrorPage muestra una página de error personalizada
+func renderErrorPage(w http.ResponseWriter, message string) {
+	w.WriteHeader(http.StatusBadRequest)
+	utils.RenderTemplate(w, "templates/error.html", map[string]string{
+		"Message": message,
+	})
+}
+
+// UploadHandler gestiona la subida de archivos de música
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		data := struct {
@@ -32,55 +41,55 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		// Limita el tamaño del formulario a 10MB
-		err := r.ParseMultipartForm(10 << 20)
+		err := r.ParseMultipartForm(10 << 20) // 10 MB
 		if err != nil {
-			http.Error(w, "Error processing form data", http.StatusBadRequest)
+			renderErrorPage(w, "El archivo excede el límite de tamaño (10 MB).")
 			return
 		}
 
-		// Obtener todos los archivos subidos con la key "musicFiles"
+		// Obtener todos los archivos subidos
 		files := r.MultipartForm.File["musicFiles"]
 		if len(files) == 0 {
-			http.Error(w, "No files uploaded", http.StatusBadRequest)
+			renderErrorPage(w, "No se subió ningún archivo.")
 			return
 		}
 
-		// Itera sobre cada archivo
+		// Procesar cada archivo
 		for _, fileHeader := range files {
 			file, err := fileHeader.Open()
 			if err != nil {
-				http.Error(w, "Error retrieving file", http.StatusInternalServerError)
+				renderErrorPage(w, "No se pudo leer el archivo.")
 				return
 			}
 			defer file.Close()
 
-			// Valida el tipo MIME
+			// Validar el tipo MIME
 			if !isMusicFile(fileHeader) {
-				http.Error(w, "Invalid file type", http.StatusBadRequest)
+				renderErrorPage(w, "El archivo no es un MP3 válido.")
 				return
 			}
 
-			// Sanitiza el nombre y agrega un prefijo con timestamp
+			// Sanitiza nombre de archivo y guarda con prefijo de timestamp
 			filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(fileHeader.Filename))
 			dstPath := filepath.Join("./music", filename)
 			dst, err := os.Create(dstPath)
 			if err != nil {
-				http.Error(w, "Error saving file", http.StatusInternalServerError)
+				renderErrorPage(w, "Error al guardar el archivo.")
 				return
 			}
 			defer dst.Close()
 
 			_, err = io.Copy(dst, file)
 			if err != nil {
-				http.Error(w, "Error saving file", http.StatusInternalServerError)
+				renderErrorPage(w, "Error al copiar el contenido del archivo.")
 				return
 			}
 
-			// Agrega la ruta del archivo a la lista en memoria
+			// Agregar el archivo a la lista de música en memoria
 			music.MusicFiles = append(music.MusicFiles, dst.Name())
 		}
 
-		// Redirige a la misma página después del POST para evitar reenvío de formulario
+		// Redirigir para evitar reenvío del formulario
 		http.Redirect(w, r, "/radio/upload", http.StatusSeeOther)
 	}
 }
