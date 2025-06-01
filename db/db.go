@@ -255,3 +255,61 @@ func GetAllVisits() ([]models.Visit, error) {
 
 	return visits, nil
 }
+
+func GetAllExperiences() ([]models.Experience, error) {
+	rows, err := Db.Query("SELECT id, title, place, description, start_year, end_year FROM experiences")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var experiences []models.Experience
+	for rows.Next() {
+		var e models.Experience
+		err := rows.Scan(&e.ID, &e.Title, &e.Place, &e.Description, &e.StartYear, &e.EndYear)
+		if err != nil {
+			return nil, err
+		}
+		experiences = append(experiences, e)
+	}
+	return experiences, nil
+}
+
+func GetAllEducation() ([]models.Education, error) {
+	rows, err := Db.Query("SELECT id, title, place, start_year, end_year FROM education")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var education []models.Education
+	for rows.Next() {
+		var e models.Education
+		err := rows.Scan(&e.ID, &e.Title, &e.Place, &e.StartYear, &e.EndYear)
+		if err != nil {
+			return nil, err
+		}
+		education = append(education, e)
+	}
+	return education, nil
+}
+
+func GetAllProjects() ([]models.Project, error) {
+	rows, err := Db.Query("SELECT id, title, description, image_url, project_url FROM projects")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projects []models.Project
+	for rows.Next() {
+		var p models.Project
+		err := rows.Scan(&p.ID, &p.Title, &p.Description, &p.ImageURL, &p.ProjectURL)
+		if err != nil {
+			return nil, err
+		}
+		projects = append(projects, p)
+	}
+	return projects, nil
+}
+

@@ -1,17 +1,49 @@
-<!-- templates/portafolio.html -->
 {{define "title"}}Portafolio{{end}}
 
 {{ define "content" }}
-
 <head>
     <link rel="stylesheet" type="text/css" href="/static/css/portafolio.css">
 </head>
 
 <div class="container-portafolio">
-    <h1>Portafolio</h1>
+
+    <h1 class="section-title">Experiencia:</h1>
+    <div class="card-grid">
+        {{range .Experiences}}
+        <div class="card">
+            <h2>{{.Title}}</h2>
+            <h4>{{.Place}}</h4>
+            <p>{{.Description}}</p>
+            <small>{{.StartYear}} - {{.EndYear}}</small>
+        </div>
+        {{end}}
+    </div>
+
+    <h1 class="section-title">Educación:</h1>
+    <div class="card-grid">
+        {{range .Education}}
+        <div class="card">
+            <h2>{{.Title}}</h2>
+            <h4>{{.Place}}</h4>
+            <small>{{.StartYear}} - {{.EndYear}}</small>
+        </div>
+        {{end}}
+    </div>
+
+    <h1 class="section-title">Proyectos:</h1>
+    <div class="card-grid projects">
+        {{range .Projects}}
+        <div class="card project-card">
+            <img src="{{.ImageURL}}" alt="{{.Title}}">
+            <h2>{{.Title}}</h2>
+            <p>{{.Description}}</p>
+            <a href="{{.ProjectURL}}" target="_blank" class="project-link">Ver proyecto</a>
+        </div>
+        {{end}}
+    </div>
+
 </div>
 
 <script src="/static/js/portafolio.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 {{ end }}

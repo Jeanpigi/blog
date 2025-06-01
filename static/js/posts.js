@@ -16,51 +16,47 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     const posts = await response.json();
 
-    posts.forEach((post) => {
-      const postsContainer = document.getElementById("posts-container");
-      // Contenedor para el contenido del post
-      const postContentDiv = document.createElement("div");
-      postContentDiv.className = "posts-content";
+    const postsContainer = document.getElementById("posts-container");
 
-      // Encabezado del post
+    posts.forEach((post) => {
+      const postContentDiv = document.createElement("div");
+      postContentDiv.className = "post";
+
       const postHeadDiv = document.createElement("div");
       postHeadDiv.className = "post-head";
 
-      // Título del post
       const postTitle = document.createElement("h2");
       const postTitleLink = document.createElement("a");
       postTitleLink.setAttribute("rel", "prefetch");
       postTitleLink.href = `/post/${post.id}`;
       postTitleLink.className = "post-title";
-      postTitle.textContent = randomEmoji();
-      postTitleLink.textContent = post.title;
+      postTitleLink.textContent = `${randomEmoji()} ${post.title}`;
       postTitle.appendChild(postTitleLink);
       postHeadDiv.appendChild(postTitle);
 
-      // Fecha del post
       const postDateDiv = document.createElement("div");
       postDateDiv.className = "post-date";
+
       const postTime = document.createElement("time");
       postTime.textContent = formatIsoTime(post.created_at);
+      postTime.className = "date-text";
       postDateDiv.appendChild(postTime);
 
-      // Tiempo de lectura del post
       const readingTimeSpan = document.createElement("span");
       readingTimeSpan.textContent = readingTime(post.content);
+      readingTimeSpan.className = "reading-time";
       postDateDiv.appendChild(readingTimeSpan);
-      postHeadDiv.appendChild(postDateDiv);
 
+      postHeadDiv.appendChild(postDateDiv);
       postContentDiv.appendChild(postHeadDiv);
 
-      // Cuerpo del post
       const postBodyDiv = document.createElement("div");
       postBodyDiv.className = "post-body";
       const postContent = document.createElement("p");
       postContent.textContent = post.description;
       postBodyDiv.appendChild(postContent);
-      postContentDiv.appendChild(postBodyDiv);
 
-      // Añadir el post al contenedor principal de posts
+      postContentDiv.appendChild(postBodyDiv);
       postsContainer.appendChild(postContentDiv);
     });
   } catch (error) {
@@ -68,17 +64,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const postsContainer = document.getElementById("posts-container");
     postsContainer.innerHTML = "<p>Error al cargar los posts.</p>";
   } finally {
-    // Cerrar la alerta de carga una vez que los posts se han cargado o ha ocurrido un error
     Swal.close();
   }
 });
 
-// Function to calculate the reading time
 const readingTime = (text) => {
   const wordsPerMinute = 200;
   const numOfWords = text.split(/\s+/).length;
   const readTime = Math.ceil(numOfWords / wordsPerMinute);
-  return `Reading time is ${readTime} Min.`;
+  return `${readTime} min de lectura`;
 };
 
 const formatIsoTime = (isoTime) =>
@@ -92,3 +86,4 @@ const randomEmoji = () => {
   const emojis = ["😀", "❤️", "🔥", "🙈", "⚽", "🐻", "🗻", "😜", "💣"];
   return emojis[Math.floor(Math.random() * emojis.length)];
 };
+
