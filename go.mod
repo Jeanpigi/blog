@@ -1,8 +1,8 @@
 module github.com/Jeanpigi/blog
 
-go 1.21
+go 1.23.0
 
-toolchain go1.21.4
+toolchain go1.23.10
 
 require (
 	github.com/go-sql-driver/mysql v1.7.1
@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/sessions v1.2.1
 	github.com/joho/godotenv v1.5.1
-	golang.org/x/crypto v0.21.0
+	golang.org/x/crypto v0.35.0
 )
 
 require (
