@@ -1,15 +1,30 @@
-run:
-  timeout: 2m
+name: Golang Linter
 
-linters:
-  enable:
-    - errcheck
-    - govet
-    - staticcheck
-    - gosimple
-    - unused
-    - revive
-    - gocritic
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-issues:
-  exclude-use-default: false
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Install golangci-lint
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+
+    - name: Run Linter
+      run: |
+        golangci-lint run ./... \
+          --skip-dirs "toolchain|go/pkg/mod"
+
+
