@@ -3,7 +3,7 @@
 ![Lint Status](https://github.com/Jeanpigi/blog/actions/workflows/lint.yml/badge.svg)
 ![Security Scan](https://github.com/Jeanpigi/blog/actions/workflows/trivy.yml/badge.svg)
 
-Blog is a personal blog by Jean Pierre Giovanni Arenas Ortiz where thoughts, experiences, and technical insights are shared. It serves as a digital garden, a place for growth and cultivation of ideas across various interests, primarily centered around technology, programming, and histories.
+Blog is a personal blog where thoughts, experiences, and technical insights are shared. It serves as a digital garden, a place for growth and cultivation of ideas across various interests, primarily centered around technology, programming, and histories.
 
 ## Personal Project
 
@@ -57,7 +57,7 @@ If you wish to contribute to this project and help it grow, follow these steps:
 
 # Authors
 
-- **Jean Pierre Giovanni Arenas Ortiz**
+- **Jean Pierre**
 
 ## Licencia
 
