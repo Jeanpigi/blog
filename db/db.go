@@ -257,7 +257,7 @@ func GetAllVisits() ([]models.Visit, error) {
 }
 
 func GetAllExperiences() ([]models.Experience, error) {
-	rows, err := Db.Query("SELECT id, title, place, description, start_year, end_year FROM experiences")
+	rows, err := Db.Query("SELECT id, title, place, description, start_year, end_year FROM experiences ORDER BY end_year DESC")
 	if err != nil {
 		return nil, err
 	}
