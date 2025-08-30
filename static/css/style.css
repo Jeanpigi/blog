@@ -4,19 +4,23 @@
     box-sizing: border-box;
 }
 
-html {
-    font-size: 62.5%;
-}
+html { font-size: 62.5%; }
+html, body { overflow-x: hidden; }
 
+/* Layout base: el footer nunca se solapa */
 body {
-    /* Asegúrate de que el margin del body sea 0 */
-    margin: 0;
-    /* Ajusta el padding-bottom para igualar la altura del footer */
-    padding-bottom: 80px;
+    display: flex;
     min-height: 100vh;
-    position: relative;
+    flex-direction: column;
+    margin: 0;
+    color: #191a22;
+    background: #fff;
 }
 
+/* el contenido ocupa el alto disponible */
+.content { flex: 1; min-height: auto; }
+
+/* ================= Header ================= */
 .Header {
     background-color: #24292e;
     color: #ffffff;
@@ -64,44 +68,35 @@ body {
     cursor: pointer;
 }
 
-.Header-social i {
-    width: 20px;
-}
+.Header-social i { width: 20px; }
 
-/* Estilos para el contenido principal */
-.content {
-    /* Ajusta el tamaño del contenido principal para dejar espacio para el footer */
-    min-height: calc(100% - 80px);
-}
-
-/* Estilo para el botón de hamburguesa */
+/* =============== Navegación =============== */
 .hamburger {
     display: none;
-    /* Oculta por defecto */
     font-size: 2.5rem;
     background: none;
     border: none;
     color: #191a22;
-    /* Cambia el color según tu diseño */
     cursor: pointer;
 }
 
 .Nav-container {
-    border-bottom: 1px solid rgb(167, 3, 153);
     background-color: #fafbfc;
     color: #191a22;
     display: grid;
     justify-content: center;
     align-items: center;
     position: relative;
-    width: 100vw;
+    width: 100%;         /* evita overflow por 100vw */
     height: 60px;
+    border-bottom: none; /* quitamos línea morada */
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.06); /* divisor sutil */
 }
 
 .Nav-container ul {
     display: flex;
     width: 350px;
-    gap: 1.5rem; 
+    gap: 1.5rem;
 }
 
 .Nav-container ul li {
@@ -120,7 +115,6 @@ body {
     height: 100%;
     width: 100%;
     text-decoration: none;
-
 }
 
 .Nav-container ul li a span {
@@ -153,9 +147,7 @@ body {
     opacity: 0;
 }
 
-.Nav-container ul li.active a span::before {
-    opacity: 0.5;
-}
+.Nav-container ul li.active a span::before { opacity: 0.5; }
 
 [aria-current] {
     position: relative;
@@ -182,39 +174,26 @@ body {
     color: rgba(25, 26, 34, 0.7);
 }
 
-.Nav-container a:hover {
-    color: rgba(25, 26, 34, 1);
-}
+.Nav-container a:hover { color: rgba(25, 26, 34, 1); }
+.Nav-container a:visited { color: rgb(167, 3, 153); }
 
-.Nav-container a:visited {
-    color: rgb(167, 3, 153);
-}
-
+/* Fix sintaxis rgba() (antes usabas rgba(#792CE2, …) que no es válido) */
 @keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(#792CE2, 1);
-    }
-
-    100% {
-        box-shadow: 0 0 0 40px rgba(#792CE2, 0);
-    }
+    0%   { box-shadow: 0 0 0 0 rgba(121, 44, 226, 1); }
+    100% { box-shadow: 0 0 0 40px rgba(121, 44, 226, 0); }
 }
 
-.pulser_effect {
-    animation: pulse infinite 1s;
-}
+.pulser_effect { animation: pulse infinite 1s; }
 
+/* ================= Footer ================= */
 .Footer {
     background: #24292e;
     color: white;
     padding-top: 1.5rem;
     margin-top: 0.2rem;
-    bottom: 0;
-    /* Ajusta el ancho del footer al 100% para ocupar todo el ancho de la página */
     width: 100%;
-    /* Establece aquí la altura que desees para el footer */
-    height: 80px;
-    position: absolute;
+    position: static;    /* sin absolute */
+    height: auto;        /* crece según contenido */
 }
 
 .Footer-content {
@@ -223,11 +202,10 @@ body {
     align-items: center;
     font-size: clamp(1.5rem, 2.5vw, 2rem);
     font-family: 'Great Vibes', cursive;
+    padding-bottom: .5rem;
 }
 
-.Footer-copy::after {
-    content: " 🇨🇴  ";
-}
+.Footer-copy::after { content: " 🇨🇴  "; }
 
 .Footer-go {
     display: flex;
@@ -235,77 +213,31 @@ body {
     gap: 1rem;
 }
 
+/* =============== Responsive =============== */
 @media (max-width: 768px) {
-    .Header {
-        flex-direction: column;
-        padding: 0.5rem;
-    }
-
-    .Header-logo img {
-        width: 5rem;
-        /* Reduce el tamaño del logo */
-    }
-
-    .Header-title {
-        margin-top: 1rem;
-        font-size: 1.2rem;
-        /* Ajusta el tamaño del título y la descripción */
-    }
-
-    .Header-title span {
-        font-size: 1rem;
-    }
-
-    .hamburger {
-        display: block;
-    }
+    .Header { flex-direction: column; padding: 0.5rem; }
+    .Header-logo img { width: 5rem; }
+    .Header-title { margin-top: 1rem; font-size: 1.2rem; }
+    .Header-title span { font-size: 1rem; }
+    .hamburger { display: block; }
 
     .Nav-container ul {
-        /* quita display:none aquí si quieres usar .is-active para mostrarlo */
         flex-direction: column;
         width: 80% !important;
-        /* o 100%, y usa !important si hace falta */
         background-color: rgba(25, 26, 34, 0.3);
         border-radius: 1rem;
         margin: 1rem auto;
         padding: 1.5rem;
         text-align: center;
         display: none;
-        /* si tu toggle lo muestra con la clase .is-active */
     }
-
     .Nav-container ul li {
         width: 100% !important;
-        /* sobrescribe los 70px de desktop */
         height: auto;
-        /* para que crezca según el contenido */
         margin: 0.5rem 0;
     }
+    .Nav-container ul li a { font-size: 1.8rem; color: #fff; padding: 1rem; }
+    .Nav-container.is-active ul { display: flex; }
 
-    .Nav-container ul li a {
-        /* tamaño de letra mayor y color blanco para buena legibilidad */
-        font-size: 1.8rem;
-        color: #fff;
-        padding: 1rem;
-    }
-
-    /* y cuando esté activo: */
-    .Nav-container.is-active ul {
-        display: flex;
-        /* o block, si prefieres */
-    }
-
-    .Footer {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        /* Ajusta el padding para reducir el espacio */
-        font-size: 1.2rem;
-        /* Reduce el tamaño de la fuente en el footer */
-    }
-
-    /* Ajusta el content para mejorar el espacio entre el contenido y el footer */
-    .content {
-        padding-bottom: 10rem;
-        /* Aumenta el padding en la parte inferior */
-    }
+    .Footer { padding-top: 1rem; padding-bottom: 1rem; font-size: 1.2rem; }
 }

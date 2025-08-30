@@ -1,20 +1,22 @@
-<!-- templates/historias.html -->
 {{define "title"}}Historias{{end}}
 
 {{ define "content" }}
 
 <head>
-    <link rel="stylesheet" type="text/css" href="/static/css/histories.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/historias.css">
 </head>
 
-<div class="container-blog">
-    <div id="container-historias" class="container-historias">
+<section class="stories-wrap">
+  <header class="stories-header">
+    <h1>Historias</h1>
+    <p class="stories-sub">Series y relatos originales con ritmo cinematográfico. Ponte cómodo y disfruta.</p>
+  </header>
 
-    </div>
-</div>
+  <!-- Grid de tarjetas -->
+  <div id="container-historias" class="stories-grid" aria-live="polite"></div>
+</section>
 
-
-<script src="/static/js/historias.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/static/js/histories.js"></script>
 
 {{ end }}

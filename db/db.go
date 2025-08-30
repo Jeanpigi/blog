@@ -18,39 +18,36 @@ var (
 	dbHost string
 	dbName string
 
-	// Db es una variable global que mantendrá la conexión a la base de datos
 	Db *sql.DB
 )
 
-// InitDB inicializa la conexión a la base de datos
 func InitDB() {
-	// Verificar si existe un archivo .env antes de intentar cargarlo
 	if _, err := os.Stat(".env"); err == nil {
-		err := godotenv.Load()
-		if err != nil {
-			log.Println("⚠️ No se pudo cargar el archivo .env, se usarán las variables del sistema.")
+		if err := godotenv.Load(); err != nil {
+			log.Println("⚠️ No se pudo cargar .env, usando variables del sistema.")
 		}
 	} else {
-		log.Println("⚠️ No se encontró el archivo .env, usando variables de entorno del sistema.")
+		log.Println("⚠️ No se encontró .env, usando variables del sistema.")
 	}
 
-	// Obtener variables de entorno (ya sea desde .env o el sistema)
 	dbUser = os.Getenv("MYSQL_USER")
 	dbPass = os.Getenv("MYSQL_ROOT_PASSWORD")
 	dbHost = os.Getenv("MYSQL_HOST")
 	dbName = os.Getenv("MYSQL_DATABASE")
 
-	// Formatear la conexión
-	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?tls=false", dbUser, dbPass, dbHost, dbName)
+	// parseTime para que MySQL maneje bien DATETIME (aunque escaneamos a string usando DATE_FORMAT);
+	// utf8mb4 para emojis/acentos adecuados.
+	dataSourceName := fmt.Sprintf(
+		"%s:%s@tcp(%s:3306)/%s?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci&tls=false",
+		dbUser, dbPass, dbHost, dbName,
+	)
 
-	// Intentar conectar a la base de datos
 	var err error
 	Db, err = sql.Open("mysql", dataSourceName)
 	if err != nil {
 		log.Fatal("❌ Error al conectar a la base de datos:", err)
 	}
 
-	// Configurar el pool de conexiones
 	Db.SetMaxOpenConns(25)
 	Db.SetMaxIdleConns(25)
 	Db.SetConnMaxLifetime(5 * time.Minute)
@@ -58,153 +55,266 @@ func InitDB() {
 	log.Println("✅ Conexión a la base de datos establecida.")
 }
 
-// CloseDB cierra la conexión a la base de datos
 func CloseDB() {
 	if Db != nil {
-		err := Db.Close()
-		if err != nil {
+		if err := Db.Close(); err != nil {
 			log.Println("❌ Error al cerrar la conexión a la base de datos:", err)
 		}
 		log.Println("✅ Conexión a la base de datos cerrada.")
 	}
 }
 
+// -------- Usuarios --------
+
 func GetUserByUsername(username string) (*models.User, error) {
-	query := "SELECT ID, Username, Password FROM Users WHERE Username = ?"
+	const query = "SELECT ID, Username, Password FROM Users WHERE Username = ?"
 	row := Db.QueryRow(query, username)
 
 	user := &models.User{}
-	err := row.Scan(&user.ID, &user.Username, &user.Password)
-	if err != nil {
+	if err := row.Scan(&user.ID, &user.Username, &user.Password); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil // El usuario no existe
+			return nil, nil
 		}
 		log.Println("Error al obtener usuario:", err)
 		return nil, err
 	}
-
 	return user, nil
 }
 
 func InsertUser(user *models.User) error {
-	query := "INSERT INTO Users (Username, Password) VALUES (?, ?)"
-	_, err := Db.Exec(query, user.Username, user.Password)
-	if err != nil {
+	const query = "INSERT INTO Users (Username, Password) VALUES (?, ?)"
+	if _, err := Db.Exec(query, user.Username, user.Password); err != nil {
 		log.Println("Error al insertar usuario:", err)
 		return err
 	}
-
 	return nil
 }
 
+// -------- Posts (helpers comunes) --------
+
+func scanPostRow(rows *sql.Rows) (*models.Post, error) {
+	p := new(models.Post)
+	// Orden explícito y CreatedAt formateado a string
+	// NOTA: la última columna es Category (coincide con p.Categoria)
+	if err := rows.Scan(
+		&p.ID,
+		&p.Title,
+		&p.Description,
+		&p.Content,
+		&p.AuthorID,
+		&p.CreatedAt, // viene de DATE_FORMAT(...)
+		&p.Categoria, // Category
+	); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// -------- Posts (listados) --------
+
 func GetAllPosts() ([]*models.Post, error) {
-	// IMPORTANTE: agrega el ORDER BY CreatedAt DESC
-	query := "SELECT * FROM Posts ORDER BY CreatedAt DESC"
+	const query = `
+		SELECT
+			ID,
+			Title,
+			Description,
+			Content,
+			AuthorID,
+			DATE_FORMAT(CreatedAt, '%Y-%m-%d %H:%i:%s') AS CreatedAt,
+			Category
+		FROM Posts
+		ORDER BY CreatedAt DESC, ID DESC`
 	rows, err := Db.Query(query)
 	if err != nil {
-		log.Println("Error al obtener posts de la base de datos:", err)
+		log.Println("Error al obtener posts:", err)
 		return nil, err
 	}
 	defer rows.Close()
 
-	posts := make([]*models.Post, 0)
+	var posts []*models.Post
 	for rows.Next() {
-		post := &models.Post{}
-		err := rows.Scan(
-			&post.ID,
-			&post.Title,
-			&post.Description,
-			&post.Content,
-			&post.AuthorID,
-			&post.CreatedAt,
-			&post.Categoria,
-		)
+		p, err := scanPostRow(rows)
 		if err != nil {
 			log.Println("Error al escanear post:", err)
 			return nil, err
 		}
-		posts = append(posts, post)
+		posts = append(posts, p)
 	}
-
 	if err := rows.Err(); err != nil {
-		log.Println("Error al leer las filas de posts:", err)
 		return nil, err
 	}
-
 	return posts, nil
 }
 
-func FindPostByID(postID string) (*models.Post, error) {
-	query := "SELECT * FROM Posts WHERE ID = ?"
-	row := Db.QueryRow(query, postID)
-
-	var post models.Post
-	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Content, &post.AuthorID, &post.CreatedAt, &post.Categoria)
+func GetPostsPaged(limit, offset int) ([]*models.Post, error) {
+	const query = `
+		SELECT
+			ID,
+			Title,
+			Description,
+			Content,
+			AuthorID,
+			DATE_FORMAT(CreatedAt, '%Y-%m-%d %H:%i:%s') AS CreatedAt,
+			Category
+		FROM Posts
+		ORDER BY CreatedAt DESC, ID DESC
+		LIMIT ? OFFSET ?`
+	rows, err := Db.Query(query, limit, offset)
 	if err != nil {
-		log.Printf("Error al buscar el post con ID %s: %v", postID, err)
-		return nil, err
-	}
-
-	return &post, nil
-}
-
-func FindPostsByCategory(categoria string) ([]*models.Post, error) {
-	var posts []*models.Post
-	query := "SELECT * FROM Posts WHERE Category = ? ORDER BY CreatedAt DESC"
-	rows, err := Db.Query(query, categoria)
-	if err != nil {
-		log.Printf("Error al buscar posts con la categoría %s: %v", categoria, err)
+		log.Println("GetPostsPaged error:", err)
 		return nil, err
 	}
 	defer rows.Close()
 
+	var posts []*models.Post
 	for rows.Next() {
-		var post models.Post
-		if err := rows.Scan(&post.ID, &post.Title, &post.Description, &post.Content, &post.AuthorID, &post.CreatedAt, &post.Categoria); err != nil {
-			log.Printf("Error al escanear post: %v", err)
+		p, err := scanPostRow(rows)
+		if err != nil {
+			log.Println("GetPostsPaged scan error:", err)
 			return nil, err
 		}
-		posts = append(posts, &post)
+		posts = append(posts, p)
 	}
-
 	if err := rows.Err(); err != nil {
-		log.Printf("Error post rows: %v", err)
 		return nil, err
 	}
-
 	return posts, nil
 }
 
-func InsertPost(post *models.Post) error {
-	query := "INSERT INTO Posts (Title, Description, Content, AuthorID, CreatedAt, Category) VALUES (?, ?, ?, ?, ?, ?)"
-	_, err := Db.Exec(query, post.Title, post.Description, post.Content, post.AuthorID, post.CreatedAt, post.Categoria)
+func FindPostsByCategory(categoria string) ([]*models.Post, error) {
+	const query = `
+		SELECT
+			ID,
+			Title,
+			Description,
+			Content,
+			AuthorID,
+			DATE_FORMAT(CreatedAt, '%Y-%m-%d %H:%i:%s') AS CreatedAt,
+			Category
+		FROM Posts
+		WHERE Category = ?
+		ORDER BY CreatedAt DESC, ID DESC`
+	rows, err := Db.Query(query, categoria)
 	if err != nil {
-		log.Println("Error al insertar el post en la base de datos:", err)
+		log.Printf("Error al buscar posts con categoría %s: %v", categoria, err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []*models.Post
+	for rows.Next() {
+		p, err := scanPostRow(rows)
+		if err != nil {
+			log.Println("Error al escanear post:", err)
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
+
+func FindPostsByCategoryPaged(categoria string, limit, offset int) ([]*models.Post, error) {
+	const query = `
+		SELECT
+			ID,
+			Title,
+			Description,
+			Content,
+			AuthorID,
+			DATE_FORMAT(CreatedAt, '%Y-%m-%d %H:%i:%s') AS CreatedAt,
+			Category
+		FROM Posts
+		WHERE Category = ?
+		ORDER BY CreatedAt DESC, ID DESC
+		LIMIT ? OFFSET ?`
+	rows, err := Db.Query(query, categoria, limit, offset)
+	if err != nil {
+		log.Printf("FindPostsByCategoryPaged error: %v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []*models.Post
+	for rows.Next() {
+		p, err := scanPostRow(rows)
+		if err != nil {
+			log.Println("FindPostsByCategoryPaged scan error:", err)
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
+
+// -------- Post (detalles) --------
+
+func FindPostByID(postID string) (*models.Post, error) {
+	const query = `
+		SELECT
+			ID,
+			Title,
+			Description,
+			Content,
+			AuthorID,
+			DATE_FORMAT(CreatedAt, '%Y-%m-%d %H:%i:%s') AS CreatedAt,
+			Category
+		FROM Posts
+		WHERE ID = ?`
+	row := Db.QueryRow(query, postID)
+
+	var post models.Post
+	if err := row.Scan(
+		&post.ID,
+		&post.Title,
+		&post.Description,
+		&post.Content,
+		&post.AuthorID,
+		&post.CreatedAt,
+		&post.Categoria,
+	); err != nil {
+		log.Printf("Error al buscar post %s: %v", postID, err)
+		return nil, err
+	}
+	return &post, nil
+}
+
+// -------- Mutaciones --------
+
+func InsertPost(post *models.Post) error {
+	const query = `
+		INSERT INTO Posts (Title, Description, Content, AuthorID, CreatedAt, Category)
+		VALUES (?, ?, ?, ?, ?, ?)`
+	if _, err := Db.Exec(query, post.Title, post.Description, post.Content, post.AuthorID, post.CreatedAt, post.Categoria); err != nil {
+		log.Println("Error al insertar post:", err)
 		return err
 	}
-
 	return nil
 }
 
 func UpdatePost(postID int, post *models.Post) error {
-	query := "UPDATE Posts SET Title = ?, Description = ?, Content = ?, Category = ?, AuthorID = ? WHERE id = ?"
-	_, err := Db.Exec(query, post.Title, post.Description, post.Content, post.Categoria, post.AuthorID, postID)
-	if err != nil {
-		log.Println("Error al actualizar post en la base de datos:", err)
+	const query = `
+		UPDATE Posts
+		SET Title = ?, Description = ?, Content = ?, Category = ?, AuthorID = ?
+		WHERE ID = ?`
+	if _, err := Db.Exec(query, post.Title, post.Description, post.Content, post.Categoria, post.AuthorID, postID); err != nil {
+		log.Println("Error al actualizar post:", err)
 		return err
 	}
-
 	return nil
 }
 
 func DeletePost(postID int) error {
-	query := "DELETE FROM Posts WHERE ID = ?"
-	_, err := Db.Exec(query, postID)
-	if err != nil {
-		log.Println("Error al eliminar post en la base de datos:", err)
+	const query = "DELETE FROM Posts WHERE ID = ?"
+	if _, err := Db.Exec(query, postID); err != nil {
+		log.Println("Error al eliminar post:", err)
 		return err
 	}
-
 	return nil
 }
 
@@ -312,4 +422,3 @@ func GetAllProjects() ([]models.Project, error) {
 	}
 	return projects, nil
 }
-

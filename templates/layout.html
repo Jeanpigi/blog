@@ -1,98 +1,65 @@
 {{define "layout"}}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{template "title" .}}</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <link rel="shortcut icon" href="/static/assets/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TLE4DOSLVG"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-TLE4DOSLVG', {
-        anonymize_ip: true
-        });
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{template "title" .}}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="shortcut icon" href="/static/assets/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <!-- GA -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TLE4DOSLVG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TLE4DOSLVG', { anonymize_ip: true });
+  </script>
 </head>
-
 <body>
-    <div class="Header">
-        <div class="Header-logo">
-            <a href="/login">
-                <img src="/static/assets/logo.svg" alt="logo" />
-            </a>
-        </div>
-        <div class="Header-title">
-            <h1>JbearP Blog</h1>
-            <span> Tecnología | Historias web</span>
-        </div>
-        <div class="Header-social">
-            <ul>
-                <li>
-                    <a href="http://github.com/Jeanpigi" target="_blank" rel="noreferrer">
-                        <i class="fa-brands fa-github"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="https://www.instagram.com/jean_pierre_gio/" target="_blank">
-                        <i class="fa-brands fa-instagram"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="https://www.youtube.com/channel/UCXNcM9LiqXfXgKU8HIwg9Xg" target="_blank">
-                        <i class="fa-brands fa-youtube"></i>
-                    </a>
-                </li>
-            </ul>
-        </div>
+  <div class="Header">
+    <div class="Header-logo">
+      <a href="/login"><img src="/static/assets/logo.svg" alt="logo" /></a>
     </div>
-
-    <div class="Nav-container">
-        <button class="hamburger" aria-label="Toggle navigation">&#9776;</button>
-        <ul>
-            <li>
-                <a href="/">Inicio</a>
-            </li>
-            <li>
-                <a href="/blog">Blog</a>
-            </li>
-            <li>
-                <a href="/historias">Historias</a>
-            </li>
-            <li>
-                <a href="/tecnologias">Tecnología</a>
-            </li>
-            <li>
-                <a href="/portafolio">Portafolio</a>
-            </li>
-        </ul>
+    <div class="Header-title">
+      <h1>JbearP Blog</h1>
+      <span> Tecnología | Historias web</span>
     </div>
-
-    <div>
-        {{template "content" .}}
+    <div class="Header-social">
+      <ul>
+        <li><a href="http://github.com/Jeanpigi" target="_blank" rel="noreferrer"><i class="fa-brands fa-github"></i></a></li>
+        <li><a href="https://www.instagram.com/jean_pierre_gio/" target="_blank"><i class="fa-brands fa-instagram"></i></a></li>
+        <li><a href="https://www.youtube.com/channel/UCXNcM9LiqXfXgKU8HIwg9Xg" target="_blank"><i class="fa-brands fa-youtube"></i></a></li>
+      </ul>
     </div>
+  </div>
 
-    <div class="Footer">
-        <div class="Footer-container">
-            <div class="Footer-content">
-                <div class="Footer-copy"> Hecho con 💜 por 🐻 JbearP </div>
-                <div class="Footer-go">
-                    Full Power by Go
-                </div>
-            </div>
-        </div>
+  <div class="Nav-container">
+    <button class="hamburger" aria-label="Toggle navigation">&#9776;</button>
+    <ul>
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/historias">Historias</a></li>
+      <li><a href="/tecnologias">Tecnología</a></li>
+      <li><a href="/portafolio">Portafolio</a></li>
+    </ul>
+  </div>
+
+  <main class="content">
+    {{template "content" .}}
+  </main>
+
+  <footer class="Footer">
+    <div class="Footer-container">
+      <div class="Footer-content">
+        <div class="Footer-copy"> Hecho con 💜 por 🐻 JbearP </div>
+        <div class="Footer-go"> Full Power by Go </div>
+      </div>
     </div>
+  </footer>
 
-    <script src="/static/js/burguerButton.js"></script>
+  <script src="/static/js/burguerButton.js"></script>
 </body>
-
 </html>
 {{end}}

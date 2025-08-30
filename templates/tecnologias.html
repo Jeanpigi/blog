@@ -1,20 +1,27 @@
-<!-- templates/tecnologias.html -->
 {{define "title"}}Tecnologías{{end}}
 
 {{ define "content" }}
 
 <head>
-    <link rel="stylesheet" type="text/css" href="/static/css/technology.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/technologia.css">
 </head>
 
-<div class="container-blog">
-    <div id="container-tecnologia" class="container-tecnologia">
+<section class="tech-wrap">
+  <header class="tech-header">
+    <h1>Tecnología</h1>
+    <p class="tech-sub">
+      Guías, hacks, programación, diseño, videojuegos y tendencias que sí te sirven.
+    </p>
+  </header>
 
-    </div>
-</div>
+  <!-- Grid de tarjetas -->
+  <div id="container-tecnologia" class="container-tecnologia" aria-live="polite">
+    <!-- el JS inyecta las cards aquí -->
+  </div>
+</section>
 
-
-<script src="/static/js/tech.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/static/js/tecnologia.js"></script>
 
 {{ end }}
+

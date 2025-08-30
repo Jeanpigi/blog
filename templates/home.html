@@ -1,68 +1,83 @@
-<!-- templates/home.html -->
 {{ define "title" }}Home{{ end }}
 
 {{ define "content" }}
 
 <head>
-    <link rel="stylesheet" type="text/css" href="/static/css/inicio.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/home.css">
 </head>
 
 <div class="container-home">
-    <div class="About">
-        <h1><strong>¿Qué es Jbearp Blog?</strong></h1>
-        <div class="About-parrafo">
-            <p>
-                ¡Bienvenido(a) a <strong>Jbearp</strong>! he
-                creado
-                este espacio para compartir mi pasión por la tecnología y las historias web. Aquí encontrarás dos
-                secciones principales: <em>Historias</em>, donde publico series y relatos originales, y
-                <em>Tecnología</em>, dedicada a la programación, el diseño, los videojuegos y las últimas tendencias
-                digitales.
-            </p>
-            <p>
-                Mi objetivo es brindarte un lugar para aprender, inspirarte y divertirte. ¡Gracias por unirte a esta
-                aventura y que disfrutes de todo lo que <strong>Jbearp</strong> tiene para ofrecer!
-            </p>
-        </div>
+  <section class="About">
 
-        <div class="About-content">
-            <picture class="About-content-picture">
-                <img src="/static/assets/Jean.jpeg" alt="imagen" border="0" />
-            </picture>
-            <div class="content">
-                <span class="border">Freelancer</span>
-                <span class="wave">Freelancer</span>
-            </div>
-        </div>
+    <!-- HERO -->
+    <header class="About-hero">
+      <h1><strong>Historias que enganchan. Tecnología que transforma.</strong></h1>
+      <p class="About-sub">
+        Bienvenido(a) a <strong>Jbearp</strong>, mi laboratorio creativo donde mezclo
+        <em>relatos intensos</em> y <em>experimentos tech</em>. Entra, inspírate y llévate ideas listas para poner en marcha.
+      </p>
+      <div class="About-ctas">
+        <a class="btn btn-primary" href="/historias"><i class="fa fa-book"></i> Leer historias</a>
+        <a class="btn btn-outline" href="/tecnologias"><i class="fa fa-code"></i> Explorar tecnología</a>
+      </div>
+    </header>
 
-        <div class="About-parrafo">
-            <p>
-                <strong>¿Quién soy?</strong><br />
-                ¡Hola! Soy <strong>Jean Pierre</strong>, un apasionado de la
-                <strong>tecnología</strong>,
-                la <strong>inteligencia artificial</strong>, las <strong>matemáticas</strong> y la
-                <strong>seguridad informática</strong>. Soy Especialista TIC para la Innovación Educativa, Ingeniero de  Sistemas, Developer y amplia experiencia en el sector.
-                Disfruto explorar temas de hacking, Linux y la vanguardia tecnológica, siempre con el afán de aprender y compartir conocimiento.
-            </p>
-            <p>
-                Mi objetivo profesional es contribuir en la creación de proyectos innovadores, respaldado
-                por mis logros, mi experiencia y las certificaciones obtenidas. Me motiva impulsar la
-                transformación
-                digital y fomentar el aprendizaje continuo, convencido de que la curiosidad y la pasión por la
-                tecnología
-                pueden cambiar el mundo. ¡Bienvenido(a) a este espacio donde comparto mis pasiones y descubrimientos!
-            </p>
-        </div>
-
-        <div class="About-span">
-            <span>
-                <strong>Conoce más sobre mi trabajo:</strong>
-            </span>
-            <a href="/portafolio">
-                <i class="fa fa-globe"></i>
-            </a>
-        </div>
+    <!-- INTRO -->
+    <div class="About-parrafo">
+      <p>
+        Aquí encontrarás dos mundos que conviven: <em>Historias</em>, con series y relatos
+        originales que te atrapan desde la primera línea; y <em>Tecnología</em>, con guías,
+        hacks, programación, diseño, videojuegos y tendencias que sí te sirven en la vida real.
+      </p>
+      <p>
+        Mi meta es simple: que aprendas algo nuevo, te motives a crear y te diviertas en el proceso.
+        Gracias por pasarte por <strong>Jbearp</strong>—si te quedas, prometo sorprenderte.
+      </p>
     </div>
+
+    <!-- AVATAR + CLAIM -->
+    <div class="About-content">
+      <picture class="About-content-picture">
+        <img src="/static/assets/Jean.jpeg" alt="Jean Pierre Arenas" />
+      </picture>
+
+      <!-- CHIP RENOMBRADO: de .content a .badge -->
+      <div class="badge">
+        <span class="badge__text">Hacker</span>
+      </div>
+
+    </div>
+
+    <!-- QUIÉN SOY -->
+    <div class="About-parrafo">
+      <p>
+        <strong>¿Quién soy?</strong><br/>
+        Soy <strong>Jean Pierre</strong>: ingeniero de sistemas, especialista TIC y developer.
+        Vivo entre <strong>tecnología</strong>, <strong>IA</strong>, <strong>matemáticas</strong> y
+        <strong>seguridad informática</strong>. Me apasiona Linux, el hacking ético y todo lo que empuje la frontera de lo posible.
+      </p>
+      <p>
+        Quiero construir proyectos que dejen huella. Me respaldan años de experiencia, logros y certificaciones,
+        pero lo que realmente me mueve es <em>aprender, compartir y crear</em>. Si te vibra este mundo,
+        este blog es tu casa.
+      </p>
+    </div>
+
+    <!-- Highlights -->
+    <ul class="About-highlights">
+      <li><i class="fa fa-check"></i> Relatos originales con ritmo cinematográfico</li>
+      <li><i class="fa fa-check"></i> Guías técnicas claras y accionables</li>
+      <li><i class="fa fa-check"></i> Hacking, Linux y IA sin humo</li>
+    </ul>
+
+    <div class="About-span">
+      <span><strong>¿Quieres ver mi trabajo en acción?</strong></span>
+      <a class="btn-link" href="/portafolio" aria-label="Ver portafolio">
+        <i class="fa fa-globe"></i> Portafolio
+      </a>
+    </div>
+  </section>
 </div>
 
 {{ end }}
+
