@@ -1,243 +1,272 @@
+/* ================= Reset ================= */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html { font-size: 62.5%; }
-html, body { overflow-x: hidden; }
+html {
+  font-size: 62.5%;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
 
 /* Layout base: el footer nunca se solapa */
 body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-    margin: 0;
-    color: #191a22;
-    background: #fff;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  margin: 0;
+  color: #191a22;
+  background: #fff;
 }
 
-/* el contenido ocupa el alto disponible */
-.content { flex: 1; min-height: auto; }
+/* El contenido ocupa el alto disponible */
+.content {
+  flex: 1;
+  min-height: auto;
+}
 
 /* ================= Header ================= */
 .Header {
-    background-color: #24292e;
-    color: #ffffff;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.Header-title {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: clamp(1.3rem, 2.5vw, 2rem);
-}
-
-.Header-title span {
-    font-size: 1.4rem;
-    font-weight: 300;
-    letter-spacing: normal;
-}
-
-.Header-social ul {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    gap: 1rem;
-}
-
-.Header-social a {
-    text-decoration: none;
-    font-weight: 300;
-    font-size: clamp(1.5rem, 2.5vw, 2rem);
-    color: white;
+  background-color: #24292e;
+  color: #ffffff;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .Header-logo {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .Header-logo img {
-    width: 7rem;
-    cursor: pointer;
+  width: 7rem;
+  cursor: pointer;
 }
 
-.Header-social i { width: 20px; }
+.Header-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(1.3rem, 2.5vw, 2rem);
+}
 
-/* =============== Navegación =============== */
+.Header-title span {
+  font-size: 1.4rem;
+  font-weight: 300;
+  letter-spacing: normal;
+}
+
+.Header-social ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  gap: 1rem;
+}
+
+.Header-social a {
+  text-decoration: none;
+  font-weight: 300;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  color: white;
+}
+
+.Header-social i {
+  width: 20px;
+}
+
+/* ================= Navegación ================= */
+/* Botón hamburguesa (solo móvil) */
 .hamburger {
-    display: none;
-    font-size: 2.5rem;
-    background: none;
-    border: none;
-    color: #191a22;
-    cursor: pointer;
+  display: none;
+  font-size: 2.6rem;
+  background: none;
+  border: none;
+  color: #191a22;
+  cursor: pointer;
+  line-height: 1;
 }
 
+/* Barra de navegación */
 .Nav-container {
-    background-color: #fafbfc;
-    color: #191a22;
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    width: 100%;         /* evita overflow por 100vw */
-    height: 60px;
-    border-bottom: none; /* quitamos línea morada */
-    box-shadow: inset 0 -1px 0 rgba(0,0,0,.06); /* divisor sutil */
+  background-color: #fafbfc;
+  color: #191a22;
+  position: relative;
+  width: 100%;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.06);
 }
 
+/* Menú desktop */
 .Nav-container ul {
-    display: flex;
-    width: 350px;
-    gap: 1.5rem;
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
 }
 
 .Nav-container ul li {
-    position: relative;
-    list-style: none;
-    width: 70px;
-    height: 60px;
-    z-index: 2;
+  display: block;
 }
 
 .Nav-container ul li a {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    text-decoration: none;
+  text-decoration: none;
+  display: inline-block;
+  padding: 0.8rem 0.6rem;
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: rgba(25, 26, 34, 0.75);
+  transition: color 0.2s ease;
 }
 
-.Nav-container ul li a span {
-    font-size: 1.4rem;
-    font-weight: 300;
-    position: relative;
-    display: block;
-    width: 55px;
-    height: 55px;
-    text-align: center;
-    line-height: 65px;
-    border-radius: 50%;
+.Nav-container ul li a:hover {
+  color: rgba(25, 26, 34, 1);
 }
 
-.Nav-container ul li.active a span {
-    background: #24292e;
-    color: #fff;
-    transform: translateY(-27px);
+/* Quita el morado de :visited (tu causa del “color raro”) */
+.Nav-container ul li a:visited {
+  color: rgba(25, 26, 34, 0.75);
 }
 
-.Nav-container ul li a span::before {
-    content: "";
-    position: absolute;
-    top: 10px;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #24292e;
-    filter: blur(5px);
-    opacity: 0;
+/* Si quieres subrayar la página actual usando aria-current */
+.Nav-container ul li a[aria-current="page"] {
+  color: rgba(25, 26, 34, 1);
+  position: relative;
 }
 
-.Nav-container ul li.active a span::before { opacity: 0.5; }
-
-[aria-current] {
-    position: relative;
-    display: inline-block;
+.Nav-container ul li a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 0.6rem;
+  right: 0.6rem;
+  bottom: 0.3rem;
+  height: 2px;
+  background: #564761;
+  border-radius: 99px;
 }
-
-[aria-current]::after {
-    position: absolute;
-    content: "";
-    width: calc(100% - 1em);
-    height: 3px;
-    background-color: #564761;
-    display: block;
-    bottom: -1px;
-}
-
-.Nav-container a {
-    text-decoration: none;
-    padding: 1em 1em 1em 0;
-    display: block;
-    font-size: 1.4rem;
-    font-weight: 300;
-    transition: all 0.3s ease-in-out 0s;
-    color: rgba(25, 26, 34, 0.7);
-}
-
-.Nav-container a:hover { color: rgba(25, 26, 34, 1); }
-.Nav-container a:visited { color: rgb(167, 3, 153); }
-
-/* Fix sintaxis rgba() (antes usabas rgba(#792CE2, …) que no es válido) */
-@keyframes pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(121, 44, 226, 1); }
-    100% { box-shadow: 0 0 0 40px rgba(121, 44, 226, 0); }
-}
-
-.pulser_effect { animation: pulse infinite 1s; }
 
 /* ================= Footer ================= */
 .Footer {
-    background: #24292e;
-    color: white;
-    padding-top: 1.5rem;
-    margin-top: 0.2rem;
-    width: 100%;
-    position: static;    /* sin absolute */
-    height: auto;        /* crece según contenido */
+  background: #24292e;
+  color: white;
+  padding-top: 1.5rem;
+  margin-top: 0.2rem;
+  width: 100%;
+  position: static;
+  height: auto;
 }
 
 .Footer-content {
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    font-size: clamp(1.5rem, 2.5vw, 2rem);
-    font-family: 'Great Vibes', cursive;
-    padding-bottom: .5rem;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-family: 'Great Vibes', cursive;
+  padding-bottom: .5rem;
 }
 
-.Footer-copy::after { content: " 🇨🇴  "; }
+.Footer-copy::after {
+  content: " 🇨🇴  ";
+}
 
 .Footer-go {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
 }
 
-/* =============== Responsive =============== */
+/* ================= Responsive (móvil) ================= */
 @media (max-width: 768px) {
-    .Header { flex-direction: column; padding: 0.5rem; }
-    .Header-logo img { width: 5rem; }
-    .Header-title { margin-top: 1rem; font-size: 1.2rem; }
-    .Header-title span { font-size: 1rem; }
-    .hamburger { display: block; }
+  .Header {
+    flex-direction: column;
+    padding: 0.5rem;
+    gap: 0.6rem;
+  }
 
-    .Nav-container ul {
-        flex-direction: column;
-        width: 80% !important;
-        background-color: rgba(25, 26, 34, 0.3);
-        border-radius: 1rem;
-        margin: 1rem auto;
-        padding: 1.5rem;
-        text-align: center;
-        display: none;
-    }
-    .Nav-container ul li {
-        width: 100% !important;
-        height: auto;
-        margin: 0.5rem 0;
-    }
-    .Nav-container ul li a { font-size: 1.8rem; color: #fff; padding: 1rem; }
-    .Nav-container.is-active ul { display: flex; }
+  .Header-logo img {
+    width: 5rem;
+  }
 
-    .Footer { padding-top: 1rem; padding-bottom: 1rem; font-size: 1.2rem; }
+  .Header-title {
+    margin-top: 0.3rem;
+  }
+
+  .Header-title span {
+    font-size: 1rem;
+  }
+
+  /* Hamburguesa visible */
+  .hamburger {
+    display: block;
+    position: absolute;
+    left: 15rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* El UL pasa a dropdown */
+  .Nav-container {
+    justify-content: center;
+  }
+
+  .Nav-container ul {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: min(92vw, 360px);
+    display: none;
+    /* se muestra con .is-active */
+    flex-direction: column;
+    gap: 0.6rem;
+
+    background: #24292e;
+    border-radius: 1rem;
+    padding: 1rem;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    z-index: 50;
+  }
+
+  .Nav-container.is-active ul {
+    display: flex;
+  }
+
+  .Nav-container ul li a {
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    font-size: 1.7rem;
+    color: #fff;
+    border-radius: 0.8rem;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .Nav-container ul li a:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+  }
+
+  .Nav-container ul li a:visited {
+    color: #fff;
+  }
+
+  .Footer {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
 }
