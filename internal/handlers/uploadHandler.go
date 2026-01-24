@@ -18,7 +18,7 @@ import (
 const (
 	maxPerFile = 20 << 20 // 20 MB
 	// Límite total del body por request (ej.: 5 archivos * 20MB + margen)
-	maxRequestBody = 120 << 20 // 120 MB
+	maxRequestBody = 1000 << 20 // 120 MB
 )
 
 var safeNameRx = regexp.MustCompile(`[^a-zA-Z0-9._\- ]+`)
@@ -63,7 +63,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		r.Body = http.MaxBytesReader(w, r.Body, maxRequestBody)
 
 		// Límite de memoria para multipart (el resto va a disco temporal)
-		if err := r.ParseMultipartForm(25 << 20); err != nil {
+		if err := r.ParseMultipartForm(maxRequestBody); err != nil {
 			http.Error(w, "El archivo excede el límite de tamaño (25MB en memoria).", http.StatusBadRequest)
 			return
 		}
