@@ -1,0 +1,29 @@
+# Binarios y ejecutables (Fundamentales para ahorrar tokens)
+bin/
+obj/
+*.exe
+*.exe_
+*.dll
+*.so
+*.dylib
+# El nombre de tu binario principal si lo compilas en la raíz
+tu_nombre_de_proyecto
+
+# Dependencias (Claude no necesita leer el código de otros)
+vendor/
+pkg/
+
+# Herramientas de test y cobertura
+*.out
+*.test
+*.prof
+coverage.txt
+
+# Archivos de entorno y secretos
+.env
+.env.*
+.idea/
+.vscode/
+
+# Caché de Go (Muy pesado)
+.cache/

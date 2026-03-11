@@ -2,29 +2,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("container-tecnologia");
   if (!container) return;
 
-  // Limpia cualquier HTML previo (por si otro script ya pintó)
-  container.innerHTML = "";
-
   Swal.fire({
-    title: "Cargando…",
-    text: "Trayendo posts de tecnología.",
+    title: "Cargando tecnología…",
     showConfirmButton: false,
     allowOutsideClick: false,
+    background: "#ffffff",
+    color: "#1f2937",
     didOpen: () => Swal.showLoading(),
   });
 
   try {
-    const resp = await fetch("/api/categories", { cache: "no-store" });
+    const resp = await fetch("/api/categories?limit=50", { cache: "no-store" });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
-    const posts = Array.isArray(data) ? data : [];
-
-    render(posts);
-    console.log("[tech] posts renderizados:", posts.length);
-
+    const posts = await resp.json();
+    render(Array.isArray(posts) ? posts : []);
   } catch (e) {
-    console.error("[tech] error:", e);
-    container.innerHTML = `<div class="tech-empty">No pudimos cargar los posts. <button class="tech-btn" onclick="location.reload()">Reintentar</button></div>`;
+    console.error("[tech]", e);
+    container.innerHTML = `
+      <div class="cat-empty">
+        No pudimos cargar los posts.
+        <button class="cat-btn" onclick="location.reload()">Reintentar</button>
+      </div>`;
   } finally {
     Swal.close();
   }
@@ -32,80 +30,94 @@ document.addEventListener("DOMContentLoaded", async () => {
   function render(posts) {
     container.innerHTML = "";
     if (!posts.length) {
-      container.innerHTML = `<div class="tech-empty">No hay posts por ahora 👀</div>`;
+      container.innerHTML = `<div class="cat-empty">No hay posts de tecnología por ahora.</div>`;
       return;
     }
 
     const frag = document.createDocumentFragment();
-
-    posts.forEach((post) => {
-      const card = document.createElement("article");
-      // Fuerza la clase moderna
-      card.className = "post-card";
-
-      // HEAD
-      const head = el("header", "post-card__head");
-      const emoji = el("span", "post-card__emoji", randomEmoji());
-      const h2 = el("h2", "post-card__title");
-      const link = el("a", "post-card__link", post.title || "Sin título");
-      link.href = `/post/${post.id}`;
-      link.rel = "prefetch";
-
-      h2.appendChild(link);
-      head.append(emoji, h2);
-
-      // META
-      const meta = el("div", "post-card__meta");
-      const time = document.createElement("time");
-      time.dateTime = post.created_at || "";
-      time.textContent = formatDate(post.created_at);
-      const read = el("span", "post-card__read", readingTime(post.content || post.description || ""));
-      meta.append(time, read);
-
-      // BODY
-      const body = el("div", "post-card__body");
-      body.appendChild(el("p", null, post.description || "Sin descripción."));
-
-      card.append(head, meta, body);
-      frag.appendChild(card);
-    });
-
+    posts.forEach(post => frag.appendChild(buildCard(post)));
     container.appendChild(frag);
-    revealOnView();
+    revealCards();
   }
 
-  function el(tag, className, text) {
-    const n = document.createElement(tag);
-    if (className) n.className = className;
-    if (text) n.textContent = text;
-    return n;
+  function buildCard(post) {
+    const article = document.createElement("article");
+    article.className = "cat-card";
+    article.tabIndex = 0;
+
+    // reading_min viene del backend (calculado sobre el HTML completo del post)
+    const mins = post.reading_min || 1;
+    const date = formatDate(post.created_at);
+
+    article.innerHTML = `
+      <div class="cat-card__meta">
+        <time>${date}</time>
+        <span class="cat-card__sep">·</span>
+        <span>${mins} min de lectura</span>
+      </div>
+      <h2 class="cat-card__title">
+        <a href="/post/${post.id}" class="cat-card__link">${escapeHtml(post.title || "Sin título")}</a>
+      </h2>
+      <p class="cat-card__desc">${escapeHtml(post.description || "")}</p>
+      <a class="cat-card__more" href="/post/${post.id}">Leer →</a>
+    `;
+
+    return article;
   }
 
-  function revealOnView() {
-    const cards = document.querySelectorAll(".post-card");
+  function revealCards() {
     const io = new IntersectionObserver((entries, obs) => {
       entries.forEach(en => {
-        if (en.isIntersecting) { en.target.classList.add("is-visible"); obs.unobserve(en.target); }
+        if (en.isIntersecting) {
+          en.target.classList.add("is-visible");
+          obs.unobserve(en.target);
+        }
       });
-    }, { threshold: 0.1 });
-    cards.forEach(c => io.observe(c));
-  }
-
-  function readingTime(text) {
-    const words = (text || "").trim().split(/\s+/).filter(Boolean).length;
-    const mins = Math.max(1, Math.ceil(words / 200));
-    return `⏱️ ${mins} min de lectura`;
+    }, { threshold: 0.08 });
+    document.querySelectorAll(".cat-card").forEach(c => io.observe(c));
   }
 
   function formatDate(iso) {
-    if (!iso) return "Fecha desconocida";
+    if (!iso) return "";
     try {
-      return new Date(iso).toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
-    } catch { return "Fecha desconocida"; }
+      return new Date(iso.replace(" ", "T")).toLocaleDateString("es-ES", {
+        year: "numeric", month: "long", day: "numeric",
+      });
+    } catch { return ""; }
   }
 
-  function randomEmoji() {
-    const emojis = ["💡","🧠","⚙️","🛠️","🚀","🔐","🖥️","📦","🧪","🧰"];
-    return emojis[Math.floor(Math.random() * emojis.length)];
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
+});
+
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".cat-card");
+  if (!card || e.target.closest("a")) return;
+  const link = card.querySelector(".cat-card__link");
+  if (link) window.location.href = link.href;
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const card = document.activeElement?.closest?.(".cat-card");
+  if (!card) return;
+  const link = card.querySelector(".cat-card__link");
+  if (link) { e.preventDefault(); window.location.href = link.href; }
+});
+
+["mouseover", "touchstart"].forEach(ev => {
+  document.addEventListener(ev, (e) => {
+    const link = e.target.closest(".cat-card")?.querySelector(".cat-card__link");
+    if (!link?.href) return;
+    if (!document.head.querySelector(`link[href="${link.href}"]`)) {
+      const l = document.createElement("link");
+      l.rel = "prefetch"; l.as = "document"; l.href = link.href;
+      document.head.appendChild(l);
+    }
+  }, { passive: true });
 });

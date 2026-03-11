@@ -1,49 +1,88 @@
-{{define "title"}}Portafolio{{end}}
+{{define "title"}}Portafolio — JbearP{{end}}
 
-{{ define "content" }}
-<head>
-    <link rel="stylesheet" type="text/css" href="/static/css/portafolio.css">
-</head>
+{{block "extra_css" .}}
+<link rel="stylesheet" href="/static/css/portafolio.css">
+{{end}}
 
-<div class="container-portafolio">
+{{define "content"}}
+<div class="portfolio">
 
-    <h1 class="section-title">Experiencia:</h1>
-    <div class="card-grid">
-        {{range .Experiences}}
-        <div class="card">
-            <h2>{{.Title}}</h2>
-            <h4>{{.Place}}</h4>
-            <p>{{.Description}}</p>
-            <small>{{.StartYear}} - {{.EndYear}}</small>
+  <!-- HERO -->
+  <header class="portfolio__hero">
+    <h1>Portafolio</h1>
+    <p>Experiencia, formación y proyectos que definen mi camino como developer.</p>
+  </header>
+
+  <!-- EXPERIENCIA -->
+  <section class="portfolio__section">
+    <div class="portfolio__section-head">
+      <span class="portfolio__section-icon">💼</span>
+      <h2>Experiencia</h2>
+    </div>
+    <div class="timeline">
+      {{range .Experiences}}
+      <div class="timeline__item">
+        <div class="timeline__dot"></div>
+        <div class="timeline__body">
+          <div class="timeline__period">{{.StartYear}} — {{.EndYear}}</div>
+          <h3 class="timeline__title">{{.Title}}</h3>
+          <div class="timeline__place">{{.Place}}</div>
+          {{if .Description}}
+          <p class="timeline__desc">{{.Description}}</p>
+          {{end}}
+        </div>
+      </div>
+      {{end}}
+    </div>
+  </section>
+
+  <!-- EDUCACIÓN -->
+  <section class="portfolio__section">
+    <div class="portfolio__section-head">
+      <span class="portfolio__section-icon">🎓</span>
+      <h2>Educación</h2>
+    </div>
+    <div class="timeline">
+      {{range .Education}}
+      <div class="timeline__item">
+        <div class="timeline__dot"></div>
+        <div class="timeline__body">
+          <div class="timeline__period">{{.StartYear}} — {{.EndYear}}</div>
+          <h3 class="timeline__title">{{.Title}}</h3>
+          <div class="timeline__place">{{.Place}}</div>
+        </div>
+      </div>
+      {{end}}
+    </div>
+  </section>
+
+  <!-- PROYECTOS -->
+  {{if .Projects}}
+  <section class="portfolio__section">
+    <div class="portfolio__section-head">
+      <span class="portfolio__section-icon">🚀</span>
+      <h2>Proyectos</h2>
+    </div>
+    <div class="projects-grid">
+      {{range .Projects}}
+      <article class="project-card">
+        {{if .ImageURL}}
+        <div class="project-card__img-wrap">
+          <img src="{{.ImageURL}}" alt="{{.Title}}" loading="lazy">
         </div>
         {{end}}
-    </div>
-
-    <h1 class="section-title">Educación:</h1>
-    <div class="card-grid">
-        {{range .Education}}
-        <div class="card">
-            <h2>{{.Title}}</h2>
-            <h4>{{.Place}}</h4>
-            <small>{{.StartYear}} - {{.EndYear}}</small>
+        <div class="project-card__body">
+          <h3 class="project-card__title">{{.Title}}</h3>
+          <p class="project-card__desc">{{.Description}}</p>
+          <a href="{{.ProjectURL}}" target="_blank" rel="noopener noreferrer" class="project-card__link">
+            Ver proyecto <span aria-hidden="true">↗</span>
+          </a>
         </div>
-        {{end}}
+      </article>
+      {{end}}
     </div>
-
-    <h1 class="section-title">Proyectos:</h1>
-    <div class="card-grid projects">
-        {{range .Projects}}
-        <div class="card project-card">
-            <img src="{{.ImageURL}}" alt="{{.Title}}">
-            <h2>{{.Title}}</h2>
-            <p>{{.Description}}</p>
-            <a href="{{.ProjectURL}}" target="_blank" class="project-link">Ver proyecto</a>
-        </div>
-        {{end}}
-    </div>
+  </section>
+  {{end}}
 
 </div>
-
-<script src="/static/js/portafolio.js"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-{{ end }}
+{{end}}

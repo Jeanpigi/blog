@@ -1,19 +1,20 @@
-<!-- templates/blog.html -->
-{{define "title"}}Blog{{end}}
+{{define "title"}}Blog — JbearP{{end}}
 
-{{ define "content" }}
+{{block "extra_css" .}}
+<link rel="stylesheet" href="/static/css/blog.css">
+{{end}}
 
-<head>
-    <link rel="stylesheet" type="text/css" href="/static/css/blog.css">
-</head>
-
+{{define "content"}}
 <div class="container-blog">
-    <!-- Contenedor para los posts -->
-    <div id="posts-container">
-        <!-- Los posts se cargarán aquí -->
-    </div>
+  <div class="blog-header">
+    <h2>Últimas publicaciones</h2>
+    <p>Tecnología, historias y todo lo que vale la pena leer.</p>
+  </div>
+  <div id="posts-container" aria-live="polite">
+    <!-- Posts cargados vía JS -->
+  </div>
 </div>
 
-<script src="/static/js/posts.js?v=2"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-{{ end }}
+<script src="/static/js/posts.js?v=3"></script>
+{{end}}

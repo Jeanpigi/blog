@@ -1,22 +1,18 @@
-{{define "title"}}Historias{{end}}
+{{define "title"}}Historias — JbearP{{end}}
 
-{{ define "content" }}
+{{block "extra_css" .}}
+<link rel="stylesheet" href="/static/css/categories.css">
+{{end}}
 
-<head>
-  <link rel="stylesheet" type="text/css" href="/static/css/historias.css">
-</head>
-
-<section class="stories-wrap">
-  <header class="stories-header">
+{{define "content"}}
+<div class="cat-page">
+  <header class="cat-header">
     <h1>Historias</h1>
-    <p class="stories-sub">Series y relatos originales con ritmo cinematográfico. Ponte cómodo y disfruta.</p>
+    <p>Series y relatos originales con ritmo cinematográfico. Ponte cómodo y disfruta.</p>
   </header>
-
-  <!-- Grid de tarjetas -->
-  <div id="container-historias" class="stories-grid" aria-live="polite"></div>
-</section>
+  <div id="container-historias" class="cat-grid" aria-live="polite"></div>
+</div>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/static/js/histories.js"></script>
-
-{{ end }}
+{{end}}

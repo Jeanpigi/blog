@@ -19,19 +19,18 @@ import (
 )
 
 func main() {
-	// 🔹 Inicializar la conexión a la base de datos
-	db.InitDB()
-	defer db.CloseDB()
-
-	// 🔹 Cargar variables de entorno desde `.env` si existe
+	// 🔹 Cargar variables de entorno PRIMERO (antes de InitDB)
 	if _, err := os.Stat(".env"); err == nil {
-		err := godotenv.Load()
-		if err != nil {
+		if err := godotenv.Load(); err != nil {
 			log.Println("⚠️ No se pudo cargar el archivo .env, se usarán las variables del sistema.")
 		}
 	} else {
 		log.Println("⚠️ No se encontró el archivo .env, usando variables del sistema.")
 	}
+
+	// 🔹 Inicializar la conexión a la base de datos
+	db.InitDB()
+	defer db.CloseDB()
 
 	// 🔹 Verificar clave de sesión
 	sessionKey := os.Getenv("SESSION_KEY")

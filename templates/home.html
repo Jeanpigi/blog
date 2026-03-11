@@ -1,11 +1,10 @@
-{{ define "title" }}Home{{ end }}
+{{define "title"}}Inicio — JbearP{{end}}
 
-{{ define "content" }}
+{{block "extra_css" .}}
+<link rel="stylesheet" href="/static/css/home.css">
+{{end}}
 
-<head>
-  <link rel="stylesheet" type="text/css" href="/static/css/home.css">
-</head>
-
+{{define "content"}}
 <div class="container-home">
   <section class="About">
 
@@ -40,12 +39,9 @@
       <picture class="About-content-picture">
         <img src="/static/assets/Jean.jpeg" alt="Jean Pierre Arenas" />
       </picture>
-
-      <!-- CHIP RENOMBRADO: de .content a .badge -->
       <div class="badge">
         <span class="badge__text">Hacker</span>
       </div>
-
     </div>
 
     <!-- QUIÉN SOY -->
@@ -76,8 +72,7 @@
         <i class="fa fa-globe"></i> Portafolio
       </a>
     </div>
+
   </section>
 </div>
-
-{{ end }}
-
+{{end}}

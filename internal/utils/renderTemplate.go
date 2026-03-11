@@ -5,29 +5,37 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"sync"
+)
+
+var (
+	templateCache   = map[string]*template.Template{}
+	templateCacheMu sync.RWMutex
 )
 
 func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
-	files := []string{
-		"templates/layout.html",
-		tmpl,
-	}
+	templateCacheMu.RLock()
+	t, ok := templateCache[tmpl]
+	templateCacheMu.RUnlock()
 
-	templates, err := template.ParseFiles(files...)
-
-	if err != nil {
-		log.Print(err.Error())
-		http.Error(w, "Internal Server Error", 500)
-		return
+	if !ok {
+		var err error
+		t, err = template.ParseFiles("templates/layout.html", tmpl)
+		if err != nil {
+			log.Print(err.Error())
+			http.Error(w, "Internal Server Error", 500)
+			return
+		}
+		templateCacheMu.Lock()
+		templateCache[tmpl] = t
+		templateCacheMu.Unlock()
 	}
 
 	var buf bytes.Buffer
-	err = templates.ExecuteTemplate(&buf, "layout", data)
-	if err != nil {
+	if err := t.ExecuteTemplate(&buf, "layout", data); err != nil {
 		log.Print(err.Error())
 		http.Error(w, "Internal Server Error", 500)
 		return
 	}
-	buf.WriteTo(w) // Solo se escribe en w si todo salió bien
-
+	buf.WriteTo(w)
 }
