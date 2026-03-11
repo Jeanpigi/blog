@@ -48,7 +48,7 @@ func ValidateCSRF(sessionID, token string) bool {
 
 // 🔑 Hashea contraseñas de manera segura con bcrypt
 func HashPassword(password string) string {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
 		log.Fatal("Error al generar hash de contraseña:", err)
 	}

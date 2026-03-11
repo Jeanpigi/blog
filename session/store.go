@@ -1,6 +1,7 @@
 package session
 
 import (
+	"encoding/base64"
 	"log"
 	"net/http"
 	"os"
@@ -8,25 +9,39 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-// 🛡️ Variable global para manejar sesiones
+// Variable global para manejar sesiones
 var Store *sessions.CookieStore
 
-// 🔧 Inicializa la sesión con una clave segura
+// InitStore inicializa el store con dos claves: autenticación (HMAC) y cifrado (AES).
+// SESSION_AUTH_KEY: 64 bytes en base64 (para HMAC-SHA512)
+// SESSION_ENC_KEY:  32 bytes en base64 (para AES-256)
 func InitStore() {
-	sessionKey := os.Getenv("SESSION_KEY")
-	if sessionKey == "" {
-		log.Fatal("Error: SESSION_KEY no está configurado en el entorno")
+	authKeyB64 := os.Getenv("SESSION_AUTH_KEY")
+	encKeyB64 := os.Getenv("SESSION_ENC_KEY")
+
+	if authKeyB64 == "" || encKeyB64 == "" {
+		log.Fatal("Error: SESSION_AUTH_KEY y SESSION_ENC_KEY deben estar configurados")
 	}
 
-	Store = sessions.NewCookieStore([]byte(sessionKey))
+	authKey, err := base64.StdEncoding.DecodeString(authKeyB64)
+	if err != nil || len(authKey) < 32 {
+		log.Fatalf("SESSION_AUTH_KEY inválida: debe ser base64 de al menos 32 bytes (recomendado 64)")
+	}
 
-	// 🔒 Configuración segura de sesiones
+	encKey, err := base64.StdEncoding.DecodeString(encKeyB64)
+	if err != nil || (len(encKey) != 16 && len(encKey) != 24 && len(encKey) != 32) {
+		log.Fatalf("SESSION_ENC_KEY inválida: debe ser base64 de 16, 24 o 32 bytes")
+	}
+
+	// Dos claves: la primera firma (HMAC), la segunda cifra (AES)
+	Store = sessions.NewCookieStore(authKey, encKey)
+
 	Store.Options = &sessions.Options{
 		Path:     "/",
-		MaxAge:   86400 * 7,  // 7 días de duración
-		HttpOnly: true,       // Evita acceso desde JavaScript (protección XSS)
-		Secure:   true,       // Solo HTTPS
-		SameSite: http.SameSiteStrictMode, // Evita ataques CSRF
+		MaxAge:   86400 * 7,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
 	}
 }
 

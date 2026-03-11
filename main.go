@@ -32,10 +32,9 @@ func main() {
 	db.InitDB()
 	defer db.CloseDB()
 
-	// 🔹 Verificar clave de sesión
-	sessionKey := os.Getenv("SESSION_KEY")
-	if sessionKey == "" {
-		log.Fatal("❌ Error: SESSION_KEY no está definida. Verifica tus variables de entorno.")
+	// 🔹 Verificar claves de sesión
+	if os.Getenv("SESSION_AUTH_KEY") == "" || os.Getenv("SESSION_ENC_KEY") == "" {
+		log.Fatal("❌ Error: SESSION_AUTH_KEY y SESSION_ENC_KEY deben estar definidas.")
 	}
 
 	// 🔹 Inicializar sesión
@@ -93,8 +92,12 @@ func main() {
 	router.NotFoundHandler = http.HandlerFunc(handlers.NotFoundHandler)
 
 	// 🔹 Middleware CORS
+	allowedOrigin := os.Getenv("ALLOWED_ORIGIN")
+	if allowedOrigin == "" {
+		allowedOrigin = "http://localhost:8080"
+	}
 	corsHandler := myHandler.CORS(
-		myHandler.AllowedOrigins([]string{"*"}),
+		myHandler.AllowedOrigins([]string{allowedOrigin}),
 		myHandler.AllowedMethods([]string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}),
 		myHandler.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
