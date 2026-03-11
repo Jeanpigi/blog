@@ -92,12 +92,8 @@ func main() {
 	router.NotFoundHandler = http.HandlerFunc(handlers.NotFoundHandler)
 
 	// 🔹 Middleware CORS
-	allowedOrigin := os.Getenv("ALLOWED_ORIGIN")
-	if allowedOrigin == "" {
-		allowedOrigin = "http://localhost:8080"
-	}
 	corsHandler := myHandler.CORS(
-		myHandler.AllowedOrigins([]string{allowedOrigin}),
+		myHandler.AllowedOrigins([]string{"*"}),
 		myHandler.AllowedMethods([]string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}),
 		myHandler.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
