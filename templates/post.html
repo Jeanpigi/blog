@@ -1,7 +1,7 @@
 {{define "title"}}{{.Post.Title}} — JbearP{{end}}
 
 {{block "extra_css" .}}
-<link rel="stylesheet" href="/static/css/posts.css">
+<link rel="stylesheet" href="/static/css/posts.css?v={{staticVer}}">
 {{end}}
 
 {{define "content"}}
@@ -48,5 +48,5 @@
   </article>
 </div>
 
-<script src="/static/js/createdAt.js"></script>
+<script src="/static/js/createdAt.js?v={{staticVer}}"></script>
 {{end}}

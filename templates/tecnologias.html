@@ -1,7 +1,7 @@
 {{define "title"}}Tecnología — JbearP{{end}}
 
 {{block "extra_css" .}}
-<link rel="stylesheet" href="/static/css/categories.css">
+<link rel="stylesheet" href="/static/css/categories.css?v={{staticVer}}">
 {{end}}
 
 {{define "content"}}
@@ -14,5 +14,5 @@
 </div>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/static/js/tecnologia.js"></script>
+<script src="/static/js/tecnologia.js?v={{staticVer}}"></script>
 {{end}}

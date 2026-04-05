@@ -1,7 +1,7 @@
 {{define "title"}}Subir Música{{end}}
 
 {{define "extra_css"}}
-<link rel="stylesheet" href="/static/css/upload.css">
+<link rel="stylesheet" href="/static/css/upload.css?v={{staticVer}}">
 {{end}}
 
 {{define "content"}}
@@ -50,5 +50,5 @@
 </div>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script defer src="/static/js/upload.js"></script>
+<script defer src="/static/js/upload.js?v={{staticVer}}"></script>
 {{end}}
