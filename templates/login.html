@@ -1,68 +1,101 @@
 {{define "title"}}Login{{end}}
 
-{{ define "content" }}
+{{define "extra_css"}}
+<link rel="stylesheet" href="/static/css/form.css">
+{{end}}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/form.css">
-</head>
+{{define "content"}}
+<div class="auth-wrapper">
+  <div class="auth-card">
 
-<div class="container">
-    <form action="/login" method="POST" class="form">
-        <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
-
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" placeholder="Enter your username" required aria-label="Username">
-        </div>
-
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="off" aria-label="Password">
-        </div>
-
-        <div>
-            <input type="submit" value="Login">
-        </div>
-    </form>
-
-    <div class="SignupPrompt">
-        <p>Not have an account? <a href="/signup">Signup</a></p>
+    <div class="auth-brand">
+      <img src="/static/assets/logo.svg" alt="JbearP" class="auth-logo">
+      <h1 class="auth-title">JbearP Blog</h1>
+      <p class="auth-subtitle">Ingresa a tu cuenta</p>
     </div>
 
-    <script>
-        // Obtener el parámetro de error de la URL
-        const params = new URLSearchParams(window.location.search);
-        if (params.has("error")) {
-            let errorMessage = "Ocurrió un error desconocido.";
-    
-            switch (params.get("error")) {
-                case "invalid_username":
-                    errorMessage = "El nombre de usuario solo puede contener letras, números y guion bajo (3-20 caracteres).";
-                    break;
-                case "invalid_credentials":
-                    errorMessage = "Usuario o contraseña incorrectos. Inténtalo de nuevo.";
-                    break;
-                case "csrf_invalid":
-                    errorMessage = "Error de seguridad (CSRF inválido). Recarga la página e intenta de nuevo.";
-                    break;
-                case "too_many_attempts":
-                    errorMessage = "Demasiados intentos fallidos. Intenta más tarde.";
-                    break;
-            }
-    
-            // Mostrar alerta con SweetAlert2
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: errorMessage,
-                confirmButtonColor: "#d33",
-                confirmButtonText: "OK"
-            });
-        }
-    </script>
-    
+    <form action="/login" method="POST" class="auth-form" autocomplete="on">
+      <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
+
+      <div class="field-group">
+        <label for="username">Usuario</label>
+        <div class="input-wrap">
+          <i class="fa fa-user input-icon"></i>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Tu nombre de usuario"
+            autocomplete="username"
+            required
+            aria-label="Usuario"
+          >
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="password">Contraseña</label>
+        <div class="input-wrap">
+          <i class="fa fa-lock input-icon"></i>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Tu contraseña"
+            autocomplete="current-password"
+            required
+            aria-label="Contraseña"
+          >
+          <button type="button" class="toggle-pw" aria-label="Mostrar contraseña" tabindex="-1">
+            <i class="fa fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="auth-btn">Entrar</button>
+    </form>
+
+  </div>
 </div>
 
-{{ end }}
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  if (!params.has("error")) return;
+
+  var messages = {
+    invalid_username:    "El usuario solo puede tener letras, números y guion bajo (3-20 caracteres).",
+    invalid_credentials: "Usuario o contraseña incorrectos. Inténtalo de nuevo.",
+    csrf_invalid:        "Error de seguridad (CSRF inválido). Recarga la página e intenta de nuevo.",
+    too_many_attempts:   "Demasiados intentos fallidos. Espera 15 minutos antes de intentar de nuevo.",
+  };
+
+  var msg = messages[params.get("error")] || "Ocurrió un error desconocido.";
+
+  Swal.fire({
+    icon: "error",
+    title: "Acceso denegado",
+    text: msg,
+    confirmButtonColor: "#a10395",
+    confirmButtonText: "OK",
+  });
+
+  // Limpiar el parámetro de la URL sin recargar
+  window.history.replaceState({}, "", "/login");
+}());
+
+// Toggle mostrar/ocultar contraseña
+document.querySelector(".toggle-pw").addEventListener("click", function () {
+  var input = document.getElementById("password");
+  var icon  = this.querySelector("i");
+  if (input.type === "password") {
+    input.type = "text";
+    icon.className = "fa fa-eye-slash";
+  } else {
+    input.type = "password";
+    icon.className = "fa fa-eye";
+  }
+});
+</script>
+{{end}}

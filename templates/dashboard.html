@@ -1,88 +1,235 @@
 {{define "title"}}Dashboard{{end}}
 
-{{ define "content" }}
+{{define "extra_css"}}
+<link rel="stylesheet" href="/static/css/dashboards.css">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+{{end}}
 
-<head>
-    <link rel="stylesheet" type="text/css" href="/static/css/dashboards.css">
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-</head>
+{{define "content"}}
+<div class="dash-wrapper">
 
-<div class="container-dashboard">
-    <nav class="breadcrumbs">
-        <a href="/dashboard">Dashboard</a>
-        <span> / </span>
-        <a href="/radio/upload">Subir música</a>
-    </nav>
-
-    <div id="username" data-username="{{.Username}}">
-        <h1>Welcome {{.Username}}</h1>
+  <!-- Header -->
+  <header class="dash-header">
+    <div>
+      <h1 class="dash-title">Dashboard</h1>
+      <span class="dash-subtitle">Hola, <strong>{{.Username}}</strong></span>
     </div>
-
-    <!-- Formulario para agregar un nuevo post -->
-    <div class="new-post-form">
-        <h2>Agregar un nuevo post</h2>
-        <form id="newPostForm" action="/api/create-post" method="POST">
-            <input type="hidden" name="authorID" value="{{.ID}}">
-            <input type="text" name="title" placeholder="Título del post" required>
-            <input type="text" name="description" placeholder="Descripción del Post" required>
-
-            <!-- Reemplazo del <textarea> por un <div> para Quill -->
-            <div id="editor" style="height: 200px;"></div>
-            <!-- Campo oculto para enviar contenido al servidor -->
-            <input type="hidden" name="content" id="hiddenContent">
-
-            <div class="categoria">
-                <select name="categoria" required>
-                    <option value="Tech">Tech</option>
-                    <option value="Historias">Historias</option>
-                </select>
-            </div>
-            <button class="button" type="submit">Agregar Post</button>
-        </form>
+    <div class="dash-header-right">
+      <a href="/radio/upload" class="btn btn-outline">Subir música</a>
+      <form action="/logout" method="POST" style="margin:0">
+        <button class="btn btn-danger" type="submit">Logout</button>
+      </form>
     </div>
+  </header>
 
-    <h3>Buscar Post</h3>
-    <div class="search-posts-form">
-        <input type="text" id="searchQuery" placeholder="Buscar posts...">
-        <button class="button" type="button" id="searchButton">Buscar</button>
+  <!-- Tabs -->
+  <div class="dash-tabs">
+    <button class="dash-tab active" data-tab="create">Crear Post</button>
+    <button class="dash-tab" data-tab="manage">Gestionar Posts</button>
+  </div>
+
+  <!-- Panel: Crear Post -->
+  <div class="dash-panel" id="tab-create">
+    <div class="card">
+      <h2 class="card-title">Nuevo Post</h2>
+      <form id="newPostForm">
+        <input type="hidden" name="authorID" value="{{.ID}}">
+        <div class="form-group">
+          <label for="postTitle">Título</label>
+          <input type="text" id="postTitle" name="title" placeholder="Título del post" required>
+        </div>
+        <div class="form-group">
+          <label for="postDesc">Descripción</label>
+          <input type="text" id="postDesc" name="description" placeholder="Descripción corta" required>
+        </div>
+        <div class="form-group">
+          <label>Contenido</label>
+          <div id="editor"></div>
+          <input type="hidden" name="content" id="hiddenContent">
+        </div>
+        <div class="form-group">
+          <label for="postCat">Categoría</label>
+          <select id="postCat" name="categoria" required>
+            <option value="Tech">Tech</option>
+            <option value="Historias">Historias</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Publicar Post</button>
+      </form>
     </div>
+  </div>
 
-    <div class="container-button-logout">
-        <form action="/logout" method="POST">
-            <button class="button" id="logoutButton" type="submit">Logout</button>
-        </form>
+  <!-- Panel: Gestionar Posts -->
+  <div class="dash-panel hidden" id="tab-manage">
+    <div class="card">
+      <h2 class="card-title">Buscar y editar posts</h2>
+      <div class="search-bar">
+        <input type="text" id="searchQuery" placeholder="Buscar por título...">
+        <button class="btn btn-primary" id="searchButton">Buscar</button>
+      </div>
+      <div id="searchResults" class="results-list">
+        <p class="results-empty">Escribe un término y pulsa Buscar.</p>
+      </div>
     </div>
+  </div>
 
-    <!-- Scripts -->
-    <script defer src="/static/js/localStorages.js"></script>
-    <script defer src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script defer src="/static/js/createPost.js"></script>
-    <script defer src="/static/js/searchPost.js"></script>
-
-    <!-- Quill.js -->
-    <script defer src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Inicializa Quill en el div con ID 'editor'
-            var quill = new Quill("#editor", {
-                theme: "snow",
-                placeholder: "Escribe tu contenido aquí...",
-                modules: {
-                    toolbar: [
-                        ["bold", "italic", "underline"],
-                        [{ list: "ordered" }, { list: "bullet" }],
-                        ["link", "image"],
-                    ],
-                },
-            });
-
-            // Captura el contenido antes de enviar el formulario
-            document.querySelector("#newPostForm").addEventListener("submit", function () {
-                document.querySelector("#hiddenContent").value = quill.root.innerHTML;
-            });
-        });
-    </script>
 </div>
 
-{{ end }}
+<!-- Modal Editar Post -->
+<div class="modal-overlay hidden" id="editModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Editar Post</h3>
+      <button class="modal-close" id="closeModal" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="editPostForm">
+        <input type="hidden" id="editPostId">
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" id="editTitle" required>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <input type="text" id="editDescription" required>
+        </div>
+        <div class="form-group">
+          <label>Contenido</label>
+          <div id="editEditor"></div>
+          <input type="hidden" id="editHiddenContent">
+        </div>
+        <div class="form-group">
+          <label>Categoría</label>
+          <select id="editCategoria" required>
+            <option value="Tech">Tech</option>
+            <option value="Historias">Historias</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancelEdit">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Datos de sesión para localStorages.js -->
+<div id="username" data-username="{{.Username}}" style="display:none"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script defer src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script defer src="/static/js/localStorages.js"></script>
+<script defer src="/static/js/createPost.js"></script>
+<script defer src="/static/js/searchPost.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  /* ---- Tab switching ---- */
+  document.querySelectorAll('.dash-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.dash-tab').forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      document.querySelectorAll('.dash-panel').forEach(function (p) { p.classList.add('hidden'); });
+      document.getElementById('tab-' + tab.dataset.tab).classList.remove('hidden');
+    });
+  });
+
+  /* ---- Quill: crear post ---- */
+  window.quillEditor = new Quill('#editor', {
+    theme: 'snow',
+    placeholder: 'Escribe tu contenido aquí...',
+    modules: {
+      toolbar: [
+        ['bold', 'italic', 'underline'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'image'],
+        ['code-block'],
+      ],
+    },
+  });
+
+  document.getElementById('newPostForm').addEventListener('submit', function () {
+    document.getElementById('hiddenContent').value = window.quillEditor.root.innerHTML;
+  });
+
+  /* ---- Quill: editar post ---- */
+  window.quillEditEditor = new Quill('#editEditor', {
+    theme: 'snow',
+    placeholder: 'Edita el contenido...',
+    modules: {
+      toolbar: [
+        ['bold', 'italic', 'underline'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'image'],
+        ['code-block'],
+      ],
+    },
+  });
+
+  document.getElementById('editPostForm').addEventListener('submit', function () {
+    document.getElementById('editHiddenContent').value = window.quillEditEditor.root.innerHTML;
+  });
+
+  /* ---- Modal: abrir (llamado desde searchPost.js) ---- */
+  window.openEditModal = function (postId) {
+    fetch('/api/posts/' + postId)
+      .then(function (r) { return r.json(); })
+      .then(function (post) {
+        document.getElementById('editPostId').value        = post.id;
+        document.getElementById('editTitle').value         = post.title;
+        document.getElementById('editDescription').value   = post.description;
+        document.getElementById('editCategoria').value     = post.categoria;
+        window.quillEditEditor.root.innerHTML              = post.content || '';
+        document.getElementById('editModalOverlay').classList.remove('hidden');
+      })
+      .catch(function () {
+        Swal.fire('Error', 'No se pudo cargar el post.', 'error');
+      });
+  };
+
+  /* ---- Modal: cerrar ---- */
+  function closeModal() {
+    document.getElementById('editModalOverlay').classList.add('hidden');
+  }
+
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  document.getElementById('cancelEdit').addEventListener('click', closeModal);
+  document.getElementById('editModalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeModal();
+  });
+
+  /* ---- Guardar edición ---- */
+  document.getElementById('editPostForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var id = document.getElementById('editPostId').value;
+    var body = {
+      title:       document.getElementById('editTitle').value,
+      description: document.getElementById('editDescription').value,
+      content:     window.quillEditEditor.root.innerHTML,
+      categoria:   document.getElementById('editCategoria').value,
+    };
+
+    fetch('/api/update-post/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    .then(function (r) {
+      if (!r.ok) throw new Error('Error ' + r.status);
+      return r.json();
+    })
+    .then(function () {
+      Swal.fire('¡Listo!', 'Post actualizado correctamente.', 'success');
+      closeModal();
+    })
+    .catch(function () {
+      Swal.fire('Error', 'No se pudo actualizar el post.', 'error');
+    });
+  });
+
+});
+</script>
+{{end}}

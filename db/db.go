@@ -248,8 +248,8 @@ func InsertPost(post *models.Post) error {
 }
 
 func UpdatePost(postID int, post *models.Post) error {
-	const query = `UPDATE Posts SET Title=?, Description=?, Content=?, Category=?, AuthorID=? WHERE ID=?`
-	_, err := Db.Exec(query, post.Title, post.Description, post.Content, post.Categoria, post.AuthorID, postID)
+	const query = `UPDATE Posts SET Title=?, Description=?, Content=?, Category=? WHERE ID=?`
+	_, err := Db.Exec(query, post.Title, post.Description, post.Content, post.Categoria, postID)
 	return err
 }
 

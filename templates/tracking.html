@@ -1,34 +1,133 @@
-<!-- templates/home.html -->
-{{ define "title" }}Visitas{{ end }}
+{{ define "title" }}Mapa de Visitas{{ end }}
+
+{{ define "extra_css" }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="/static/css/tracking.css" />
+{{ end }}
 
 {{ define "content" }}
+<div class="tracking-container">
+  <h2 class="tracking-title">Mapa de Visitas</h2>
 
-<head>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-</head>
+  <div class="tracking-stats">
+    <div class="stat-card">
+      <span class="stat-number" id="statTotal">—</span>
+      <span class="stat-label">Visitas</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number" id="statCountries">—</span>
+      <span class="stat-label">Países</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number" id="statIPs">—</span>
+      <span class="stat-label">IPs únicas</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number" id="statCities">—</span>
+      <span class="stat-label">Ciudades</span>
+    </div>
+  </div>
 
+  <div id="map"></div>
 
-<h2>Mapa de Visitas</h2>
-<div id="map" style="height: 500px;"></div>
+  <div class="visits-section">
+    <h3>Visitas recientes</h3>
+    <div class="table-scroll">
+      <table class="visits-table">
+        <thead>
+          <tr>
+            <th>País</th>
+            <th>Ciudad</th>
+            <th>Región</th>
+            <th>Página</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody id="visitsBody">
+          <tr>
+            <td colspan="5" class="tracking-empty">Cargando visitas...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    var map = L.map('map').setView([10, -75], 3); // Vista inicial
+document.addEventListener("DOMContentLoaded", function () {
+  var map = L.map('map', { zoomControl: true }).setView([20, 0], 2);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 18,
+  }).addTo(map);
 
-    fetch('/api/visits/location')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(visit => {
-                if (visit.latitude && visit.longitude) {
-                    L.marker([visit.latitude, visit.longitude])
-                        .addTo(map)
-                        .bindPopup(`${visit.city}, ${visit.country}<br>${visit.page}`);
-                }
-            });
-        });
+  fetch('/api/visits/location')
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (!Array.isArray(data) || data.length === 0) {
+        document.getElementById('visitsBody').innerHTML =
+          '<tr><td colspan="5" class="tracking-empty">No hay visitas registradas.</td></tr>';
+        document.getElementById('statTotal').textContent = '0';
+        document.getElementById('statCountries').textContent = '0';
+        document.getElementById('statIPs').textContent = '0';
+        document.getElementById('statCities').textContent = '0';
+        return;
+      }
+
+      // ---- Estadísticas ----
+      var countries = new Set();
+      var ips = new Set();
+      var cities = new Set();
+      data.forEach(function (v) {
+        if (v.country) countries.add(v.country);
+        if (v.ip)      ips.add(v.ip);
+        if (v.city)    cities.add(v.city);
+      });
+      document.getElementById('statTotal').textContent     = data.length;
+      document.getElementById('statCountries').textContent = countries.size;
+      document.getElementById('statIPs').textContent       = ips.size;
+      document.getElementById('statCities').textContent    = cities.size;
+
+      // ---- Marcadores en el mapa ----
+      data.forEach(function (v) {
+        if (v.latitude && v.longitude) {
+          L.circleMarker([v.latitude, v.longitude], {
+            radius: 7,
+            fillColor: '#a10395',
+            color: '#fff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.85,
+          }).addTo(map).bindPopup(
+            '<strong>' + (v.city || '—') + ', ' + (v.country || '—') + '</strong>' +
+            '<br><span>Página: <code>' + (v.page || '/') + '</code></span>' +
+            (v.timestamp ? '<br><span style="font-size:0.82em;color:#888">' + String(v.timestamp).slice(0, 10) + '</span>' : '')
+          );
+        }
+      });
+
+      // ---- Tabla ----
+      var tbody = document.getElementById('visitsBody');
+      tbody.innerHTML = '';
+      data.slice(0, 25).forEach(function (v) {
+        var date = v.timestamp ? String(v.timestamp).slice(0, 16).replace('T', ' ') : '—';
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + (v.country || '—') + '</td>' +
+          '<td>' + (v.city    || '—') + '</td>' +
+          '<td>' + (v.region  || '—') + '</td>' +
+          '<td><span class="badge-page">' + (v.page || '/') + '</span></td>' +
+          '<td>' + date + '</td>';
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(function (err) {
+      console.error('Error cargando visitas:', err);
+      document.getElementById('visitsBody').innerHTML =
+        '<tr><td colspan="5" class="tracking-empty">Error al cargar visitas.</td></tr>';
+    });
+});
 </script>
 {{ end }}

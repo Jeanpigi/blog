@@ -1,37 +1,54 @@
-{{ define "title" }}Upload Music{{ end }}
+{{define "title"}}Subir Música{{end}}
 
-{{ define "content" }}
+{{define "extra_css"}}
+<link rel="stylesheet" href="/static/css/upload.css">
+{{end}}
 
+{{define "content"}}
+<div class="upload-wrapper">
 
-<head>
-    <link rel="stylesheet" type="text/css"  href="/static/css/upload.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
+  <nav class="upload-breadcrumbs">
+    <a href="/dashboard">Dashboard</a>
+    <span>/</span>
+    <span>Subir música</span>
+  </nav>
 
-<div class="container">
-    <nav class="breadcrumbs">
-        <a href="/dashboard">Dashboard</a>
-        <span> / </span>
-        <span>Subir música</span>
-    </nav>
-
-
-    <h1>Upload Music</h1>
-    <form id="uploadForm" action="/radio/upload" method="post" enctype="multipart/form-data">
-        <input id="musicFile" type="file" name="musicFiles" accept="audio/*" multiple required>
-        <button id="submitButton" type="submit">Upload</button>
-    </form>
-
-    <div class="container-button-logout">
-        <form action="/logout" method="POST">
-            <button class="button" id="logoutButton" type="submit">Salir</button>
-        </form>
+  <div class="upload-card">
+    <div class="upload-header">
+      <i class="fa fa-music upload-icon-header"></i>
+      <h1>Radio — Subir pistas</h1>
+      <p>Formatos aceptados: <strong>MP3</strong> · máx. 20 MB por archivo · hasta 5 a la vez</p>
     </div>
 
+    <form id="uploadForm" action="/radio/upload" method="post" enctype="multipart/form-data">
+
+      <!-- Zona drag-and-drop -->
+      <label class="drop-zone" id="dropZone" for="musicFile">
+        <i class="fa fa-cloud-upload-alt drop-icon"></i>
+        <span class="drop-text">Arrastra tus MP3 aquí</span>
+        <span class="drop-hint">o haz clic para seleccionar</span>
+        <input id="musicFile" type="file" name="musicFiles" accept=".mp3,audio/mpeg" multiple required>
+      </label>
+
+      <!-- Lista de archivos seleccionados -->
+      <ul class="file-list" id="fileList"></ul>
+
+      <button id="submitButton" type="submit" class="upload-btn" disabled>
+        <i class="fa fa-upload"></i>
+        <span>Subir</span>
+      </button>
+
+    </form>
+
+    <div class="upload-footer">
+      <a href="/dashboard" class="back-link">
+        <i class="fa fa-arrow-left"></i> Volver al dashboard
+      </a>
+    </div>
+  </div>
+
 </div>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script defer src="/static/js/upload.js"></script>
-{{ end }}
-
-
-
-
+{{end}}

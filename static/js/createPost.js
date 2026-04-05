@@ -1,59 +1,55 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("newPostForm");
+  var form = document.getElementById("newPostForm");
+  if (!form) return;
 
   form.addEventListener("submit", function (event) {
-    event.preventDefault(); // Previene el envío automático del formulario
+    event.preventDefault();
 
-    // Recoger los datos del formulario
-    const formData = new FormData(this);
-    const post = {
-      title: formData.get("title"),
+    var formData = new FormData(this);
+    var post = {
+      title:       formData.get("title"),
       description: formData.get("description"),
-      content: formData.get("content"),
-      categoria: formData.get("categoria"),
-      author_id: parseInt(formData.get("authorID"), 10),
+      content:     formData.get("content"),
+      categoria:   formData.get("categoria"),
+      author_id:   parseInt(formData.get("authorID"), 10),
     };
 
-    // Verificar que todos los campos requeridos estén llenos
     if (!post.title || !post.description || !post.content || !post.categoria) {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Todos los campos son requeridos!",
-        // footer: '<a href>Why do I have this issue?</a>' // Opcional, si necesitas un footer
+        title: "Campos incompletos",
+        text: "Todos los campos son requeridos.",
       });
-    } else {
-      // Si todos los campos están llenos, enviar los datos al servidor de forma asíncrona
-      fetch("/api/create-post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(post),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.text();
-        })
-        .then((data) => {
-          Swal.fire(
-            "¡Buen trabajo!",
-            "El post fue creado exitosamente.",
-            "success"
-          );
-          // Limpia el formulario tras el envío exitoso
-          form.reset();
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Hubo un problema al crear el post.",
-          });
-        });
+      return;
     }
+
+    fetch("/api/create-post", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(post),
+    })
+      .then(function (response) {
+        if (!response.ok) throw new Error("Error " + response.status);
+        return response.text();
+      })
+      .then(function () {
+        Swal.fire("¡Publicado!", "El post fue creado exitosamente.", "success");
+
+        // Limpiar campos del formulario
+        form.reset();
+
+        // Limpiar el editor Quill (form.reset() no lo limpia)
+        if (window.quillEditor) {
+          window.quillEditor.setContents([]);
+        }
+      })
+      .catch(function (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un problema al crear el post.",
+        });
+      });
   });
 });

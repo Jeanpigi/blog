@@ -1,160 +1,241 @@
-/* 🧱 Contenedor principal */
-.container {
-  max-width: 600px;
-  min-height: 60vh;
-  margin: 4rem auto;
-  padding: 3rem 2rem;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  text-align: center;
+/* ===== Upload / Radio ===== */
+
+.upload-wrapper {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* ---- Breadcrumbs ---- */
+.upload-breadcrumbs {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* 🧭 Migas de pan */
-.breadcrumbs {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  color: #555;
-  text-align: left;
-  flex-wrap: wrap;
-}
-
-.breadcrumbs a {
-  text-decoration: none;
-  color: #a10395;
-  font-weight: 500;
-}
-
-.breadcrumbs a:hover {
-  text-decoration: underline;
-}
-
-.breadcrumbs span {
-  margin: 0 5px;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
   color: #888;
 }
 
-/* 📝 Título */
-.container h1 {
-  font-size: 2.5rem;
+.upload-breadcrumbs a {
+  color: #a10395;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.upload-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Card ---- */
+.upload-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+}
+
+/* ---- Header ---- */
+.upload-header {
+  text-align: center;
   margin-bottom: 2rem;
-  color: #24292e;
 }
 
-/* 🗂️ Formulario */
-#uploadForm {
-  margin-top: 1rem;
-}
-
-/* 🎵 Selector de archivos */
-input[type="file"] {
+.upload-icon-header {
+  font-size: 2.5rem;
+  color: #a10395;
+  margin-bottom: 0.75rem;
   display: block;
-  margin: 0 auto 1.5rem auto;
-  padding: 12px;
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  transition: border-color 0.3s ease;
-  width: 100%;
-  max-width: 400px;
-  font-size: 1rem;
 }
 
-input[type="file"]:hover {
-  border-color: #a10395;
+.upload-header h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1a1d21;
+  margin: 0 0 0.5rem;
 }
 
-/* 🎯 Botón de subida */
-button {
-  padding: 12px 30px;
-  background: linear-gradient(45deg, #a10395, #007BFF);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.upload-header p {
+  font-size: 0.875rem;
+  color: #888;
+  margin: 0;
 }
 
-button:hover {
-  background: linear-gradient(45deg, #7a0378, #0056b3);
-  transform: translateY(-2px);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-/* 🔓 Logout */
-.container-button-logout {
-  margin-top: 2rem;
+/* ---- Zona drag-and-drop ---- */
+.drop-zone {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-}
-
-#logoutButton {
-  background: linear-gradient(45deg, #dc3545, #ff4b5c);
-  color: #fff;
-  font-weight: bold;
-  padding: 12px 30px;
-  border-radius: 30px;
-  border: none;
+  gap: 0.5rem;
+  border: 2.5px dashed #d0d0d0;
+  border-radius: 14px;
+  padding: 2.5rem 1rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  background: #fafafa;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: center;
+  position: relative;
 }
 
-#logoutButton:hover {
-  background: linear-gradient(45deg, #b02a37, #e03145);
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: #a10395;
+  background: #fdf4ff;
 }
 
-/* 📱 Responsive */
-@media (max-width: 768px) {
-  .container {
-    margin: 2rem auto;
-    padding: 2rem 1.5rem;
-  }
-
-  .container h1 {
-    font-size: 2rem;
-  }
-
-  input[type="file"] {
-    font-size: 0.95rem;
-  }
-
-  .breadcrumbs {
-    font-size: 1rem;
-  }
+.drop-icon {
+  font-size: 2.8rem;
+  color: #ccc;
+  transition: color 0.2s;
 }
 
+.drop-zone:hover .drop-icon,
+.drop-zone.drag-over .drop-icon {
+  color: #a10395;
+}
+
+.drop-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.drop-hint {
+  font-size: 0.82rem;
+  color: #aaa;
+}
+
+/* Ocultar el input nativo */
+.drop-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- Lista de archivos ---- */
+.file-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.file-list:empty {
+  display: none;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  font-size: 0.875rem;
+  color: #333;
+  animation: fadeIn 0.2s ease;
+}
+
+.file-item .file-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.file-item .file-size {
+  color: #999;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.file-item .file-ic {
+  color: #a10395;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Botón subir ---- */
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.8rem;
+  background: #a10395;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(161, 3, 149, 0.28);
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.upload-btn:hover:not(:disabled) {
+  background: #870280;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(161, 3, 149, 0.36);
+}
+
+.upload-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ---- Footer ---- */
+.upload-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.back-link {
+  font-size: 0.875rem;
+  color: #888;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #a10395;
+}
+
+/* ---- Responsive ---- */
 @media (max-width: 480px) {
-  .container {
-    padding: 1.5rem 1rem;
+  .upload-card {
+    padding: 1.75rem 1.25rem;
+    border-radius: 14px;
   }
 
-  .container h1 {
-    font-size: 1.6rem;
+  .upload-header h1 {
+    font-size: 1.4rem;
   }
 
-  button,
-  #logoutButton {
-    width: 100%;
-    font-size: 1rem;
+  .drop-zone {
+    padding: 2rem 0.75rem;
   }
 
-  input[type="file"] {
-    max-width: 100%;
-    font-size: 0.9rem;
-  }
-
-  .breadcrumbs {
-    text-align: center;
-    font-size: 0.95rem;
+  .drop-icon {
+    font-size: 2.2rem;
   }
 }
-
