@@ -56,15 +56,20 @@
     navigator.mediaSession.setActionHandler('stop', function () {
       audio.pause();
     });
-    // "siguiente" avanza la emisión para todos los oyentes
+    // "siguiente" — solo admin puede forzar el avance vía API
     navigator.mediaSession.setActionHandler('nexttrack', function () {
       postAdvance().then(function (data) {
-        if (data && data.song) {
-          updateTitle(data.song);
-          setMediaMetadata(data.song);
-        }
+        if (!data || !data.song) return;
+        updateTitle(data.song);
+        setMediaMetadata(data.song);
         audio.src = '/radio/stream';
-        audio.play().catch(function () {});
+        var elapsed = (Date.now() - data.startedAt) / 1000;
+        audio.play().then(function () {
+          applyState(true);
+          if (elapsed > 2 && elapsed < 900) {
+            try { audio.currentTime = elapsed; } catch (_) {}
+          }
+        }).catch(function () {});
       });
     });
   }
@@ -119,6 +124,18 @@
     return fetch('/api/radio/advance', { method: 'POST' })
       .then(function (r) { return r.json(); })
       .catch(function () { return null; });
+  }
+
+  // Polls /api/radio/now-playing until startedAt changes (server advanced) or max attempts.
+  function waitForNextSong(oldStartedAt, attempts, callback) {
+    if (attempts >= 15) return;
+    fetchNowPlaying().then(function (data) {
+      if (data && data.startedAt !== oldStartedAt) {
+        callback(data);
+      } else {
+        setTimeout(function () { waitForNextSong(oldStartedAt, attempts + 1, callback); }, 1000);
+      }
+    });
   }
 
   // ── Reproducción ──────────────────────────────────────────────────────────
@@ -181,13 +198,21 @@
 
   audio.addEventListener('ended', function () {
     applyState(false);
-    postAdvance().then(function (data) {
-      if (data && data.song) {
+    // Server auto-advances based on song duration; poll until it does.
+    fetchNowPlaying().then(function (current) {
+      var oldStartedAt = current ? current.startedAt : 0;
+      waitForNextSong(oldStartedAt, 0, function (data) {
         updateTitle(data.song);
         setMediaMetadata(data.song);
-      }
-      audio.src = '/radio/stream';
-      audio.play().then(function () { applyState(true); }).catch(function () {});
+        audio.src = '/radio/stream';
+        var elapsed = (Date.now() - data.startedAt) / 1000;
+        audio.play().then(function () {
+          applyState(true);
+          if (elapsed > 2 && elapsed < 900) {
+            try { audio.currentTime = elapsed; } catch (_) {}
+          }
+        }).catch(function () { applyState(false); });
+      });
     });
   });
 

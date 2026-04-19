@@ -165,7 +165,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			music.MusicFiles = append(music.MusicFiles, dstPath)
 			playlist.AddSong(dstPath)
 			// Si el broadcast estaba vacío (servidor inició sin canciones), activarlo ahora.
-			AdvanceBroadcast()
+			StartBroadcastIfEmpty()
 			uploaded = append(uploaded, name)
 		}
 
