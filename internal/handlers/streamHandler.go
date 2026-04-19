@@ -5,38 +5,75 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/Jeanpigi/blog/internal/playlist"
 )
 
-// nowPlaying mantiene la canción actual para que requests de rango consecutivos
-// sirvan el mismo archivo (un request sin Range = nueva canción).
-var (
-	nowPlaying   string
-	nowPlayingMu sync.Mutex
-)
+// broadcast mantiene el estado global de la emisión de radio.
+// Todos los clientes reciben la misma canción en la misma posición.
+var broadcast struct {
+	song         string
+	startedAt    time.Time
+	lastAdvanced time.Time
+	mu           sync.RWMutex
+}
+
+// InitBroadcast debe llamarse una vez después de que la playlist esté cargada.
+func InitBroadcast() {
+	broadcast.mu.Lock()
+	defer broadcast.mu.Unlock()
+	broadcast.song = playlist.NextSong()
+	broadcast.startedAt = time.Now()
+	broadcast.lastAdvanced = time.Now()
+}
+
+// GetBroadcastState devuelve el nombre base de la canción actual y cuándo empezó.
+func GetBroadcastState() (string, time.Time) {
+	broadcast.mu.RLock()
+	defer broadcast.mu.RUnlock()
+	return filepath.Base(broadcast.song), broadcast.startedAt
+}
+
+// AdvanceBroadcast avanza a la siguiente canción.
+// Debounceado a 5s para evitar saltos cuando varios clientes terminan simultáneamente.
+// Si no hay canción activa (broadcast vacío), omite el debounce para inicializar.
+func AdvanceBroadcast() {
+	broadcast.mu.Lock()
+	defer broadcast.mu.Unlock()
+	if broadcast.song != "" && time.Since(broadcast.lastAdvanced) < 5*time.Second {
+		return
+	}
+	next := playlist.NextSong()
+	if next == "" {
+		return
+	}
+	broadcast.song = next
+	broadcast.startedAt = time.Now()
+	broadcast.lastAdvanced = time.Now()
+}
 
 func StreamHandler(w http.ResponseWriter, r *http.Request) {
-	rangeHeader := r.Header.Get("Range")
+	broadcast.mu.RLock()
+	songPath := broadcast.song
+	broadcast.mu.RUnlock()
 
-	nowPlayingMu.Lock()
-	if rangeHeader == "" || nowPlaying == "" {
-		nowPlaying = playlist.NextSong()
+	// Si no hay canción activa (playlist vacía al inicio y canciones subidas después),
+	// intentar obtener una ahora.
+	if songPath == "" {
+		AdvanceBroadcast()
+		broadcast.mu.RLock()
+		songPath = broadcast.song
+		broadcast.mu.RUnlock()
 	}
-	songPath := nowPlaying
-	nowPlayingMu.Unlock()
 
 	if songPath == "" {
-		http.Error(w, "No hay canciones en la playlist. Sube archivos MP3 primero.", http.StatusServiceUnavailable)
+		http.Error(w, "No hay canciones disponibles. Sube archivos MP3 primero.", http.StatusServiceUnavailable)
 		return
 	}
 
 	file, err := os.Open(songPath)
 	if err != nil {
-		// El archivo podría haber sido borrado; avanzar a la siguiente canción
-		nowPlayingMu.Lock()
-		nowPlaying = ""
-		nowPlayingMu.Unlock()
 		http.Error(w, "Canción no disponible", http.StatusInternalServerError)
 		return
 	}
@@ -48,17 +85,11 @@ func StreamHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Headers de radio/audio
 	w.Header().Set("Content-Type", "audio/mpeg")
 	w.Header().Set("Cache-Control", "no-cache, no-store")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
-	// Nombre de la canción actual (útil para reproductores)
 	w.Header().Set("X-Song-Name", filepath.Base(songPath))
+	w.Header().Set("Access-Control-Expose-Headers", "X-Song-Name")
 
-	// http.ServeContent maneja automáticamente:
-	// - Range requests (206 Partial Content)
-	// - ETag y Last-Modified
-	// - Content-Length correcto
-	// - Buffer interno optimizado (~32KB, adecuado para 128kbps ≈ 16KB/s)
 	http.ServeContent(w, r, filepath.Base(songPath), stat.ModTime(), file)
 }

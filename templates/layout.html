@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="/static/css/style.css?v={{staticVer}}">
+  <link rel="stylesheet" href="/static/css/radio.css?v={{staticVer}}">
   <link rel="shortcut icon" href="/static/assets/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
   {{block "extra_css" .}}{{end}}
@@ -64,6 +65,68 @@
   </footer>
 
   <script src="/static/js/burguerButton.js?v={{staticVer}}"></script>
+  <script src="/static/js/pjax.js?v={{staticVer}}"></script>
+
+  <!-- ===== JbearP Radio Player ===== -->
+  <audio id="radioAudio" preload="none"></audio>
+
+  <div class="radio-wrap">
+    <div class="radio-player">
+
+      <!-- Player expandido -->
+      <div class="radio-full" id="radioFull">
+        <button class="radio-btn-collapse" id="radioCollapseBtn" aria-label="Minimizar player">
+          <i class="fa fa-chevron-down"></i> Minimizar
+        </button>
+
+        <div class="radio-disc">
+          <div class="radio-disc-outer" id="radioDisc">
+            <div class="radio-disc-inner"></div>
+          </div>
+        </div>
+
+        <div class="radio-full-info">
+          <div class="radio-full-live">
+            <div class="radio-live-dot"></div>
+            <span>En vivo</span>
+          </div>
+          <div class="radio-full-song" id="radioFullSong">JbearP Radio</div>
+          <div class="radio-full-station">Transmisión en tiempo real</div>
+        </div>
+
+        <div class="radio-full-controls">
+          <button class="radio-btn-main" id="radioBtnMain" aria-label="Reproducir / Pausar">
+            <i class="fa fa-play" id="radioPlayIconMain"></i>
+          </button>
+        </div>
+
+        <div class="radio-volume-row">
+          <i class="fa fa-volume-down"></i>
+          <input type="range" class="radio-volume-slider" id="radioVolume"
+                 min="0" max="1" step="0.05" value="0.8" aria-label="Volumen">
+          <i class="fa fa-volume-up"></i>
+        </div>
+      </div>
+
+      <!-- Mini player (siempre visible) -->
+      <div class="radio-mini" id="radioMini" role="region" aria-label="Radio JbearP">
+        <div class="radio-live-dot" id="radioLiveDot"></div>
+        <div class="radio-wave is-paused" id="radioWave" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <span class="radio-mini-title" id="radioMiniTitle">JbearP Radio</span>
+        <button class="radio-btn" id="radioBtnMini" aria-label="Reproducir / Pausar radio">
+          <i class="fa fa-play" id="radioPlayIconMini"></i>
+        </button>
+        <button class="radio-btn radio-btn-expand" id="radioExpandBtn" aria-label="Abrir player completo">
+          <i class="fa fa-chevron-up"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/static/js/radio.js?v={{staticVer}}"></script>
 </body>
 </html>
 {{end}}

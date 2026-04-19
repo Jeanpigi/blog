@@ -1,0 +1,627 @@
+/* ===== JbearP Radio Player — Apple-inspired ===== */
+
+/* Espacio para que el contenido no quede oculto tras el player fijo */
+.main-content {
+  padding-bottom: 8rem;
+}
+
+/* ───────────────────────────────────────────────
+   Contenedor flotante
+─────────────────────────────────────────────── */
+.radio-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 9000;
+  padding: 0 1.6rem;
+  /* respeta el notch / home-bar de iPhone */
+  padding-bottom: max(1.4rem, env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+.radio-player {
+  pointer-events: all;
+  width: 100%;
+  max-width: 56rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* ───────────────────────────────────────────────
+   Live dot pulsante
+─────────────────────────────────────────────── */
+.radio-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff375f;
+  flex-shrink: 0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.radio-live-dot.is-paused {
+  background: #48484a;
+  animation: none;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(255, 55, 95, 0.6); }
+  50%       { box-shadow: 0 0 0 5px rgba(255, 55, 95, 0);   }
+}
+
+/* ───────────────────────────────────────────────
+   Wave bars
+─────────────────────────────────────────────── */
+.radio-wave {
+  display: flex;
+  align-items: center;
+  gap: 2.5px;
+  flex-shrink: 0;
+  height: 18px;
+}
+
+.radio-wave span {
+  display: block;
+  width: 3px;
+  background: #bf5af2;
+  border-radius: 2px;
+  transform-origin: bottom;
+  animation: wave-bar 0.9s ease-in-out infinite;
+}
+
+.radio-wave span:nth-child(1) { height: 7px;  animation-delay: 0s;    }
+.radio-wave span:nth-child(2) { height: 14px; animation-delay: 0.18s; }
+.radio-wave span:nth-child(3) { height: 10px; animation-delay: 0.36s; }
+.radio-wave span:nth-child(4) { height: 16px; animation-delay: 0.09s; }
+.radio-wave span:nth-child(5) { height: 8px;  animation-delay: 0.27s; }
+
+@keyframes wave-bar {
+  0%, 100% { transform: scaleY(0.25); opacity: 0.6; }
+  50%       { transform: scaleY(1);   opacity: 1;   }
+}
+
+.radio-wave.is-paused span {
+  animation-play-state: paused;
+  transform: scaleY(0.25);
+  opacity: 0.4;
+}
+
+/* ───────────────────────────────────────────────
+   Mini player
+─────────────────────────────────────────────── */
+.radio-mini {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  /* fallback sólido para navegadores sin backdrop-filter */
+  background: #1c1c1e;
+  background: rgba(28, 28, 30, 0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  /* touch highlight en móvil */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.radio-mini:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+}
+
+.radio-mini-title {
+  flex: 1;
+  min-width: 0; /* crítico: permite que flex-child se encoja y muestre ellipsis */
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.015em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+}
+
+/* Botones del mini player */
+.radio-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background 0.15s;
+  flex-shrink: 0;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+  /* área táctil mínima de 44px para accesibilidad móvil */
+  min-width: 4.4rem;
+  min-height: 4.4rem;
+}
+
+.radio-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.radio-btn i {
+  font-size: 1.55rem;
+  width: 1.6rem;
+  text-align: center;
+  display: block;
+}
+
+.radio-btn-expand i {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ───────────────────────────────────────────────
+   Full player
+─────────────────────────────────────────────── */
+.radio-full {
+  /* fallback sólido */
+  background: #161618;
+  background: rgba(22, 22, 24, 0.97);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  padding: 2rem 2.2rem 1.8rem;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.8rem;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.05);
+  animation: radio-slide-up 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  /* Nunca superar el viewport — deja espacio para mini player y padding */
+  max-height: calc(100dvh - 10rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* scrollbar invisible pero funcional */
+  scrollbar-width: none;
+}
+
+.radio-full::-webkit-scrollbar {
+  display: none;
+}
+
+.radio-full.is-visible {
+  display: flex;
+}
+
+@keyframes radio-slide-up {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ───────────────────────────────────────────────
+   Disco giratorio
+─────────────────────────────────────────────── */
+.radio-disc {
+  width: 15rem;
+  height: 15rem;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.radio-disc-outer {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #1a1028 0%,
+    #2d1b69 20%,
+    #7c3aed 40%,
+    #bf5af2 55%,
+    #7c3aed 70%,
+    #2d1b69 85%,
+    #1a1028 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.05),
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    0 0 60px rgba(191, 90, 242, 0.18);
+  animation: radio-spin 10s linear infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+.radio-disc-outer.is-playing {
+  animation-play-state: running;
+}
+
+@keyframes radio-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Surcos del vinilo */
+.radio-disc-outer::before {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 0 0 6px  rgba(255, 255, 255, 0.04),
+    0 0 0 12px rgba(255, 255, 255, 0.03),
+    0 0 0 18px rgba(255, 255, 255, 0.02);
+}
+
+.radio-disc-inner {
+  width: 36%;
+  height: 36%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2a2a2e, #1c1c1e);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.radio-disc-inner::after {
+  content: '';
+  position: absolute;
+  inset: 32%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Reflejo de luz */
+.radio-disc-outer::after {
+  content: '';
+  position: absolute;
+  top: 8%; left: 20%;
+  width: 28%; height: 15%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  filter: blur(6px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ───────────────────────────────────────────────
+   Info de la canción
+─────────────────────────────────────────────── */
+.radio-full-info {
+  text-align: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.radio-full-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 55, 95, 0.12);
+  border: 1px solid rgba(255, 55, 95, 0.25);
+  border-radius: 999px;
+  padding: 0.25rem 0.9rem;
+  margin-bottom: 0.9rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ff375f;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.radio-full-live .radio-live-dot {
+  width: 6px;
+  height: 6px;
+}
+
+.radio-full-song {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+}
+
+.radio-full-station {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 0.4rem;
+  font-weight: 500;
+}
+
+/* ───────────────────────────────────────────────
+   Controles principales
+─────────────────────────────────────────────── */
+.radio-full-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radio-btn-main {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.radio-btn-main:hover  { transform: scale(1.06); box-shadow: 0 8px 32px rgba(0,0,0,0.45); }
+.radio-btn-main:active { transform: scale(0.95); }
+
+.radio-btn-main i {
+  font-size: 2.2rem;
+  color: #1c1c1e;
+}
+
+.radio-btn-main .fa-play {
+  margin-left: 3px; /* centrado óptico del triángulo */
+}
+
+/* ───────────────────────────────────────────────
+   Volumen
+─────────────────────────────────────────────── */
+.radio-volume-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.radio-volume-row i {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.radio-volume-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    #bf5af2 0%,
+    #bf5af2 var(--vol, 80%),
+    rgba(255, 255, 255, 0.15) var(--vol, 80%),
+    rgba(255, 255, 255, 0.15) 100%
+  );
+}
+
+.radio-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s;
+}
+
+.radio-volume-slider::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+.radio-volume-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Botón colapsar */
+.radio-btn-collapse {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  transition: color 0.15s, background 0.15s;
+  align-self: flex-end;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.radio-btn-collapse:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ───────────────────────────────────────────────
+   Responsive — tablet (768px)
+─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .radio-disc {
+    width: 13rem;
+    height: 13rem;
+  }
+}
+
+/* ───────────────────────────────────────────────
+   Responsive — móvil (480px)
+─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .main-content {
+    padding-bottom: 7.5rem;
+  }
+
+  .radio-wrap {
+    padding: 0 0.8rem;
+    padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
+  }
+
+  .radio-mini {
+    padding: 0.8rem 1rem;
+    gap: 0.6rem;
+    border-radius: 18px;
+  }
+
+  .radio-mini-title {
+    font-size: 1.2rem;
+  }
+
+  .radio-btn {
+    min-width: 4rem;
+    min-height: 4rem;
+    padding: 0.4rem;
+  }
+
+  .radio-btn i {
+    font-size: 1.4rem;
+  }
+
+  .radio-full {
+    padding: 1.4rem 1.4rem 1.2rem;
+    gap: 1.2rem;
+    border-radius: 22px;
+    max-height: calc(100dvh - 8rem);
+  }
+
+  .radio-disc {
+    width: 11rem;
+    height: 11rem;
+  }
+
+  .radio-full-song {
+    font-size: 1.55rem;
+  }
+
+  .radio-full-station {
+    font-size: 1.15rem;
+  }
+
+  .radio-btn-main {
+    width: 5.4rem;
+    height: 5.4rem;
+  }
+
+  .radio-btn-main i {
+    font-size: 2rem;
+  }
+}
+
+/* ───────────────────────────────────────────────
+   Responsive — móvil muy pequeño (360px)
+─────────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .radio-mini {
+    gap: 0.5rem;
+    padding: 0.7rem 0.9rem;
+  }
+
+  /* Ocultar wave bars en pantallas muy estrechas para ganar espacio al título */
+  .radio-wave {
+    display: none;
+  }
+
+  .radio-mini-title {
+    font-size: 1.15rem;
+  }
+
+  .radio-disc {
+    width: 9.5rem;
+    height: 9.5rem;
+  }
+}
+
+/* ───────────────────────────────────────────────
+   Landscape en móvil — player expandido compacto
+─────────────────────────────────────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .radio-full {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem 1.6rem;
+    gap: 1rem;
+    max-height: calc(100dvh - 7rem);
+  }
+
+  .radio-disc {
+    width: 8rem;
+    height: 8rem;
+    flex-shrink: 0;
+  }
+
+  .radio-full-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .radio-full-live {
+    margin-bottom: 0.4rem;
+  }
+
+  .radio-full-song {
+    font-size: 1.45rem;
+  }
+
+  .radio-full-controls {
+    order: 3;
+  }
+
+  .radio-volume-row {
+    order: 4;
+    flex-basis: 100%;
+  }
+
+  .radio-btn-collapse {
+    order: 0;
+    align-self: flex-start;
+  }
+}
+
+/* ───────────────────────────────────────────────
+   Accesibilidad — reducir movimiento
+─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .radio-disc-outer,
+  .radio-wave span,
+  .radio-live-dot,
+  .radio-full {
+    animation: none !important;
+  }
+}

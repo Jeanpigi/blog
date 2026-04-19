@@ -1,29 +1,42 @@
-# Binarios y ejecutables (Fundamentales para ahorrar tokens)
-bin/
-obj/
-*.exe
-*.exe_
-*.dll
-*.so
-*.dylib
-# El nombre de tu binario principal si lo compilas en la raíz
-tu_nombre_de_proyecto
+# Binarios compilados
+blog
+dbcheck
 
-# Dependencias (Claude no necesita leer el código de otros)
+# Archivos de audio (binarios, Claude no los puede leer)
+music/
+*.mp3
+*.wav
+*.flac
+*.ogg
+
+# Assets estáticos binarios
+static/assets/*.jpeg
+static/assets/*.jpg
+static/assets/*.png
+static/assets/*.ico
+static/assets/*.svg
+static/assets/*.webp
+static/assets/*.gif
+
+# Go internals (Claude no necesita leerlos)
+go.sum
 vendor/
-pkg/
-
-# Herramientas de test y cobertura
-*.out
 *.test
+*.out
 *.prof
 coverage.txt
 
-# Archivos de entorno y secretos
+# Secretos y entorno
 .env
 .env.*
+
+# IDEs
 .idea/
 .vscode/
 
-# Caché de Go (Muy pesado)
-.cache/
+# Git objects (muy pesado, nunca útil)
+.git/
+
+# OS
+.DS_Store
+Thumbs.db

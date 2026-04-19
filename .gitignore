@@ -103,5 +103,8 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/go,dotenv,macos,windows,linux
 # Claude
-CLAUDE.md 
-.cladueignore
+CLAUDE.md
+.claudeignore
+
+#musica
+music

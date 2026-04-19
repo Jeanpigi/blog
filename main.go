@@ -46,6 +46,7 @@ func main() {
 		log.Fatalf("❌ Error al cargar archivos de música: %v", err)
 	}
 	playlist.CreatePlaylist()
+	handlers.InitBroadcast()
 
 	// 🔹 Configurar router principal
 	router := mux.NewRouter()
@@ -87,6 +88,8 @@ func main() {
 	// ✅ RUTAS DE RADIO (integradas)
 	router.HandleFunc("/radio/stream", handlers.StreamHandler).Methods("GET")
 	router.HandleFunc("/radio/upload", middleware.RequireAuth(handlers.UploadHandler)).Methods("GET", "POST")
+	router.HandleFunc("/api/radio/now-playing", handlers.NowPlayingHandler).Methods("GET")
+	router.HandleFunc("/api/radio/advance", handlers.AdvanceSongHandler).Methods("POST")
 
 	// 🔹 Handler para rutas inexistentes
 	router.NotFoundHandler = http.HandlerFunc(handlers.NotFoundHandler)

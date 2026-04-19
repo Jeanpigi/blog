@@ -1,16 +1,16 @@
 {{define "title"}}Tecnología — JbearP{{end}}
 
 {{block "extra_css" .}}
-<link rel="stylesheet" href="/static/css/categories.css?v={{staticVer}}">
+<link rel="stylesheet" href="/static/css/blog.css?v={{staticVer}}">
 {{end}}
 
 {{define "content"}}
-<div class="cat-page">
-  <header class="cat-header">
-    <h1>Tecnología</h1>
+<div class="container-blog">
+  <div class="blog-header">
+    <h2>Tecnología</h2>
     <p>Guías, hacks, programación, diseño, videojuegos y tendencias que sí te sirven.</p>
-  </header>
-  <div id="container-tecnologia" class="cat-grid" aria-live="polite"></div>
+  </div>
+  <div id="container-tecnologia" aria-live="polite"></div>
 </div>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

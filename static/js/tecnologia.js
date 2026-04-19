@@ -19,9 +19,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (e) {
     console.error("[tech]", e);
     container.innerHTML = `
-      <div class="cat-empty">
-        No pudimos cargar los posts.
-        <button class="cat-btn" onclick="location.reload()">Reintentar</button>
+      <div style="text-align:center;padding:4rem 0;color:#ef4444;font-size:1.5rem">
+        No pudimos cargar los posts. Intenta de nuevo.
       </div>`;
   } finally {
     Swal.close();
@@ -30,51 +29,40 @@ document.addEventListener("DOMContentLoaded", async () => {
   function render(posts) {
     container.innerHTML = "";
     if (!posts.length) {
-      container.innerHTML = `<div class="cat-empty">No hay posts de tecnología por ahora.</div>`;
+      container.innerHTML = `
+        <div style="text-align:center;padding:4rem 0;color:#6b7280;font-size:1.5rem">
+          No hay posts de tecnología por ahora.
+        </div>`;
       return;
     }
-
     const frag = document.createDocumentFragment();
     posts.forEach(post => frag.appendChild(buildCard(post)));
     container.appendChild(frag);
-    revealCards();
   }
 
   function buildCard(post) {
     const article = document.createElement("article");
-    article.className = "cat-card";
-    article.tabIndex = 0;
+    article.className = "post";
 
-    // reading_min viene del backend (calculado sobre el HTML completo del post)
-    const mins = post.reading_min || 1;
     const date = formatDate(post.created_at);
+    const mins = post.reading_min || 1;
 
     article.innerHTML = `
-      <div class="cat-card__meta">
-        <time>${date}</time>
-        <span class="cat-card__sep">·</span>
-        <span>${mins} min de lectura</span>
+      <header class="post-head">
+        <div class="post-date">
+          <span class="post-categoria-badge tech">Tech</span>
+          <time class="date-text">${date}</time>
+          <span class="reading-time">${mins} min de lectura</span>
+        </div>
+        <h2><a href="/post/${post.id}">${escapeHtml(post.title || "Sin título")}</a></h2>
+      </header>
+      <div class="post-body">
+        <p>${escapeHtml(post.description || "")}</p>
       </div>
-      <h2 class="cat-card__title">
-        <a href="/post/${post.id}" class="cat-card__link">${escapeHtml(post.title || "Sin título")}</a>
-      </h2>
-      <p class="cat-card__desc">${escapeHtml(post.description || "")}</p>
-      <a class="cat-card__more" href="/post/${post.id}">Leer →</a>
+      <a class="post-readmore" href="/post/${post.id}">Leer artículo →</a>
     `;
 
     return article;
-  }
-
-  function revealCards() {
-    const io = new IntersectionObserver((entries, obs) => {
-      entries.forEach(en => {
-        if (en.isIntersecting) {
-          en.target.classList.add("is-visible");
-          obs.unobserve(en.target);
-        }
-      });
-    }, { threshold: 0.08 });
-    document.querySelectorAll(".cat-card").forEach(c => io.observe(c));
   }
 
   function formatDate(iso) {
@@ -93,31 +81,4 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
-});
-
-document.addEventListener("click", (e) => {
-  const card = e.target.closest(".cat-card");
-  if (!card || e.target.closest("a")) return;
-  const link = card.querySelector(".cat-card__link");
-  if (link) window.location.href = link.href;
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key !== "Enter" && e.key !== " ") return;
-  const card = document.activeElement?.closest?.(".cat-card");
-  if (!card) return;
-  const link = card.querySelector(".cat-card__link");
-  if (link) { e.preventDefault(); window.location.href = link.href; }
-});
-
-["mouseover", "touchstart"].forEach(ev => {
-  document.addEventListener(ev, (e) => {
-    const link = e.target.closest(".cat-card")?.querySelector(".cat-card__link");
-    if (!link?.href) return;
-    if (!document.head.querySelector(`link[href="${link.href}"]`)) {
-      const l = document.createElement("link");
-      l.rel = "prefetch"; l.as = "document"; l.href = link.href;
-      document.head.appendChild(l);
-    }
-  }, { passive: true });
 });

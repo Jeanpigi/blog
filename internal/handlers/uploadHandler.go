@@ -164,6 +164,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			// 6. Actualizar música y playlist en memoria (sin reiniciar servidor)
 			music.MusicFiles = append(music.MusicFiles, dstPath)
 			playlist.AddSong(dstPath)
+			// Si el broadcast estaba vacío (servidor inició sin canciones), activarlo ahora.
+			AdvanceBroadcast()
 			uploaded = append(uploaded, name)
 		}
 
