@@ -10,13 +10,7 @@ music/
 *.ogg
 
 # Assets estáticos binarios
-static/assets/*.jpeg
-static/assets/*.jpg
-static/assets/*.png
-static/assets/*.ico
-static/assets/*.svg
-static/assets/*.webp
-static/assets/*.gif
+static/assets/
 
 # Go internals (Claude no necesita leerlos)
 go.sum
@@ -30,13 +24,18 @@ coverage.txt
 .env
 .env.*
 
-# IDEs
+# CI/CD (no relevante para edición de código)
+.github/
+
+# IDEs y OS
 .idea/
 .vscode/
-
-# Git objects (muy pesado, nunca útil)
-.git/
-
-# OS
 .DS_Store
 Thumbs.db
+
+# Git objects
+.git/
+
+# Claude meta (no leer archivos de configuración propios)
+.claude/
+.claudeignore
