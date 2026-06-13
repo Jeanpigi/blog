@@ -73,9 +73,18 @@ func sanitizeName(name string) string {
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		utils.RenderTemplate(w, "templates/upload.html", struct{ Title string }{"Subir Música"})
+		csrfToken := utils.IssueCSRFToken(w)
+		utils.RenderTemplate(w, "templates/upload.html", struct {
+			Title     string
+			CsrfToken string
+		}{"Subir Música", csrfToken})
 
 	case http.MethodPost:
+		if !utils.ValidateCSRFHeader(r) {
+			http.Error(w, "CSRF token inválido o ausente", http.StatusForbidden)
+			return
+		}
+
 		r.Body = http.MaxBytesReader(w, r.Body, maxRequestBody)
 
 		if err := r.ParseMultipartForm(32 << 20); err != nil {

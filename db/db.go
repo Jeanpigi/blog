@@ -32,13 +32,16 @@ func InitDB() {
 		DBName:               dbName,
 		ParseTime:            true,
 		AllowNativePasswords: true,
+		Timeout:              10 * time.Second,
+		ReadTimeout:          30 * time.Second,
+		WriteTimeout:         30 * time.Second,
 		Params: map[string]string{
 			"charset":   "utf8mb4",
 			"collation": "utf8mb4_unicode_ci",
 		},
 	}
 	dsn := cfg.FormatDSN()
-	log.Printf("🔗 Conectando a DB: %s@%s:%s/%s", dbUser, dbHost, dbPort, dbName)
+	log.Printf("🔗 Conectando a DB: %s@[host]/%s", dbUser, dbName)
 
 	var err error
 	Db, err = sql.Open("mysql", dsn)
@@ -47,8 +50,9 @@ func InitDB() {
 	}
 
 	Db.SetMaxOpenConns(25)
-	Db.SetMaxIdleConns(25)
+	Db.SetMaxIdleConns(10)
 	Db.SetConnMaxLifetime(5 * time.Minute)
+	Db.SetConnMaxIdleTime(3 * time.Minute)
 
 	if err := Db.Ping(); err != nil {
 		log.Fatal("❌ No se pudo conectar a la base de datos:", err)

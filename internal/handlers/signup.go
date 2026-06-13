@@ -19,13 +19,34 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "GET" {
-		utils.RenderTemplate(w, "templates/signup.html", nil)
+		csrfToken := utils.IssueCSRFToken(w)
+		utils.RenderTemplate(w, "templates/signup.html", map[string]interface{}{
+			"CsrfToken": csrfToken,
+		})
+		return
+	}
+
+	// Validar CSRF (double-submit cookie)
+	if !utils.ValidateCSRFForm(r) {
+		http.Error(w, "CSRF token inválido", http.StatusForbidden)
 		return
 	}
 
 	// Si es un POST, procesar el formulario
 	username := r.FormValue("username")
 	password := r.FormValue("password")
+
+	// Validar formato de usuario (letras, números, guion bajo; 3-20 caracteres)
+	if !validUsername.MatchString(username) {
+		http.Error(w, "Usuario inválido: 3-20 caracteres alfanuméricos o guion bajo", http.StatusBadRequest)
+		return
+	}
+
+	// Exigir una contraseña mínimamente fuerte
+	if len(password) < 8 {
+		http.Error(w, "La contraseña debe tener al menos 8 caracteres", http.StatusBadRequest)
+		return
+	}
 
 	// Verificar si el usuario ya existe
 	existingUser, _ := db.GetUserByUsername(username)

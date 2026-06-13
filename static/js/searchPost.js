@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.disabled = true;
       btn.textContent = "...";
 
-      fetch("/api/delete-post/" + postId, { method: "DELETE" })
+      fetch("/api/delete-post/" + postId, { method: "DELETE", headers: window.csrfHeaders() })
         .then(function (r) {
           if (!r.ok) throw new Error("Error " + r.status);
           return r.json();

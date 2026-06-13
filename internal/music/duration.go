@@ -4,14 +4,29 @@ import (
 	"encoding/binary"
 	"io"
 	"os"
+	"sync"
 )
 
 var mpegBitrates = [16]int{0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0}
 var mpegSampleRates = [4]int{44100, 48000, 32000, 0}
 
+// durationCache evita re-parsear el mismo MP3 cada vez que vuelve a sonar.
+// La duración de un archivo no cambia, así que se cachea por ruta de forma indefinida.
+var durationCache sync.Map // map[string]float64
+
 // Duration returns the approximate duration of an MP3 file in seconds.
-// Falls back to 240s on any error.
+// Falls back to 240s on any error. El resultado se cachea por ruta.
 func Duration(path string) float64 {
+	if v, ok := durationCache.Load(path); ok {
+		return v.(float64)
+	}
+	d := computeDuration(path)
+	durationCache.Store(path, d)
+	return d
+}
+
+// computeDuration hace el parseo real del MP3 (cabecera ID3, frame, Xing/CBR).
+func computeDuration(path string) float64 {
 	f, err := os.Open(path)
 	if err != nil {
 		return 240

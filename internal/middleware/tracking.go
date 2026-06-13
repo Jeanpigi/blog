@@ -33,6 +33,15 @@ var (
 	geoClient  = &http.Client{Timeout: 3 * time.Second}
 )
 
+// ClientIP devuelve la IP real del cliente. Detrás de Cloudflare + nginx la IP
+// llega en CF-Connecting-IP; r.RemoteAddr sería la del proxy (127.0.0.1).
+// IMPORTANTE: confía en estas cabeceras solo porque el origen está restringido
+// a las IPs de Cloudflare. Si el origen fuera accesible directamente, un atacante
+// podría falsificarlas (p. ej. para evadir el rate-limit de login).
+func ClientIP(r *http.Request) string {
+	return getClientIP(r)
+}
+
 func getClientIP(r *http.Request) string {
 	ip := r.Header.Get("CF-Connecting-IP")
 	if ip == "" {
@@ -90,6 +99,12 @@ func TrackVisitMiddleware(next http.Handler) http.Handler {
 
 		// Servir primero, registrar después
 		next.ServeHTTP(w, r)
+
+		// Solo contamos GET reales: las peticiones HEAD (monitores de uptime,
+		// crawlers) no deben inflar las estadísticas de visitas.
+		if r.Method != http.MethodGet {
+			return
+		}
 
 		go func() {
 			geo := getGeoInfo(ip)

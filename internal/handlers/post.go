@@ -18,8 +18,11 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Renderizar la plantilla para los detalles del post con los datos obtenidos
+	// Renderizar la plantilla. El contenido (HTML del editor Quill) se sanea con
+	// bluemonday y se marca como template.HTML para que se muestre con formato
+	// sin riesgo de XSS almacenado.
 	utils.RenderTemplate(w, "templates/post.html", map[string]interface{}{
-		"Post": post,
+		"Post":        post,
+		"ContentHTML": utils.SanitizePostHTML(post.Content),
 	})
 }

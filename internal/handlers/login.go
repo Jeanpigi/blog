@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"net"
 	"net/http"
 	"regexp"
 	"sync"
 	"time"
 
+	"github.com/Jeanpigi/blog/internal/middleware"
 	"github.com/Jeanpigi/blog/internal/utils"
 	"github.com/Jeanpigi/blog/session"
 )
@@ -28,15 +28,6 @@ var (
 	loginMu      sync.Mutex
 	loginAttempts = make(map[string]loginEntry)
 )
-
-// remoteIP extrae solo la IP de r.RemoteAddr (que viene como "ip:port").
-func remoteIP(r *http.Request) string {
-	ip, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr
-	}
-	return ip
-}
 
 // isBlocked devuelve true si la IP sigue bloqueada.
 func isBlocked(ip string) bool {
@@ -80,12 +71,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ip := remoteIP(r)
+	ip := middleware.ClientIP(r)
 
 	// Mostrar formulario (GET)
 	if r.Method == http.MethodGet {
-		sessionID := session.GetSessionID(r)
-		csrfToken := utils.GenerateCSRFToken(sessionID)
+		csrfToken := utils.IssueCSRFToken(w)
 		utils.RenderTemplate(w, "templates/login.html", map[string]interface{}{
 			"CsrfToken": csrfToken,
 		})
@@ -98,10 +88,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validar CSRF
-	sessionID := session.GetSessionID(r)
-	csrfToken := r.FormValue("csrf_token")
-	if !utils.ValidateCSRF(sessionID, csrfToken) {
+	// Validar CSRF (double-submit cookie)
+	if !utils.ValidateCSRFForm(r) {
 		http.Redirect(w, r, "/login?error=csrf_invalid", http.StatusSeeOther)
 		return
 	}

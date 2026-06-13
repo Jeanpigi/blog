@@ -116,7 +116,7 @@
     }
 
     try {
-      var res = await fetch("/radio/upload", { method: "POST", body: formData });
+      var res = await fetch("/radio/upload", { method: "POST", headers: window.csrfHeaders(), body: formData });
 
       if (!res.ok) {
         var msg = await res.text();

@@ -21,6 +21,7 @@ var broadcast struct {
 var (
 	broadcastTimer   *time.Timer
 	broadcastTimerMu sync.Mutex
+	lastAdvance      time.Time
 )
 
 // InitBroadcast must be called once after the playlist is loaded.
@@ -83,6 +84,17 @@ func scheduleBroadcastAdvance(song string) {
 }
 
 func advanceBroadcast() {
+	// Guard anti doble-avance: el timer de fin de canción y un skip manual del
+	// admin pueden dispararse casi a la vez y saltar dos canciones. Ignoramos
+	// avances que ocurran a menos de 1s del anterior.
+	broadcastTimerMu.Lock()
+	if time.Since(lastAdvance) < time.Second {
+		broadcastTimerMu.Unlock()
+		return
+	}
+	lastAdvance = time.Now()
+	broadcastTimerMu.Unlock()
+
 	next := playlist.NextSong()
 	if next == "" {
 		scheduleBroadcastAdvance("")

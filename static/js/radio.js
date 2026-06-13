@@ -17,12 +17,35 @@
   const iconMain    = document.getElementById('radioPlayIconMain');
   const liveDots    = document.querySelectorAll('.radio-live-dot');
 
-  const LS_KEY = 'jbearp_radio_autoplay';
+  const LS_KEY     = 'jbearp_radio_autoplay';
+  const LS_VOL_KEY = 'jbearp_radio_volume';
 
   let isPlaying  = false;
   let retryTimer = null;
   let retryCount = 0;
   const MAX_RETRIES = 5;
+
+  // Desfase entre el reloj del servidor y el del cliente (ms).
+  // serverNow - Date.now() en el momento de la respuesta. Permite que la
+  // sincronización no dependa de que el reloj del visitante esté en hora.
+  let serverOffset = 0;
+
+  // Calcula la posición actual de la canción (segundos) corrigiendo el reloj.
+  function computeElapsed(startedAt) {
+    return (Date.now() + serverOffset - startedAt) / 1000;
+  }
+
+  // Sincroniza audio.currentTime con la emisión global si el desfase es notable.
+  function syncPosition(startedAt) {
+    var elapsed = computeElapsed(startedAt);
+    if (elapsed > 2 && elapsed < 36000) {
+      try {
+        if (Math.abs(audio.currentTime - elapsed) > 2) {
+          audio.currentTime = elapsed;
+        }
+      } catch (_) {}
+    }
+  }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -63,12 +86,9 @@
         updateTitle(data.song);
         setMediaMetadata(data.song);
         audio.src = '/radio/stream';
-        var elapsed = (Date.now() - data.startedAt) / 1000;
         audio.play().then(function () {
           applyState(true);
-          if (elapsed > 2 && elapsed < 900) {
-            try { audio.currentTime = elapsed; } catch (_) {}
-          }
+          syncPosition(data.startedAt);
         }).catch(function () {});
       });
     });
@@ -117,6 +137,12 @@
   function fetchNowPlaying() {
     return fetch('/api/radio/now-playing')
       .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && typeof data.serverNow === 'number') {
+          serverOffset = data.serverNow - Date.now();
+        }
+        return data;
+      })
       .catch(function () { return null; });
   }
 
@@ -126,14 +152,15 @@
       .catch(function () { return null; });
   }
 
-  // Polls /api/radio/now-playing until startedAt changes (server advanced) or max attempts.
+  // Sondea /api/radio/now-playing hasta que startedAt cambie (el servidor avanzó)
+  // o se agoten los intentos. Sondeo a 500ms para una transición más fluida.
   function waitForNextSong(oldStartedAt, attempts, callback) {
-    if (attempts >= 15) return;
+    if (attempts >= 40) return;
     fetchNowPlaying().then(function (data) {
-      if (data && data.startedAt !== oldStartedAt) {
+      if (data && data.song && data.startedAt !== oldStartedAt) {
         callback(data);
       } else {
-        setTimeout(function () { waitForNextSong(oldStartedAt, attempts + 1, callback); }, 1000);
+        setTimeout(function () { waitForNextSong(oldStartedAt, attempts + 1, callback); }, 500);
       }
     });
   }
@@ -153,8 +180,6 @@
       setMediaMetadata(data.song);
       retryCount = 0;
 
-      var elapsed = (Date.now() - data.startedAt) / 1000;
-
       audio.src = '/radio/stream';
       audio.volume = volSlider ? parseFloat(volSlider.value) : 0.8;
 
@@ -162,10 +187,8 @@
       if (playPromise !== undefined) {
         playPromise.then(function () {
           applyState(true);
-          // Sincronizar posición con la emisión global
-          if (elapsed > 2 && elapsed < 900) {
-            try { audio.currentTime = elapsed; } catch (_) {}
-          }
+          // Sincronizar posición con la emisión global (corrigiendo reloj)
+          syncPosition(data.startedAt);
         }).catch(function () {
           applyState(false);
         });
@@ -205,12 +228,9 @@
         updateTitle(data.song);
         setMediaMetadata(data.song);
         audio.src = '/radio/stream';
-        var elapsed = (Date.now() - data.startedAt) / 1000;
         audio.play().then(function () {
           applyState(true);
-          if (elapsed > 2 && elapsed < 900) {
-            try { audio.currentTime = elapsed; } catch (_) {}
-          }
+          syncPosition(data.startedAt);
         }).catch(function () { applyState(false); });
       });
     });
@@ -232,6 +252,7 @@
       var v = parseFloat(volSlider.value);
       audio.volume = v;
       setVolFill(v);
+      try { localStorage.setItem(LS_VOL_KEY, String(v)); } catch (_) {}
     });
   }
 
@@ -239,7 +260,8 @@
 
   setupMediaSession();
 
-  var initVol = 0.8;
+  var savedVol = parseFloat(localStorage.getItem(LS_VOL_KEY));
+  var initVol  = (savedVol >= 0 && savedVol <= 1) ? savedVol : 0.8;
   if (volSlider) volSlider.value = initVol;
   setVolFill(initVol);
   audio.volume = initVol;

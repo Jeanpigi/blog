@@ -14,13 +14,19 @@ import (
 // UpdatePostHandler permite actualizar un post solo si el usuario es el autor
 func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 	sess, _ := session.Store.Get(r, "session-name")
-	username := sess.Values["username"].(string)
+	username, ok := sess.Values["username"].(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	user, _ := db.GetUserByUsername(username)
 	if user == nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB
 
 	vars := mux.Vars(r)
 	postID, err := strconv.Atoi(vars["postID"])

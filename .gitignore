@@ -18,6 +18,10 @@
 # Test binary, built with `go test -c`
 *.test
 
+# Binarios compilados del proyecto
+/blog
+/dbcheck
+
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 

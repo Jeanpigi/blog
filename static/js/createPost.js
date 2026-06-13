@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetch("/api/create-post", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: Object.assign({ "Content-Type": "application/json" }, window.csrfHeaders()),
       body: JSON.stringify(post),
     })
       .then(function (response) {
