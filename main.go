@@ -89,8 +89,8 @@ func main() {
 	router.HandleFunc("/api/categories", handlers.GetPostsByCategoryHandler).Methods("GET", "HEAD")
 	router.HandleFunc("/api/histories", handlers.GetPostsByHistoryHandler).Methods("GET", "HEAD")
 
-	// 🔹 API: Visitas
-	router.HandleFunc("/api/visits/location", handlers.GetVisitsWithLocationHandler).Methods("GET", "HEAD")
+	// 🔹 API: Visitas (expone IPs y geolocalización de visitantes: solo el admin)
+	router.HandleFunc("/api/visits/location", middleware.RequireAuth(handlers.GetVisitsWithLocationHandler)).Methods("GET", "HEAD")
 
 	// ✅ RUTAS DE RADIO (integradas)
 	router.HandleFunc("/radio/stream", handlers.StreamHandler).Methods("GET", "HEAD")

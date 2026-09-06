@@ -16,10 +16,10 @@ var (
 )
 
 func CreatePlaylist() {
+	files := music.Snapshot()
 	mu.Lock()
 	defer mu.Unlock()
-	pl = make([]string, len(music.MusicFiles))
-	copy(pl, music.MusicFiles)
+	pl = files
 	shuffle(pl)
 	currentSong = 0
 }
@@ -50,11 +50,12 @@ func NextSong() string {
 	defer mu.Unlock()
 
 	// Si la playlist está vacía pero hay archivos cargados, crearla ahora.
-	if len(pl) == 0 && len(music.MusicFiles) > 0 {
-		pl = make([]string, len(music.MusicFiles))
-		copy(pl, music.MusicFiles)
-		shuffle(pl)
-		currentSong = 0
+	if len(pl) == 0 {
+		if files := music.Snapshot(); len(files) > 0 {
+			pl = files
+			shuffle(pl)
+			currentSong = 0
+		}
 	}
 
 	if len(pl) == 0 {

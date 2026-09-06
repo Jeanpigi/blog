@@ -13,7 +13,11 @@ import (
 // DeletePostHandler protege la eliminación de posts para que solo el autor pueda hacerlo
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	sess, _ := session.Store.Get(r, "session-name")
-	username := sess.Values["username"].(string)
+	username, ok := sess.Values["username"].(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	user, _ := db.GetUserByUsername(username)
 	if user == nil {

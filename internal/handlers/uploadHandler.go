@@ -171,7 +171,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			f.Close()
 
 			// 6. Actualizar música y playlist en memoria (sin reiniciar servidor)
-			music.MusicFiles = append(music.MusicFiles, dstPath)
+			music.AddFile(dstPath)
 			playlist.AddSong(dstPath)
 			// Si el broadcast estaba vacío (servidor inició sin canciones), activarlo ahora.
 			StartBroadcastIfEmpty()
