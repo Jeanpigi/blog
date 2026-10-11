@@ -185,3 +185,18 @@
     height: 260px;
   }
 }
+
+.tracking-back {
+  margin-bottom: 1.2rem;
+  font-size: 1.4rem;
+}
+
+.tracking-back a {
+  color: #a10395;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tracking-back a:hover {
+  text-decoration: underline;
+}

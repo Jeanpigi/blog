@@ -29,8 +29,8 @@ type geoCacheEntry struct {
 }
 
 var (
-	geoCache   sync.Map
-	geoClient  = &http.Client{Timeout: 3 * time.Second}
+	geoCache  sync.Map
+	geoClient = &http.Client{Timeout: 3 * time.Second}
 )
 
 // ClientIP devuelve la IP real del cliente. Detrás de Cloudflare + nginx la IP

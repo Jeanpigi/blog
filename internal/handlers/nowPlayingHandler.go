@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 	"time"
 )
@@ -14,9 +13,8 @@ type nowPlayingResponse struct {
 
 func NowPlayingHandler(w http.ResponseWriter, r *http.Request) {
 	song, startedAt := GetBroadcastState()
-	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store")
-	json.NewEncoder(w).Encode(nowPlayingResponse{
+	writeJSON(w, http.StatusOK, nowPlayingResponse{
 		Song:      song,
 		StartedAt: startedAt.UnixMilli(),
 		ServerNow: time.Now().UnixMilli(),

@@ -1,10 +1,16 @@
-POST http://localhost:8080/api/create-post HTTP/1.1
-content-type: application/json
+# Requiere sesión + CSRF: copia las cookies "session-name" y "csrf_token"
+# desde el navegador (DevTools → Application → Cookies) tras entrar al dashboard.
+@session = PEGA_AQUI_LA_COOKIE_session-name
+@csrf = PEGA_AQUI_LA_COOKIE_csrf_token
+
+POST http://localhost:8080/api/posts HTTP/1.1
+Content-Type: application/json
+Cookie: session-name={{session}}; csrf_token={{csrf}}
+X-CSRF-Token: {{csrf}}
 
 {
     "title": "Post 1",
-    "description": "Este es el contenido de mi nuevo postmaosmoas.",
-    "content": "La complejidad del caso amplió aún más malsmoasmoasmoasmoas",
-    "author_id": 1,
-    "categoria": "tech"
+    "description": "Descripción corta del post.",
+    "content": "<p>Contenido del post.</p>",
+    "categoria": "Tech"
 }

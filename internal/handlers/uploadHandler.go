@@ -72,7 +72,7 @@ func sanitizeName(name string) string {
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodGet:
+	case http.MethodGet, http.MethodHead:
 		csrfToken := utils.IssueCSRFToken(w)
 		utils.RenderTemplate(w, "templates/upload.html", struct {
 			Title     string
@@ -80,11 +80,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}{"Subir Música", csrfToken})
 
 	case http.MethodPost:
-		if !utils.ValidateCSRFHeader(r) {
-			http.Error(w, "CSRF token inválido o ausente", http.StatusForbidden)
-			return
-		}
-
+		// Auth y CSRF los aplica el router (middleware.RequireAuth + RequireCSRF).
 		r.Body = http.MaxBytesReader(w, r.Body, maxRequestBody)
 
 		if err := r.ParseMultipartForm(32 << 20); err != nil {

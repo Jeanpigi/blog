@@ -147,8 +147,10 @@
   }
 
   function postAdvance() {
-    return fetch('/api/radio/advance', { method: 'POST' })
-      .then(function (r) { return r.json(); })
+    // Solo el admin (con sesión) puede avanzar; para el resto devuelve 401/403.
+    var headers = window.csrfHeaders ? window.csrfHeaders() : {};
+    return fetch('/api/radio/advance', { method: 'POST', headers: headers })
+      .then(function (r) { return r.ok ? r.json() : null; })
       .catch(function () { return null; });
   }
 

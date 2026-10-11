@@ -1,50 +1,34 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	db "github.com/Jeanpigi/blog/db"
-	"github.com/Jeanpigi/blog/internal/models"
-	"github.com/Jeanpigi/blog/session"
+	"github.com/Jeanpigi/blog/internal/middleware"
 )
 
-// CreatePostHandler permite solo a usuarios autenticados crear posts
+// CreatePostHandler — POST /api/posts (requiere auth + CSRF).
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	sess, _ := session.Store.Get(r, "session-name")
-	username, ok := sess.Values["username"].(string)
-	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
+	user := middleware.CurrentUser(r)
 
-	user, _ := db.GetUserByUsername(username)
-	if user == nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB
-
-	var post models.Post
-	err := json.NewDecoder(r.Body).Decode(&post)
+	post, err := decodePostInput(w, r)
 	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	post.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
 	post.AuthorID = user.ID
+	post.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
 
-	err = db.InsertPost(&post)
+	id, err := db.InsertPost(post)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Println("❌ Error creando post:", err)
+		writeError(w, http.StatusInternalServerError, "No se pudo crear el post")
 		return
 	}
+	post.ID = int(id)
 
-	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintln(w, "Post created successfully")
+	writeJSON(w, http.StatusCreated, post)
 }
-

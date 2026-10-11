@@ -1,12 +1,13 @@
 {{ define "title" }}Mapa de Visitas{{ end }}
 
 {{ define "extra_css" }}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="/static/css/tracking.css?v={{staticVer}}" />
 {{ end }}
 
 {{ define "content" }}
 <div class="tracking-container">
+  <p class="tracking-back"><a href="/dashboard"><i class="fa fa-arrow-left"></i> Dashboard</a></p>
   <h2 class="tracking-title">Mapa de Visitas</h2>
 
   <div class="tracking-stats">
@@ -53,9 +54,16 @@
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  // Los datos vienen de ip-api.com y del User-Agent/URL del visitante: escapar siempre.
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
   var map = L.map('map', { zoomControl: true }).setView([20, 0], 2);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -101,8 +109,8 @@ document.addEventListener("DOMContentLoaded", function () {
             opacity: 1,
             fillOpacity: 0.85,
           }).addTo(map).bindPopup(
-            '<strong>' + (v.city || '—') + ', ' + (v.country || '—') + '</strong>' +
-            '<br><span>Página: <code>' + (v.page || '/') + '</code></span>' +
+            '<strong>' + esc(v.city || '—') + ', ' + esc(v.country || '—') + '</strong>' +
+            '<br><span>Página: <code>' + esc(v.page || '/') + '</code></span>' +
             (v.timestamp ? '<br><span style="font-size:0.82em;color:#888">' + String(v.timestamp).slice(0, 10) + '</span>' : '')
           );
         }
@@ -115,11 +123,11 @@ document.addEventListener("DOMContentLoaded", function () {
         var date = v.timestamp ? String(v.timestamp).slice(0, 16).replace('T', ' ') : '—';
         var tr = document.createElement('tr');
         tr.innerHTML =
-          '<td>' + (v.country || '—') + '</td>' +
-          '<td>' + (v.city    || '—') + '</td>' +
-          '<td>' + (v.region  || '—') + '</td>' +
-          '<td><span class="badge-page">' + (v.page || '/') + '</span></td>' +
-          '<td>' + date + '</td>';
+          '<td>' + esc(v.country || '—') + '</td>' +
+          '<td>' + esc(v.city    || '—') + '</td>' +
+          '<td>' + esc(v.region  || '—') + '</td>' +
+          '<td><span class="badge-page">' + esc(v.page || '/') + '</span></td>' +
+          '<td>' + esc(date) + '</td>';
         tbody.appendChild(tr);
       });
     })

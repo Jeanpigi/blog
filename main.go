@@ -18,6 +18,7 @@ import (
 	"github.com/Jeanpigi/blog/internal/middleware"
 	"github.com/Jeanpigi/blog/internal/music"
 	"github.com/Jeanpigi/blog/internal/playlist"
+	"github.com/Jeanpigi/blog/internal/utils"
 	"github.com/Jeanpigi/blog/session"
 	myHandler "github.com/gorilla/handlers"
 )
@@ -55,52 +56,11 @@ func main() {
 	playlist.CreatePlaylist()
 	handlers.InitBroadcast()
 
-	// 🔹 Configurar router principal
-	router := mux.NewRouter()
+	// 🔹 Versión de assets para cache-busting (?v=...). En producción conviene
+	// fijarla al hash de git: STATIC_VERSION=$(git rev-parse --short HEAD)
+	utils.SetStaticVersion(os.Getenv("STATIC_VERSION"))
 
-	// 🔹 Servir archivos estáticos compartidos
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
-
-	// 🔹 Middleware de visitas para rutas del blog
-	router.Handle("/", middleware.TrackVisitMiddleware(http.HandlerFunc(handlers.HomeHandler))).Methods("GET", "HEAD")
-	router.Handle("/blog", middleware.TrackVisitMiddleware(http.HandlerFunc(handlers.BlogHandler))).Methods("GET", "HEAD")
-	router.Handle("/post/{id}", middleware.TrackVisitMiddleware(http.HandlerFunc(handlers.PostHandler))).Methods("GET", "HEAD")
-
-	// 🔹 Rutas de autenticación y dashboard
-	router.HandleFunc("/login", handlers.LoginHandler)
-	router.HandleFunc("/signup", handlers.SignupHandler)
-	router.HandleFunc("/dashboard", middleware.RequireAuth(handlers.DashboardHandler)).Methods("GET", "HEAD")
-	router.HandleFunc("/logout", handlers.LogoutHandler)
-
-	// 🔹 Rutas de contenido adicional
-	router.HandleFunc("/portafolio", handlers.PortafolioHandler)
-	router.HandleFunc("/historias", handlers.HistoriasHandler)
-	router.HandleFunc("/tecnologias", handlers.TecnologiasHandler)
-	router.HandleFunc("/visitas", handlers.VisitsPageHandler).Methods("GET", "HEAD")
-
-	// 🔹 API: Posts
-	router.HandleFunc("/api/posts", handlers.GetAllPostsHandler).Methods("GET", "HEAD")
-	router.HandleFunc("/api/posts/{id}", handlers.GetPostsHandler).Methods("GET", "HEAD")
-	router.HandleFunc("/api/create-post", middleware.RequireAuth(middleware.RequireCSRF(handlers.CreatePostHandler))).Methods("POST")
-	router.HandleFunc("/api/update-post/{postID}", middleware.RequireAuth(middleware.RequireCSRF(handlers.UpdatePostHandler))).Methods("PUT", "PATCH")
-	router.HandleFunc("/api/delete-post/{postID}", middleware.RequireAuth(middleware.RequireCSRF(handlers.DeletePostHandler))).Methods("DELETE")
-
-	// 🔹 API: Categorías e historias
-	router.HandleFunc("/api/categories", handlers.GetPostsByCategoryHandler).Methods("GET", "HEAD")
-	router.HandleFunc("/api/histories", handlers.GetPostsByHistoryHandler).Methods("GET", "HEAD")
-
-	// 🔹 API: Visitas (expone IPs y geolocalización de visitantes: solo el admin)
-	router.HandleFunc("/api/visits/location", middleware.RequireAuth(handlers.GetVisitsWithLocationHandler)).Methods("GET", "HEAD")
-
-	// ✅ RUTAS DE RADIO (integradas)
-	router.HandleFunc("/radio/stream", handlers.StreamHandler).Methods("GET", "HEAD")
-	router.HandleFunc("/radio/upload", middleware.RequireAuth(handlers.UploadHandler)).Methods("GET", "POST")
-	router.HandleFunc("/api/radio/now-playing", handlers.NowPlayingHandler).Methods("GET", "HEAD")
-	// Saltar canción es una acción de admin (afecta a todos los oyentes del broadcast global).
-	router.HandleFunc("/api/radio/advance", middleware.RequireAuth(handlers.AdvanceSongHandler)).Methods("POST")
-
-	// 🔹 Handler para rutas inexistentes
-	router.NotFoundHandler = http.HandlerFunc(handlers.NotFoundHandler)
+	router := newRouter()
 
 	// 🔹 Middleware CORS
 	allowedOrigin := os.Getenv("ALLOWED_ORIGIN")
@@ -121,7 +81,11 @@ func main() {
 	// WriteTimeout se deja en 0 a propósito: el stream de la radio es una
 	// descarga larga y un WriteTimeout global la cortaría. nginx/Cloudflare
 	// aplican sus propios límites de escritura por delante.
-	addr := ":8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := ":" + port
 	srv := &http.Server{
 		Addr:              addr,
 		Handler:           rootHandler,
@@ -152,4 +116,64 @@ func main() {
 	log.Println("✅ Servidor detenido limpiamente.")
 }
 
+// newRouter registra todas las rutas. Convenciones:
+//   - Páginas HTML: GET/HEAD. Las de admin redirigen a /login sin sesión.
+//   - API pública: GET /api/... (JSON).
+//   - API admin: auth → 401 JSON; mutaciones además exigen X-CSRF-Token.
+//   - Posts siguen REST: /api/posts y /api/posts/{id} con el verbo indicando la acción.
+func newRouter() *mux.Router {
+	r := mux.NewRouter()
+	r.StrictSlash(true) // /blog/ → /blog
 
+	auth := middleware.RequireAuth
+	authCSRF := func(h http.HandlerFunc) http.HandlerFunc {
+		return middleware.RequireAuth(middleware.RequireCSRF(h))
+	}
+	track := func(h http.HandlerFunc) http.Handler {
+		return middleware.TrackVisitMiddleware(h)
+	}
+	page := []string{http.MethodGet, http.MethodHead}
+
+	// 🔹 Estáticos y healthcheck
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	r.HandleFunc("/healthz", handlers.HealthHandler).Methods(page...)
+
+	// 🔹 Páginas públicas (las tres primeras registran visitas)
+	r.Handle("/", track(handlers.HomeHandler)).Methods(page...)
+	r.Handle("/blog", track(handlers.BlogHandler)).Methods(page...)
+	r.Handle("/post/{id:[0-9]+}", track(handlers.PostHandler)).Methods(page...)
+	r.HandleFunc("/historias", handlers.HistoriasHandler).Methods(page...)
+	r.HandleFunc("/tecnologias", handlers.TecnologiasHandler).Methods(page...)
+	r.HandleFunc("/portafolio", handlers.PortafolioHandler).Methods(page...)
+
+	// 🔹 Autenticación
+	r.HandleFunc("/login", handlers.LoginHandler).Methods(http.MethodGet, http.MethodHead, http.MethodPost)
+	r.HandleFunc("/logout", handlers.LogoutHandler).Methods(http.MethodPost)
+	r.HandleFunc("/signup", auth(handlers.SignupHandler)).Methods(http.MethodGet, http.MethodHead, http.MethodPost)
+
+	// 🔹 Páginas de admin
+	r.HandleFunc("/dashboard", auth(handlers.DashboardHandler)).Methods(page...)
+	r.HandleFunc("/visitas", auth(handlers.VisitsPageHandler)).Methods(page...) // expone IPs/geo
+	r.HandleFunc("/radio/upload", auth(handlers.UploadHandler)).Methods(http.MethodGet, http.MethodHead)
+	r.HandleFunc("/radio/upload", authCSRF(handlers.UploadHandler)).Methods(http.MethodPost)
+
+	// 🔹 API pública
+	r.HandleFunc("/api/posts", handlers.GetAllPostsHandler).Methods(page...)
+	r.HandleFunc("/api/posts/{id:[0-9]+}", handlers.GetPostsHandler).Methods(page...)
+	r.HandleFunc("/api/categories", handlers.GetPostsByCategoryHandler).Methods(page...)
+	r.HandleFunc("/api/histories", handlers.GetPostsByHistoryHandler).Methods(page...)
+	r.HandleFunc("/api/radio/now-playing", handlers.NowPlayingHandler).Methods(page...)
+	r.HandleFunc("/radio/stream", handlers.StreamHandler).Methods(page...)
+
+	// 🔹 API admin
+	r.HandleFunc("/api/posts", authCSRF(handlers.CreatePostHandler)).Methods(http.MethodPost)
+	r.HandleFunc("/api/posts/{id:[0-9]+}", authCSRF(handlers.UpdatePostHandler)).Methods(http.MethodPut, http.MethodPatch)
+	r.HandleFunc("/api/posts/{id:[0-9]+}", authCSRF(handlers.DeletePostHandler)).Methods(http.MethodDelete)
+	r.HandleFunc("/api/admin/stats", auth(handlers.DashboardStatsHandler)).Methods(page...)
+	r.HandleFunc("/api/visits/location", auth(handlers.GetVisitsWithLocationHandler)).Methods(page...)
+	// Saltar canción afecta a todos los oyentes del broadcast global.
+	r.HandleFunc("/api/radio/advance", authCSRF(handlers.AdvanceSongHandler)).Methods(http.MethodPost)
+
+	r.NotFoundHandler = http.HandlerFunc(handlers.NotFoundHandler)
+	return r
+}

@@ -1,29 +1,77 @@
-{{define "title"}}Signup{{end}}
+{{define "title"}}Nuevo usuario · JbearP{{end}}
 
-{{ define "content" }}
+{{define "extra_css"}}
+<link rel="stylesheet" href="/static/css/form.css?v={{staticVer}}">
+{{end}}
 
-<head>
-    <link rel="stylesheet" type="text/css" href="/static/css/form.css?v={{staticVer}}">
-</head>
+{{define "content"}}
+<div class="auth-wrapper">
+  <div class="auth-card">
 
-<div class="container">
-    <form action="/signup" method="POST" class="form">
-        <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+    <div class="auth-brand">
+      <img src="/static/assets/logo.svg" alt="JbearP" class="auth-logo">
+      <h1 class="auth-title">Nuevo usuario</h1>
+      <p class="auth-subtitle">Crea una cuenta con acceso al dashboard</p>
+    </div>
+
+    <form action="/signup" method="POST" class="auth-form" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
+
+      <div class="field-group">
+        <label for="username">Usuario</label>
+        <div class="input-wrap">
+          <i class="fa fa-user input-icon"></i>
+          <input type="text" id="username" name="username" placeholder="3-20 letras, números o _"
+                 pattern="[A-Za-z0-9_]{3,20}" autocomplete="off" required>
         </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+      </div>
+
+      <div class="field-group">
+        <label for="password">Contraseña</label>
+        <div class="input-wrap">
+          <i class="fa fa-lock input-icon"></i>
+          <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres"
+                 minlength="8" autocomplete="new-password" required>
         </div>
-        <div>
-            <input type="submit" value="Signup">
+      </div>
+
+      <div class="field-group">
+        <label for="password_confirm">Confirmar contraseña</label>
+        <div class="input-wrap">
+          <i class="fa fa-lock input-icon"></i>
+          <input type="password" id="password_confirm" name="password_confirm" placeholder="Repite la contraseña"
+                 minlength="8" autocomplete="new-password" required>
         </div>
+      </div>
+
+      <button type="submit" class="auth-btn">Crear usuario</button>
     </form>
 
-    <div class="SignupPrompt">
-        <p>Already have an account? <a href="/login">Login</a></p>
-    </div>
+    <p class="auth-footer"><a href="/dashboard"><i class="fa fa-arrow-left"></i> Volver al dashboard</a></p>
+  </div>
 </div>
-{{ end }}
+
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  if (!params.has("error")) return;
+
+  var messages = {
+    invalid_username:  "El usuario solo puede tener letras, números y guion bajo (3-20 caracteres).",
+    weak_password:     "La contraseña debe tener al menos 8 caracteres.",
+    password_mismatch: "Las contraseñas no coinciden.",
+    user_exists:       "Ese usuario ya existe.",
+    csrf_invalid:      "Error de seguridad (CSRF inválido). Recarga la página e intenta de nuevo.",
+    server_error:      "Error del servidor al crear el usuario. Revisa los logs.",
+  };
+
+  Swal.fire({
+    icon: "error",
+    title: "No se pudo crear",
+    text: messages[params.get("error")] || "Ocurrió un error desconocido.",
+    confirmButtonColor: "#a10395",
+  });
+  window.history.replaceState({}, "", "/signup");
+}());
+</script>
+{{end}}

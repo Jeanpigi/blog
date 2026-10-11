@@ -1,4 +1,4 @@
-name: Golang Linter
+name: CI
 
 on:
   push:
@@ -6,22 +6,31 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
 jobs:
-  lint:
+  lint-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod # misma versión que el proyecto (antes 1.21 ≠ go.mod)
 
-    - name: Install golangci-lint
-      run: |
-        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+      - name: Build
+        run: go build ./...
 
-    - name: Run Linter
-      run: golangci-lint run ./... --skip-dirs "toolchain|go/pkg/mod"
+      - name: Vet
+        run: go vet ./...
 
+      - name: Test
+        run: go test ./...
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.14

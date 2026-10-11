@@ -32,7 +32,7 @@ func IssueCSRFToken(w http.ResponseWriter) string {
 		Name:     CSRFCookieName,
 		Value:    token,
 		Path:     "/",
-		MaxAge:   3600,
+		MaxAge:   86400 * 7, // igual que la sesión: un dashboard abierto horas no debe fallar por CSRF
 		Secure:   true,
 		HttpOnly: false, // el JS lo lee para enviarlo en X-CSRF-Token
 		SameSite: http.SameSiteStrictMode,
@@ -101,7 +101,3 @@ func AuthenticateUser(username, password string) bool {
 	log.Println("✅ Usuario autenticado correctamente:", username)
 	return true
 }
-
-
-
-

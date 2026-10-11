@@ -1,20 +1,23 @@
 package handlers
 
 import (
-	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/Jeanpigi/blog/db"
+	"github.com/Jeanpigi/blog/internal/models"
 )
 
-// Obtener visitas con ubicación
+// GetVisitsWithLocationHandler — GET /api/visits/location (requiere auth).
 func GetVisitsWithLocationHandler(w http.ResponseWriter, r *http.Request) {
 	visits, err := db.GetAllVisits()
 	if err != nil {
-		http.Error(w, "Error obteniendo visitas", http.StatusInternalServerError)
+		log.Println("❌ Error obteniendo visitas:", err)
+		writeError(w, http.StatusInternalServerError, "Error obteniendo visitas")
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(visits)
+	if visits == nil {
+		visits = []models.Visit{} // [] en vez de null
+	}
+	writeJSON(w, http.StatusOK, visits)
 }

@@ -2,6 +2,12 @@ package models
 
 import "html/template"
 
+// Categorías válidas de un post (coinciden con la columna Posts.Category).
+const (
+	CategoryTech      = "Tech"
+	CategoryHistorias = "Historias"
+)
+
 type Post struct {
 	ID          int           `json:"id"`
 	Title       string        `json:"title"`

@@ -138,11 +138,11 @@ func runChecks(dsn, dbName string) {
 	defer db.Close()
 
 	var version string
-	db.QueryRow("SELECT VERSION()").Scan(&version)
+	_ = db.QueryRow("SELECT VERSION()").Scan(&version)
 	fmt.Printf("     Versión: %s\n", version)
 
 	var plugin string
-	db.QueryRow("SELECT plugin FROM mysql.user WHERE user = CURRENT_USER()").Scan(&plugin)
+	_ = db.QueryRow("SELECT plugin FROM mysql.user WHERE user = CURRENT_USER()").Scan(&plugin)
 	if plugin != "" {
 		fmt.Printf("     Auth plugin: %s\n", plugin)
 		if plugin == "ed25519" {
@@ -160,7 +160,7 @@ func runChecks(dsn, dbName string) {
 			fmt.Printf("       ⚠️  '%s' — no encontrada\n", t)
 		} else {
 			var rows int
-			db.QueryRow("SELECT COUNT(*) FROM `" + t + "`").Scan(&rows)
+			_ = db.QueryRow("SELECT COUNT(*) FROM `" + t + "`").Scan(&rows)
 			fmt.Printf("       ✅ '%s' — %d filas\n", t, rows)
 		}
 	}

@@ -25,7 +25,7 @@ type loginEntry struct {
 }
 
 var (
-	loginMu      sync.Mutex
+	loginMu       sync.Mutex
 	loginAttempts = make(map[string]loginEntry)
 )
 
@@ -73,8 +73,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	ip := middleware.ClientIP(r)
 
-	// Mostrar formulario (GET)
-	if r.Method == http.MethodGet {
+	// Mostrar formulario (GET/HEAD)
+	if r.Method != http.MethodPost {
 		csrfToken := utils.IssueCSRFToken(w)
 		utils.RenderTemplate(w, "templates/login.html", map[string]interface{}{
 			"CsrfToken": csrfToken,

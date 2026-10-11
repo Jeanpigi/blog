@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"github.com/Jeanpigi/blog/internal/utils"
 	"net/http"
+
+	"github.com/Jeanpigi/blog/internal/utils"
 )
 
 func HistoriasHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,7 @@
+# Normaliza finales de línea a LF (gofmt/golangci-lint fallan con CRLF).
+* text=auto eol=lf
+
+*.mp3 binary
+*.jpeg binary
+*.png binary
+*.ico binary

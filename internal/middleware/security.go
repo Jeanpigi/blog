@@ -8,12 +8,12 @@ import (
 )
 
 // contentSecurityPolicy está afinada a los recursos externos que realmente usa
-// el sitio: Google Analytics, SweetAlert2 (jsdelivr), Quill (quilljs), Google
+// el sitio: Google Analytics, SweetAlert2 y Leaflet (jsdelivr), Quill (quilljs), Google
 // Fonts y Font Awesome (cdnjs). nginx NO setea CSP, así que este es el único
 // lugar donde vive — NO agregarlo también en nginx (quedaría duplicado).
 const contentSecurityPolicy = "default-src 'self'; " +
 	"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://cdn.jsdelivr.net https://cdn.quilljs.com; " +
-	"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.quilljs.com; " +
+	"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.quilljs.com; " +
 	"font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
 	"img-src 'self' data: https:; " + // https: permite imágenes embebidas en posts (pasivas, no ejecutan JS)
 	"media-src 'self'; " +

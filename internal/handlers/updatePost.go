@@ -1,67 +1,51 @@
 package handlers
 
 import (
-	"encoding/json"
+	"log"
 	"net/http"
-	"strconv"
 
 	db "github.com/Jeanpigi/blog/db"
+	"github.com/Jeanpigi/blog/internal/middleware"
 	"github.com/Jeanpigi/blog/internal/models"
-	"github.com/Jeanpigi/blog/session"
 	"github.com/gorilla/mux"
 )
 
-// UpdatePostHandler permite actualizar un post solo si el usuario es el autor
+// UpdatePostHandler — PUT/PATCH /api/posts/{id} (solo el autor).
 func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
-	sess, _ := session.Store.Get(r, "session-name")
-	username, ok := sess.Values["username"].(string)
+	existing, ok := ownedPost(w, r)
 	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	user, _ := db.GetUserByUsername(username)
-	if user == nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB
-
-	vars := mux.Vars(r)
-	postID, err := strconv.Atoi(vars["postID"])
+	post, err := decodePostInput(w, r)
 	if err != nil {
-		http.Error(w, "Invalid postID", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	post, err := db.FindPostByID(vars["postID"])
-	if err != nil || post == nil {
-		http.Error(w, "Post not found", http.StatusNotFound)
+	if err := db.UpdatePost(existing.ID, post); err != nil {
+		log.Println("❌ Error actualizando post:", err)
+		writeError(w, http.StatusInternalServerError, "No se pudo actualizar el post")
 		return
 	}
 
-	if post.AuthorID != user.ID {
-		http.Error(w, "Forbidden: You can only update your own posts", http.StatusForbidden)
-		return
-	}
-
-	var updatedPost models.Post
-	err = json.NewDecoder(r.Body).Decode(&updatedPost)
-	if err != nil {
-		http.Error(w, "Invalid post data", http.StatusBadRequest)
-		return
-	}
-
-	err = db.UpdatePost(postID, &updatedPost)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "Post updated successfully",
-	})
+	post.ID = existing.ID
+	post.AuthorID = existing.AuthorID
+	post.CreatedAt = existing.CreatedAt
+	writeJSON(w, http.StatusOK, post)
 }
 
+// ownedPost carga el post {id} y verifica que pertenezca al usuario de la
+// sesión. Si no, ya escribió la respuesta de error y devuelve ok=false.
+func ownedPost(w http.ResponseWriter, r *http.Request) (*models.Post, bool) {
+	post, err := db.FindPostByID(mux.Vars(r)["id"])
+	if err != nil || post == nil {
+		writeError(w, http.StatusNotFound, "Post no encontrado")
+		return nil, false
+	}
+	if post.AuthorID != middleware.CurrentUser(r).ID {
+		writeError(w, http.StatusForbidden, "Solo puedes modificar tus propios posts")
+		return nil, false
+	}
+	return post, true
+}

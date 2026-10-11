@@ -245,10 +245,14 @@ func FindPostByID(postID string) (*models.Post, error) {
 
 // -------- Mutaciones --------
 
-func InsertPost(post *models.Post) error {
+// InsertPost inserta el post y devuelve su ID autogenerado.
+func InsertPost(post *models.Post) (int64, error) {
 	const query = `INSERT INTO Posts (Title, Description, Content, AuthorID, CreatedAt, Category) VALUES (?, ?, ?, ?, ?, ?)`
-	_, err := Db.Exec(query, post.Title, post.Description, post.Content, post.AuthorID, post.CreatedAt, post.Categoria)
-	return err
+	res, err := Db.Exec(query, post.Title, post.Description, post.Content, post.AuthorID, post.CreatedAt, post.Categoria)
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
 }
 
 func UpdatePost(postID int, post *models.Post) error {
@@ -292,6 +296,26 @@ func GetAllVisits() ([]models.Visit, error) {
 		visits = append(visits, v)
 	}
 	return visits, rows.Err()
+}
+
+// VisitStats resume el tráfico para el dashboard.
+type VisitStats struct {
+	Total     int `json:"total"`
+	Last7Days int `json:"last_7_days"`
+	Today     int `json:"today"`
+	UniqueIPs int `json:"unique_ips"`
+}
+
+func GetVisitStats() (VisitStats, error) {
+	const query = `
+		SELECT COUNT(*),
+		       COALESCE(SUM(timestamp >= NOW() - INTERVAL 7 DAY), 0),
+		       COALESCE(SUM(timestamp >= CURDATE()), 0),
+		       COUNT(DISTINCT ip)
+		FROM Visits`
+	var st VisitStats
+	err := Db.QueryRow(query).Scan(&st.Total, &st.Last7Days, &st.Today, &st.UniqueIPs)
+	return st, err
 }
 
 // -------- Portafolio --------

@@ -40,9 +40,13 @@ func InitBroadcast() {
 }
 
 // GetBroadcastState returns the current song base name and when it started.
+// Returns "" when nothing is playing (filepath.Base("") would yield ".").
 func GetBroadcastState() (string, time.Time) {
 	broadcast.mu.RLock()
 	defer broadcast.mu.RUnlock()
+	if broadcast.song == "" {
+		return "", broadcast.startedAt
+	}
 	return filepath.Base(broadcast.song), broadcast.startedAt
 }
 

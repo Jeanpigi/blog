@@ -1,3 +1,4 @@
+/* Unidades en rem sobre la base del sitio (html { font-size: 62.5% } → 1rem = 10px). */
 /* ===== Auth / Login ===== */
 
 .auth-wrapper {
@@ -5,14 +6,14 @@
   align-items: center;
   justify-content: center;
   min-height: 70vh;
-  padding: 2rem 1rem;
+  padding: 3.2rem 1.6rem;
 }
 
 .auth-card {
   background: #fff;
   border: 1px solid #ebebeb;
   border-radius: 18px;
-  padding: 2.5rem 2rem;
+  padding: 4rem 3.2rem;
   width: 100%;
   max-width: 420px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.09);
@@ -21,24 +22,24 @@
 /* ---- Marca ---- */
 .auth-brand {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3.2rem;
 }
 
 .auth-logo {
   width: 56px;
   height: 56px;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.2rem;
 }
 
 .auth-title {
-  font-size: 1.6rem;
+  font-size: 2.56rem;
   font-weight: 800;
   color: #1a1d21;
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.4rem;
 }
 
 .auth-subtitle {
-  font-size: 0.9rem;
+  font-size: 1.44rem;
   color: #888;
   margin: 0;
 }
@@ -47,17 +48,17 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1.76rem;
 }
 
 .field-group {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.56rem;
 }
 
 .field-group label {
-  font-size: 0.85rem;
+  font-size: 1.36rem;
   font-weight: 600;
   color: #444;
 }
@@ -71,18 +72,18 @@
 
 .input-icon {
   position: absolute;
-  left: 0.85rem;
+  left: 1.36rem;
   color: #aaa;
-  font-size: 0.9rem;
+  font-size: 1.44rem;
   pointer-events: none;
 }
 
 .input-wrap input {
   width: 100%;
-  padding: 0.65rem 2.6rem;
+  padding: 1.04rem 4.16rem;
   border: 1.5px solid #ddd;
   border-radius: 10px;
-  font-size: 0.95rem;
+  font-size: 1.52rem;
   color: #1a1d21;
   background: #fafafa;
   outline: none;
@@ -98,13 +99,13 @@
 /* Botón mostrar contraseña */
 .toggle-pw {
   position: absolute;
-  right: 0.75rem;
+  right: 1.2rem;
   background: none;
   border: none;
   cursor: pointer;
   color: #aaa;
-  font-size: 0.9rem;
-  padding: 0.2rem;
+  font-size: 1.44rem;
+  padding: 0.32rem;
   transition: color 0.2s;
 }
 
@@ -115,17 +116,17 @@
 /* ---- Submit ---- */
 .auth-btn {
   width: 100%;
-  padding: 0.75rem;
+  padding: 1.2rem;
   background: #a10395;
   color: #fff;
-  font-size: 1rem;
+  font-size: 1.6rem;
   font-weight: 600;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(161, 3, 149, 0.28);
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-  margin-top: 0.4rem;
+  margin-top: 0.64rem;
 }
 
 .auth-btn:hover {
@@ -138,14 +139,31 @@
   transform: translateY(0);
 }
 
+/* ---- Pie (enlace de vuelta) ---- */
+.auth-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 1.4rem;
+}
+
+.auth-footer a {
+  color: #a10395;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 480px) {
   .auth-card {
-    padding: 2rem 1.25rem;
+    padding: 3.2rem 2rem;
     border-radius: 14px;
   }
 
   .auth-title {
-    font-size: 1.4rem;
+    font-size: 2.24rem;
   }
 }

@@ -1,30 +1,32 @@
-name: Golang Linter
+# Configuración de golangci-lint (formato v2). Ejecutar: golangci-lint run
+version: "2"
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+run:
+  timeout: 5m
 
-jobs:
-  lint:
-    runs-on: ubuntu-latest
+linters:
+  default: standard # errcheck, govet, ineffassign, staticcheck, unused
+  enable:
+    - bodyclose  # respuestas HTTP sin cerrar (cliente de geolocalización)
+    - gosec      # problemas de seguridad comunes
+    - unconvert
+  settings:
+    gosec:
+      excludes:
+        - G104 # ya lo cubre errcheck
+        - G120 # ParseMultipartForm ya está acotado por http.MaxBytesReader
+        - G124 # la cookie CSRF NO es HttpOnly a propósito (el JS la reenvía en X-CSRF-Token)
+        - G301 # ./music en 0755: nginx/otros procesos deben poder leerlo
+        - G302 # MP3 subidos en 0644, mismo motivo
+        - G304 # rutas de archivo variables: las de música las genera el propio servidor
+        - G404 # math/rand para barajar la playlist (no es criptografía)
+        - G703 # falso positivo: el nombre del MP3 pasa por sanitizeName (filepath.Base + whitelist)
+        - G706 # log injection: solo se loguean datos de config/usuario ya validado
+  exclusions:
+    presets:
+      - std-error-handling # Close(), Flush(), fmt.Print*, etc.
 
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
-
-    - name: Install golangci-lint
-      run: |
-        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
-
-    - name: Run Linter
-      run: |
-        golangci-lint run ./... \
-          --skip-dirs "toolchain|go/pkg/mod"
-
-
+formatters:
+  enable:
+    - gofmt
+    - goimports

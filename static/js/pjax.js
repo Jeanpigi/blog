@@ -4,7 +4,8 @@
   var MAIN = 'main.main-content';
 
   // Rutas de página donde PJAX es seguro (navegación GET sin estado sensible)
-  var SAFE = ['/', '/blog', '/historias', '/tecnologias', '/portafolio', '/visitas'];
+  // (/visitas, /dashboard y /radio/upload requieren sesión: siempre carga completa)
+  var SAFE = ['/', '/blog', '/historias', '/tecnologias', '/portafolio'];
 
   function isSafe(pathname) {
     return SAFE.indexOf(pathname) !== -1 || /^\/post\/\d+/.test(pathname);

@@ -7,18 +7,13 @@ import (
 	"github.com/Jeanpigi/blog/db"
 	"github.com/Jeanpigi/blog/internal/models"
 	"github.com/Jeanpigi/blog/internal/utils"
-	"github.com/Jeanpigi/blog/session"
 )
 
-// SignupHandler maneja el registro de nuevos usuarios
+// SignupHandler — GET/POST /signup. Solo un usuario autenticado puede crear
+// cuentas nuevas (el router lo envuelve en RequireAuth). La sesión actual NO
+// cambia al usuario creado: el admin sigue logueado como sí mismo.
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
-	// 🚀 Verificar si el usuario ya ha iniciado sesión
-	if !session.IsAuthenticated(r) {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
-
-	if r.Method == "GET" {
+	if r.Method != http.MethodPost {
 		csrfToken := utils.IssueCSRFToken(w)
 		utils.RenderTemplate(w, "templates/signup.html", map[string]interface{}{
 			"CsrfToken": csrfToken,
@@ -26,54 +21,51 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validar CSRF (double-submit cookie)
+	fail := func(code string) {
+		http.Redirect(w, r, "/signup?error="+code, http.StatusSeeOther)
+	}
+
 	if !utils.ValidateCSRFForm(r) {
-		http.Error(w, "CSRF token inválido", http.StatusForbidden)
+		fail("csrf_invalid")
 		return
 	}
 
-	// Si es un POST, procesar el formulario
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	// Validar formato de usuario (letras, números, guion bajo; 3-20 caracteres)
 	if !validUsername.MatchString(username) {
-		http.Error(w, "Usuario inválido: 3-20 caracteres alfanuméricos o guion bajo", http.StatusBadRequest)
+		fail("invalid_username")
 		return
 	}
-
-	// Exigir una contraseña mínimamente fuerte
 	if len(password) < 8 {
-		http.Error(w, "La contraseña debe tener al menos 8 caracteres", http.StatusBadRequest)
+		fail("weak_password")
+		return
+	}
+	if password != r.FormValue("password_confirm") {
+		fail("password_mismatch")
 		return
 	}
 
-	// Verificar si el usuario ya existe
-	existingUser, _ := db.GetUserByUsername(username)
+	existingUser, err := db.GetUserByUsername(username)
+	if err != nil {
+		log.Println("❌ Error consultando usuario:", err)
+		fail("server_error")
+		return
+	}
 	if existingUser != nil {
-		http.Error(w, "El usuario ya existe", http.StatusConflict)
+		fail("user_exists")
 		return
 	}
 
-	// Crear un nuevo usuario con la contraseña hasheada
 	newUser := models.User{
 		Username: username,
 		Password: utils.HashPassword(password),
 	}
-
-	// Guardar el usuario en la base de datos
-	err := db.InsertUser(&newUser)
-	if err != nil {
-		log.Println("Error al insertar el usuario en la base de datos:", err)
-		http.Error(w, "Error al registrar el usuario", http.StatusInternalServerError)
+	if err := db.InsertUser(&newUser); err != nil {
+		log.Println("❌ Error al insertar el usuario:", err)
+		fail("server_error")
 		return
 	}
 
-	// Iniciar sesión automáticamente después del registro
-	session.StartSession(w, r, username)
-
-	// Redirigir al dashboard
-	http.Redirect(w, r, "/dashboard", http.StatusFound)
+	http.Redirect(w, r, "/dashboard?ok=user_created", http.StatusSeeOther)
 }
-
-
