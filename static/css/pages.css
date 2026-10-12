@@ -241,3 +241,27 @@
   .support-grid > .support-card:only-child { padding: 2.4rem 1.8rem; }
   .support-card:only-child .breb-key code { width: 100%; font-size: 1.9rem; }
 }
+
+/* ===== Texto largo (política de privacidad) ===== */
+.page--prose { max-width: 76rem; }
+.page--prose .page-hero { margin-bottom: 3.2rem; }
+.page--prose section {
+  margin-bottom: 3.2rem;
+  padding: 2.4rem 2.8rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.page--prose h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.015em; margin-bottom: 1.2rem; }
+.page--prose h3 { font-size: 1.6rem; font-weight: 700; margin: 2rem 0 0.8rem; }
+.page--prose h3:first-of-type { margin-top: 0.4rem; }
+.page--prose section p,
+.page--prose section li { font-size: 1.5rem; line-height: 1.75; color: var(--ink-2); }
+.page--prose section p + p { margin-top: 1rem; }
+.page--prose ul { margin: 0.8rem 0 1.2rem 2rem; display: grid; gap: 0.4rem; }
+.page--prose section a { color: var(--brand); font-weight: 600; text-underline-offset: 2px; }
+.page--prose strong { color: var(--ink); }
+
+@media (max-width: 640px) {
+  .page--prose section { padding: 1.8rem 1.6rem; }
+}

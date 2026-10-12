@@ -360,3 +360,6 @@ body {
   font-weight: 600;
 }
 .Footer-support:hover { text-decoration: underline; }
+
+.Footer-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.Footer-link:hover { color: #f0abfc; }

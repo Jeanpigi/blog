@@ -7,5 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var subject = a.getAttribute("data-mail-subject");
     a.href = "mailto:" + addr + (subject ? "?subject=" + encodeURIComponent(subject) : "");
     a.title = addr;
+    // data-mail-show: el texto del enlace pasa a ser la dirección (en textos legales).
+    if (a.hasAttribute("data-mail-show")) a.textContent = addr;
   });
 });

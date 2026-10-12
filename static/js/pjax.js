@@ -5,7 +5,7 @@
 
   // Rutas de página donde PJAX es seguro (navegación GET sin estado sensible)
   // (/visitas, /dashboard y /radio/upload requieren sesión: siempre carga completa)
-  var SAFE = ['/', '/blog', '/historias', '/tecnologias', '/portafolio', '/servicios', '/apoyar'];
+  var SAFE = ['/', '/blog', '/historias', '/tecnologias', '/portafolio', '/servicios', '/apoyar', '/privacidad'];
 
   function isSafe(pathname) {
     // Las páginas en inglés son las mismas con prefijo /en
