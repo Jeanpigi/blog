@@ -50,14 +50,15 @@ func InitDB() {
 		log.Fatal("❌ Error al conectar a la base de datos:", err)
 	}
 
-	// El MySQL de Hostinger corta las conexiones inactivas antes de lo que el
-	// pool esperaba ("connection reset by peer" en los logs): una conexión
-	// reutilizada después de eso hace fallar la petición. Se descartan las
-	// inactivas a los 30s y se renuevan todas cada 2 min.
-	Db.SetMaxOpenConns(25)
-	Db.SetMaxIdleConns(5)
-	Db.SetConnMaxLifetime(2 * time.Minute)
-	Db.SetConnMaxIdleTime(30 * time.Second)
+	// El MariaDB de Hostinger (o algo en la red hasta él) corta las conexiones
+	// inactivas en cuestión de segundos ("connection reset by peer" en los logs,
+	// incluso con 30s): reutilizar una conexión cortada hace fallar la petición.
+	// Se descartan las inactivas a los 10s y se limita el número de conexiones
+	// (los hostings compartidos limitan las conexiones por usuario).
+	Db.SetMaxOpenConns(10)
+	Db.SetMaxIdleConns(3)
+	Db.SetConnMaxLifetime(1 * time.Minute)
+	Db.SetConnMaxIdleTime(10 * time.Second)
 
 	if err := Db.Ping(); err != nil {
 		log.Fatal("❌ No se pudo conectar a la base de datos:", err)
