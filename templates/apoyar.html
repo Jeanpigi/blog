@@ -1,0 +1,59 @@
+{{define "title"}}{{t "title.support"}}{{end}}
+
+{{define "extra_css"}}
+<link rel="stylesheet" href="/static/css/pages.css?v={{staticVer}}">
+{{end}}
+
+{{define "content"}}
+<div class="page">
+  <header class="page-hero">
+    <span class="page-hero__icon" aria-hidden="true">☕</span>
+    <p class="page-eyebrow">{{t "support.eyebrow"}}</p>
+    <h1 class="page-title">{{t "support.title"}}</h1>
+    <p class="page-lead">{{t "support.lead"}}</p>
+  </header>
+
+  <div class="support-grid">
+    {{with .Links.BreBKey}}
+    <article class="support-card">
+      <span class="support-card__icon"><i class="fa fa-mobile-screen-button"></i></span>
+      <h2>{{t "support.brebTitle"}}</h2>
+      <p>{{t "support.brebText"}}</p>
+      <div class="breb-key">
+        <code id="brebKey">{{.}}</code>
+        <button type="button" class="page-btn page-btn--ghost" data-copy="#brebKey" data-copied="{{t "support.copied"}}">
+          <i class="fa fa-copy"></i> <span>{{t "support.copy"}}</span>
+        </button>
+      </div>
+    </article>
+    {{end}}
+
+    {{with .Links.PayURL}}
+    <article class="support-card">
+      <span class="support-card__icon"><i class="fa fa-building-columns"></i></span>
+      <h2>{{t "support.payTitle"}}</h2>
+      <p>{{t "support.payText"}}</p>
+      <a class="page-btn page-btn--primary" href="{{.}}" target="_blank" rel="noopener noreferrer">
+        <i class="fa fa-heart"></i> {{t "support.payCta"}}
+      </a>
+    </article>
+    {{end}}
+
+    {{with .Links.PayPalURL}}
+    <article class="support-card">
+      <span class="support-card__icon"><i class="fa-brands fa-paypal"></i></span>
+      <h2>{{t "support.paypalTitle"}}</h2>
+      <p>{{t "support.paypalText"}}</p>
+      <a class="page-btn page-btn--ghost" href="{{.}}" target="_blank" rel="noopener noreferrer">
+        <i class="fa-brands fa-paypal"></i> {{t "support.paypalCta"}}
+      </a>
+    </article>
+    {{end}}
+  </div>
+
+  <p class="page-note">{{t "support.thanks"}}</p>
+  <p class="page-note page-note--muted">{{t "support.other"}}</p>
+</div>
+
+<script src="/static/js/copy.js?v={{staticVer}}"></script>
+{{end}}

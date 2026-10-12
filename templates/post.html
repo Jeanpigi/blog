@@ -63,6 +63,16 @@
       </div>
     </footer>
 
+    {{if (site).SupportEnabled}}
+    <aside class="post-support" lang="{{lang}}">
+      <div>
+        <strong>{{t "post.supportTitle"}}</strong>
+        <p>{{t "post.supportText"}}</p>
+      </div>
+      <a class="post-support__btn" href="{{url "/apoyar"}}"><i class="fa fa-mug-hot"></i> {{t "post.supportCta"}}</a>
+    </aside>
+    {{end}}
+
   </article>
 </div>
 

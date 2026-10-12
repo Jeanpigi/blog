@@ -60,6 +60,7 @@
       <li><a href="{{url "/historias"}}">{{t "nav.stories"}}</a></li>
       <li><a href="{{url "/tecnologias"}}">{{t "nav.tech"}}</a></li>
       <li><a href="{{url "/portafolio"}}">{{t "nav.portfolio"}}</a></li>
+      <li><a href="{{url "/servicios"}}">{{t "nav.services"}}</a></li>
     </ul>
     {{if isPublic}}
     <div class="lang-switch" role="group" aria-label="{{t "lang.label"}}">
@@ -77,7 +78,7 @@
     <div class="Footer-container">
       <div class="Footer-content">
         <div class="Footer-copy">{{t "footer.made"}}</div>
-        <div class="Footer-go">Full Power by Go 🐹</div>
+        <div class="Footer-go">{{if (site).SupportEnabled}}<a class="Footer-support" href="{{url "/apoyar"}}"><i class="fa fa-mug-hot"></i> {{t "footer.support"}}</a> · {{end}}Full Power by Go 🐹</div>
       </div>
     </div>
   </footer>

@@ -14,6 +14,7 @@ import (
 	"unicode"
 
 	"github.com/Jeanpigi/blog/internal/i18n"
+	"github.com/Jeanpigi/blog/internal/site"
 )
 
 var (
@@ -30,6 +31,7 @@ var (
 		"srcset":    imageSrcset,
 		"hostOf":    hostOf,
 		"initials":  initials,
+		"site":      site.Load,
 	}
 )
 

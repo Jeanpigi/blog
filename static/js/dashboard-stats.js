@@ -15,6 +15,7 @@
 
   var PAGE_LABELS = {
     "/": "Inicio", "/blog": "Blog", "/historias": "Historias", "/tecnologias": "Tecnología", "/portafolio": "Portafolio",
+    "/servicios": "Servicios", "/apoyar": "Apoyar", "/en/servicios": "Servicios (EN)", "/en/apoyar": "Apoyar (EN)",
     "/en": "Inicio (EN)", "/en/blog": "Blog (EN)", "/en/historias": "Historias (EN)", "/en/tecnologias": "Tecnología (EN)", "/en/portafolio": "Portafolio (EN)",
   };
   var DEVICE_LABELS = { mobile: "Móvil", desktop: "Computador", tablet: "Tablet", Desconocido: "Desconocido" };

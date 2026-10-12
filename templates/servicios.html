@@ -1,0 +1,70 @@
+{{define "title"}}{{t "title.services"}}{{end}}
+
+{{define "extra_css"}}
+<link rel="stylesheet" href="/static/css/pages.css?v={{staticVer}}">
+{{end}}
+
+{{define "content"}}
+<div class="page">
+  <header class="page-hero">
+    <p class="page-eyebrow">{{t "services.eyebrow"}}</p>
+    <h1 class="page-title">{{t "services.title"}}</h1>
+    <p class="page-lead">{{t "services.lead"}}</p>
+  </header>
+
+  <div class="services-grid">
+    <article class="service-card">
+      <span class="support-card__icon"><i class="fa fa-code"></i></span>
+      <h2>{{t "services.web"}}</h2>
+      <p>{{t "services.webText"}}</p>
+    </article>
+    <article class="service-card">
+      <span class="support-card__icon"><i class="fa fa-gauge-high"></i></span>
+      <h2>{{t "services.perf"}}</h2>
+      <p>{{t "services.perfText"}}</p>
+    </article>
+    <article class="service-card">
+      <span class="support-card__icon"><i class="fa fa-server"></i></span>
+      <h2>{{t "services.ops"}}</h2>
+      <p>{{t "services.opsText"}}</p>
+    </article>
+    <article class="service-card">
+      <span class="support-card__icon"><i class="fa fa-chalkboard-user"></i></span>
+      <h2>{{t "services.teach"}}</h2>
+      <p>{{t "services.teachText"}}</p>
+    </article>
+  </div>
+
+  <section class="steps" aria-labelledby="steps-title">
+    <h2 id="steps-title">{{t "services.how"}}</h2>
+    <ol>
+      <li>{{t "services.step1"}}</li>
+      <li>{{t "services.step2"}}</li>
+      <li>{{t "services.step3"}}</li>
+      <li>{{t "services.step4"}}</li>
+    </ol>
+  </section>
+
+  <section class="cta-card">
+    <h2>{{t "services.ctaTitle"}}</h2>
+    {{if .Links.ContactEnabled}}
+    <p>{{t "services.ctaText"}}</p>
+    <div class="cta-actions">
+      {{with .Links.Email}}
+      <a class="page-btn page-btn--primary" href="mailto:{{.}}?subject={{t "services.mailSubject"}}"><i class="fa fa-envelope"></i> {{t "services.email"}}</a>
+      {{end}}
+      {{with .Links.WhatsApp}}
+      <a class="page-btn page-btn--whatsapp" href="https://wa.me/{{.}}?text={{t "services.waText"}}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> {{t "services.whatsapp"}}</a>
+      {{end}}
+      <a class="page-btn page-btn--ghost" href="{{url "/portafolio"}}"><i class="fa fa-briefcase"></i> {{t "services.portfolio"}}</a>
+    </div>
+    {{else}}
+    <p>{{t "services.noContact"}}</p>
+    <div class="cta-actions">
+      <a class="page-btn page-btn--ghost" href="https://github.com/Jeanpigi" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub</a>
+      <a class="page-btn page-btn--ghost" href="{{url "/portafolio"}}"><i class="fa fa-briefcase"></i> {{t "services.portfolio"}}</a>
+    </div>
+    {{end}}
+  </section>
+</div>
+{{end}}

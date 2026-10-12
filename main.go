@@ -147,6 +147,8 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/historias", handlers.HistoriasHandler).Methods(page...)
 	r.HandleFunc("/tecnologias", handlers.TecnologiasHandler).Methods(page...)
 	r.HandleFunc("/portafolio", handlers.PortafolioHandler).Methods(page...)
+	r.HandleFunc("/servicios", handlers.ServicesHandler).Methods(page...)
+	r.HandleFunc("/apoyar", handlers.SupportHandler).Methods(page...)
 
 	// 🔹 Autenticación
 	r.HandleFunc("/login", handlers.LoginHandler).Methods(http.MethodGet, http.MethodHead, http.MethodPost)

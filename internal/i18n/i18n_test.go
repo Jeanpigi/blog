@@ -17,6 +17,8 @@ func TestMiddleware(t *testing.T) {
 		{"/en", "/", EN},
 		{"/en/blog", "/blog", EN},
 		{"/en/post/12", "/post/12", EN},
+		{"/en/servicios", "/servicios", EN},
+		{"/en/apoyar", "/apoyar", EN},
 		{"/en/dashboard", "/en/dashboard", ES}, // el admin no existe en inglés → 404
 		{"/english", "/english", ES},
 	}

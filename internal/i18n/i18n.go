@@ -28,6 +28,7 @@ var postPathRx = regexp.MustCompile(`^/post/[0-9]{1,9}$`)
 
 var publicPages = map[string]bool{
 	"/": true, "/blog": true, "/historias": true, "/tecnologias": true, "/portafolio": true,
+	"/servicios": true, "/apoyar": true,
 }
 
 // IsPublicPage indica si una ruta (sin prefijo de idioma) es una página

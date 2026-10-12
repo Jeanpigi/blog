@@ -6,7 +6,7 @@
 (function () {
   "use strict";
 
-  var TRACKABLE = /^\/(blog|historias|tecnologias|portafolio|post\/\d+)?$/;
+  var TRACKABLE = /^\/(blog|historias|tecnologias|portafolio|servicios|apoyar|post\/\d+)?$/;
 
   // Las páginas en inglés son las mismas con prefijo /en.
   function trackable(path) {

@@ -353,3 +353,10 @@ body {
 @media (max-width: 768px) {
   .lang-switch { right: 1.6rem; }
 }
+
+.Footer-support {
+  color: #f0abfc;
+  text-decoration: none;
+  font-weight: 600;
+}
+.Footer-support:hover { text-decoration: underline; }

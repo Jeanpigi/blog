@@ -316,11 +316,51 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  margin: 0 0 2.4rem;
+  margin: 2.4rem 3.6rem 0;
   padding: 1.2rem 1.6rem;
   background: #fdf4ff;
   border: 1px solid #f5d0fe;
   border-radius: 10px;
   color: #6b21a8;
   font-size: 1.4rem;
+}
+
+/* Llamada a apoyar al final de cada post */
+.post-support {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  margin: 0 3.6rem 3.6rem;
+  padding: 2rem 2.4rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fdf4ff 0%, #f5f3ff 100%);
+  border: 1px solid #f5d0fe;
+}
+.post-support strong { display: block; font-size: 1.7rem; color: #0f172a; margin-bottom: 0.4rem; }
+.post-support p { font-size: 1.45rem; color: #475569; margin: 0; max-width: 52ch; }
+
+.post-support__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.1rem 2rem;
+  border-radius: 10px;
+  background: #a10395;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(161, 3, 149, 0.28);
+}
+.post-support__btn:hover { background: #870280; color: #fff; }
+
+@media (max-width: 640px) {
+  .post-support__btn { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 640px) {
+  .post-support { margin: 0 1.6rem 2.4rem; }
+  .post-untranslated { margin: 1.6rem 1.6rem 0; }
 }
