@@ -112,6 +112,82 @@
   user-select: all;
 }
 
+/* Un solo método de apoyo: tarjeta centrada y protagonista */
+.support-grid > .support-card:only-child {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 56rem;
+  margin: 0 auto;
+  align-items: center;
+  text-align: center;
+  padding: 3.2rem 2.8rem;
+}
+.support-card:only-child .breb-key { justify-content: center; margin-top: 0.8rem; }
+.support-card:only-child .breb-key code { font-size: 2.2rem; padding: 1.2rem 2rem; letter-spacing: 0.02em; }
+
+/* Pasos para apoyar desde el celular */
+.howto {
+  width: 100%;
+  margin-top: 1.6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+.howto__title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 1.2rem;
+}
+.howto__title i { color: var(--brand); }
+.howto ol { list-style: none; counter-reset: howto; display: grid; gap: 1rem; padding: 0; margin: 0; }
+.howto li {
+  counter-increment: howto;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  font-size: 1.45rem;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.howto li::before {
+  content: counter(howto);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+/* Recuadro para quien vive fuera de Colombia */
+.abroad {
+  max-width: 56rem;
+  margin: 0 auto 3.2rem;
+  padding: 2rem 2.4rem;
+  border-radius: 14px;
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  text-align: center;
+}
+.abroad h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+.abroad h2 i { color: var(--brand); }
+.abroad p { font-size: 1.45rem; color: var(--ink-2); line-height: 1.65; margin-bottom: 1.6rem; }
+
 .page-note { text-align: center; font-size: 1.5rem; color: var(--ink-2); margin-bottom: 0.8rem; }
 .page-note--muted { color: var(--muted); font-size: 1.4rem; }
 
@@ -161,5 +237,7 @@
 @media (max-width: 640px) {
   .services-grid { grid-template-columns: minmax(0, 1fr); }
   .page { padding: 3.2rem 1.6rem 12rem; }
-  .cta-actions .page-btn, .support-card .page-btn { width: 100%; }
+  .cta-actions .page-btn, .support-card .page-btn, .abroad .page-btn { width: 100%; }
+  .support-grid > .support-card:only-child { padding: 2.4rem 1.8rem; }
+  .support-card:only-child .breb-key code { width: 100%; font-size: 1.9rem; }
 }

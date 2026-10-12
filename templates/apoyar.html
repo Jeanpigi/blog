@@ -21,9 +21,17 @@
       <p>{{t "support.brebText"}}</p>
       <div class="breb-key">
         <code id="brebKey">{{.}}</code>
-        <button type="button" class="page-btn page-btn--ghost" data-copy="#brebKey" data-copied="{{t "support.copied"}}">
+        <button type="button" class="page-btn page-btn--primary" data-copy="#brebKey" data-copied="{{t "support.copied"}}">
           <i class="fa fa-copy"></i> <span>{{t "support.copy"}}</span>
         </button>
+      </div>
+      <div class="howto">
+        <p class="howto__title"><i class="fa fa-mobile-screen-button"></i> {{t "support.stepsTitle"}}</p>
+        <ol>
+          <li>{{t "support.step1"}}</li>
+          <li>{{t "support.step2"}}</li>
+          <li>{{t "support.step3"}}</li>
+        </ol>
       </div>
     </article>
     {{end}}
@@ -51,9 +59,22 @@
     {{end}}
   </div>
 
+  {{if and .Links.BreBKey (not .Links.PayPalURL)}}
+  <aside class="abroad">
+    <h2><i class="fa fa-earth-americas"></i> {{t "support.abroadTitle"}}</h2>
+    <p>{{t "support.abroadText"}}</p>
+    {{if .Links.Email}}
+    <a class="page-btn page-btn--ghost" href="#" data-mail-user="{{.Links.EmailUser}}" data-mail-domain="{{.Links.EmailDomain}}" data-mail-subject="{{t "support.mailSubject"}}"><i class="fa fa-envelope"></i> {{t "support.abroadCta"}}</a>
+    {{end}}
+  </aside>
+  {{end}}
+
   <p class="page-note">{{t "support.thanks"}}</p>
+  {{if not (and .Links.BreBKey (not .Links.PayPalURL))}}
   <p class="page-note page-note--muted">{{t "support.other"}}</p>
+  {{end}}
 </div>
 
 <script src="/static/js/copy.js?v={{staticVer}}"></script>
+<script src="/static/js/contact.js?v={{staticVer}}"></script>
 {{end}}
