@@ -13,8 +13,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	postID := vars["id"]
 
 	post, err := db.FindPostByID(postID)
-	if err != nil {
-		http.NotFound(w, r)
+	if err != nil || post == nil {
+		NotFoundHandler(w, r)
 		return
 	}
 

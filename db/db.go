@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Jeanpigi/blog/internal/analytics"
 	"github.com/Jeanpigi/blog/internal/models"
 	"github.com/go-sql-driver/mysql"
 )
@@ -269,9 +270,14 @@ func DeletePost(postID int) error {
 // -------- Visitas --------
 
 func InsertVisit(visit *models.Visit) error {
-	const query = `INSERT INTO Visits (ip, user_agent, page, country, region, city, latitude, longitude)
-	               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	_, err := Db.Exec(query, visit.IP, visit.UserAgent, visit.Page, visit.Country, visit.Region, visit.City, visit.Latitude, visit.Longitude)
+	const query = `INSERT INTO Visits (ip, user_agent, page, country, region, city, latitude, longitude, view_id, referrer, device)
+	               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	var viewID interface{} // NULL si no viene: la columna es UNIQUE
+	if visit.ViewID != "" {
+		viewID = visit.ViewID
+	}
+	_, err := Db.Exec(query, visit.IP, visit.UserAgent, visit.Page, visit.Country, visit.Region, visit.City,
+		visit.Latitude, visit.Longitude, viewID, visit.Referrer, visit.Device)
 	return err
 }
 
@@ -312,16 +318,16 @@ func GetVisitStats() (VisitStats, error) {
 		       COALESCE(SUM(timestamp >= NOW() - INTERVAL 7 DAY), 0),
 		       COALESCE(SUM(timestamp >= CURDATE()), 0),
 		       COUNT(DISTINCT ip)
-		FROM Visits`
+		FROM Visits WHERE NOT REGEXP_LIKE(user_agent, ?, 'i')`
 	var st VisitStats
-	err := Db.QueryRow(query).Scan(&st.Total, &st.Last7Days, &st.Today, &st.UniqueIPs)
+	err := Db.QueryRow(query, analytics.BotSQLPattern).Scan(&st.Total, &st.Last7Days, &st.Today, &st.UniqueIPs)
 	return st, err
 }
 
 // -------- Portafolio --------
 
 func GetAllExperiences() ([]models.Experience, error) {
-	rows, err := Db.Query("SELECT id, title, place, description, start_year, end_year FROM experiences ORDER BY end_year DESC")
+	rows, err := Db.Query("SELECT id, title, place, description, start_year, end_year FROM experiences ORDER BY (end_year = 0) DESC, end_year DESC, start_year DESC")
 	if err != nil {
 		return nil, err
 	}
@@ -338,7 +344,7 @@ func GetAllExperiences() ([]models.Experience, error) {
 }
 
 func GetAllEducation() ([]models.Education, error) {
-	rows, err := Db.Query("SELECT id, title, place, start_year, end_year FROM education")
+	rows, err := Db.Query("SELECT id, title, place, start_year, end_year FROM education ORDER BY (end_year = 0) DESC, end_year DESC, start_year DESC")
 	if err != nil {
 		return nil, err
 	}
@@ -355,7 +361,7 @@ func GetAllEducation() ([]models.Education, error) {
 }
 
 func GetAllProjects() ([]models.Project, error) {
-	rows, err := Db.Query("SELECT id, title, description, image_url, project_url FROM projects")
+	rows, err := Db.Query("SELECT id, title, description, image_url, project_url FROM projects ORDER BY id")
 	if err != nil {
 		return nil, err
 	}

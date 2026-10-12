@@ -5,13 +5,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{template "title" .}}</title>
+  {{block "meta" .}}
+  <meta name="description" content="Historias que enganchan y tecnología que transforma: relatos, guías, programación, Linux, IA y seguridad informática.">
+  <meta property="og:site_name" content="JbearP Blog">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://blog.jbearp.com/static/assets/Jean.webp">
+  {{end}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="/static/css/style.css?v={{staticVer}}">
   <link rel="stylesheet" href="/static/css/radio.css?v={{staticVer}}">
   <link rel="shortcut icon" href="/static/assets/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   {{block "extra_css" .}}{{end}}
   <!-- GA -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TLE4DOSLVG"></script>
@@ -25,7 +31,7 @@
 <body>
   <header class="Header">
     <div class="Header-logo">
-      <a href="/login"><img src="/static/assets/logo.svg" alt="logo" /></a>
+      <a href="/login"><img src="/static/assets/logo.webp" alt="JbearP" width="55" height="55" /></a>
     </div>
     <div class="Header-title">
       <h1>JbearP Blog</h1>
@@ -68,6 +74,7 @@
   <script src="/static/js/csrf.js?v={{staticVer}}"></script>
   <script src="/static/js/burguerButton.js?v={{staticVer}}"></script>
   <script src="/static/js/pjax.js?v={{staticVer}}"></script>
+  <script src="/static/js/track.js?v={{staticVer}}"></script>
 
   <!-- ===== JbearP Radio Player ===== -->
   <audio id="radioAudio" preload="none"></audio>

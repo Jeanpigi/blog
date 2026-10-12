@@ -43,6 +43,7 @@ body {
 
 .Header-logo img {
   width: 5.5rem;
+  height: auto; /* el <img> lleva width/height para reservar espacio */
   display: block;
   cursor: pointer;
   border-radius: 8px;

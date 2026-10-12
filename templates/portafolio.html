@@ -1,6 +1,6 @@
 {{define "title"}}Portafolio — JbearP{{end}}
 
-{{block "extra_css" .}}
+{{define "extra_css"}}
 <link rel="stylesheet" href="/static/css/portafolio.css?v={{staticVer}}">
 {{end}}
 
@@ -8,74 +8,49 @@
 <div class="portfolio">
 
   <!-- HERO -->
-  <header class="portfolio__hero">
-    <h1>Portafolio</h1>
-    <p>Experiencia, formación y proyectos que definen mi camino como developer.</p>
+  <header class="pf-hero">
+    <img class="pf-hero__avatar" src="/static/assets/Jean.webp" alt="Jean Pierre Arenas" width="96" height="96">
+    <p class="pf-eyebrow">Portafolio</p>
+    <h1 class="pf-hero__title">Jean Pierre Arenas</h1>
+    <p class="pf-hero__lead">Ingeniero de sistemas y developer. Construyo aplicaciones web, enseño con tecnología y me apasionan Linux, la seguridad y la IA.</p>
+
+    <ul class="pf-stats" aria-label="Resumen">
+      {{if .YearsExp}}<li><strong>{{.YearsExp}}+</strong><span>años de experiencia</span></li>{{end}}
+      <li><strong>{{len .Projects}}</strong><span>proyectos</span></li>
+      <li><strong>{{len .Education}}</strong><span>títulos y cursos</span></li>
+    </ul>
+
+    <div class="pf-hero__ctas">
+      <a class="pf-btn pf-btn--primary" href="#proyectos"><i class="fa fa-rocket"></i> Ver proyectos</a>
+      <a class="pf-btn" href="https://github.com/Jeanpigi" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub</a>
+    </div>
   </header>
-
-  <!-- EXPERIENCIA -->
-  <section class="portfolio__section">
-    <div class="portfolio__section-head">
-      <span class="portfolio__section-icon">💼</span>
-      <h2>Experiencia</h2>
-    </div>
-    <div class="timeline">
-      {{range .Experiences}}
-      <div class="timeline__item">
-        <div class="timeline__dot"></div>
-        <div class="timeline__body">
-          <div class="timeline__period">{{.StartYear}} — {{.EndYear}}</div>
-          <h3 class="timeline__title">{{.Title}}</h3>
-          <div class="timeline__place">{{.Place}}</div>
-          {{if .Description}}
-          <p class="timeline__desc">{{.Description}}</p>
-          {{end}}
-        </div>
-      </div>
-      {{end}}
-    </div>
-  </section>
-
-  <!-- EDUCACIÓN -->
-  <section class="portfolio__section">
-    <div class="portfolio__section-head">
-      <span class="portfolio__section-icon">🎓</span>
-      <h2>Educación</h2>
-    </div>
-    <div class="timeline">
-      {{range .Education}}
-      <div class="timeline__item">
-        <div class="timeline__dot"></div>
-        <div class="timeline__body">
-          <div class="timeline__period">{{.StartYear}} — {{.EndYear}}</div>
-          <h3 class="timeline__title">{{.Title}}</h3>
-          <div class="timeline__place">{{.Place}}</div>
-        </div>
-      </div>
-      {{end}}
-    </div>
-  </section>
 
   <!-- PROYECTOS -->
   {{if .Projects}}
-  <section class="portfolio__section">
-    <div class="portfolio__section-head">
-      <span class="portfolio__section-icon">🚀</span>
-      <h2>Proyectos</h2>
+  <section class="pf-section" id="proyectos" aria-labelledby="pf-projects-title">
+    <div class="pf-section__head">
+      <span class="pf-section__icon"><i class="fa fa-rocket"></i></span>
+      <h2 id="pf-projects-title">Proyectos</h2>
     </div>
     <div class="projects-grid">
       {{range .Projects}}
       <article class="project-card">
-        {{if .ImageURL}}
-        <div class="project-card__img-wrap">
-          <img src="{{.ImageURL}}" alt="{{.Title}}" loading="lazy">
-        </div>
-        {{end}}
+        <a class="project-card__media" href="{{.ProjectURL}}" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+          {{if .ImageURL}}
+            {{$srcset := srcset .ImageURL}}
+            <img src="{{.ImageURL}}"
+                 {{if $srcset}}srcset="{{$srcset}}" sizes="(max-width: 700px) 100vw, 440px"{{end}}
+                 alt="" width="960" height="540" loading="lazy" decoding="async">
+          {{else}}
+            <span class="project-card__placeholder">{{initials .Title}}</span>
+          {{end}}
+        </a>
         <div class="project-card__body">
           <h3 class="project-card__title">{{.Title}}</h3>
-          <p class="project-card__desc">{{.Description}}</p>
+          {{if .Description}}<p class="project-card__desc">{{.Description}}</p>{{end}}
           <a href="{{.ProjectURL}}" target="_blank" rel="noopener noreferrer" class="project-card__link">
-            Ver proyecto <span aria-hidden="true">↗</span>
+            Ver proyecto <span class="project-card__host">{{hostOf .ProjectURL}}</span> <i class="fa fa-arrow-up-right-from-square" aria-hidden="true"></i>
           </a>
         </div>
       </article>
@@ -83,6 +58,43 @@
     </div>
   </section>
   {{end}}
+
+  <div class="pf-columns">
+    <!-- EXPERIENCIA -->
+    <section class="pf-section" aria-labelledby="pf-exp-title">
+      <div class="pf-section__head">
+        <span class="pf-section__icon"><i class="fa fa-briefcase"></i></span>
+        <h2 id="pf-exp-title">Experiencia</h2>
+      </div>
+      <ol class="timeline">
+        {{range .Experiences}}
+        <li class="timeline__item">
+          <div class="timeline__period">{{.StartYear}} — {{if .EndYear}}{{.EndYear}}{{else}}Actualidad{{end}}</div>
+          <h3 class="timeline__title">{{.Title}}</h3>
+          <div class="timeline__place">{{.Place}}</div>
+          {{if .Description}}<p class="timeline__desc">{{.Description}}</p>{{end}}
+        </li>
+        {{end}}
+      </ol>
+    </section>
+
+    <!-- EDUCACIÓN -->
+    <section class="pf-section" aria-labelledby="pf-edu-title">
+      <div class="pf-section__head">
+        <span class="pf-section__icon"><i class="fa fa-graduation-cap"></i></span>
+        <h2 id="pf-edu-title">Educación</h2>
+      </div>
+      <ol class="timeline">
+        {{range .Education}}
+        <li class="timeline__item">
+          <div class="timeline__period">{{.StartYear}} — {{if .EndYear}}{{.EndYear}}{{else}}Actualidad{{end}}</div>
+          <h3 class="timeline__title">{{.Title}}</h3>
+          <div class="timeline__place">{{.Place}}</div>
+        </li>
+        {{end}}
+      </ol>
+    </section>
+  </div>
 
 </div>
 {{end}}

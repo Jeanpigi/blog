@@ -3,6 +3,7 @@ package music
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -16,7 +17,9 @@ func LoadMusicFiles(folder string) error {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() {
+		// Solo MP3: cualquier otro archivo de la carpeta (imágenes, .txt,
+		// desktop.ini…) se emitiría como audio y dejaría la radio en silencio.
+		if !info.IsDir() && strings.EqualFold(filepath.Ext(path), ".mp3") {
 			mu.Lock()
 			MusicFiles = append(MusicFiles, path)
 			mu.Unlock()

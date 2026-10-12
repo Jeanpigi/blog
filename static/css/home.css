@@ -99,6 +99,7 @@
 .About-content-picture:hover { transform: scale(1.03); filter: saturate(1.06) brightness(1.03); }
 .About-content-picture img {
   width: clamp(84px, 12vw, 110px);
+  height: auto;
   margin: .5rem;
   border-radius: 50%;
   box-shadow: 0 20px 50px rgba(27,9,55,.25), 0 8px 18px rgba(0,0,0,.08);

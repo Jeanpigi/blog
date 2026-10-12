@@ -85,7 +85,7 @@
 
   // ── Pestañas (con hash para poder recargar / compartir) ───────────────────
 
-  var TABS = ["posts", "editor", "radio"];
+  var TABS = ["posts", "editor", "stats", "radio"];
 
   function showTab(name, opts) {
     if (TABS.indexOf(name) === -1) name = "posts";
@@ -97,6 +97,7 @@
     $$(".dash-panel").forEach(function (p) { p.hidden = p.id !== "panel-" + name; });
     if (!(opts && opts.silent)) history.replaceState(history.state, "", "#" + name);
     if (name === "radio") loadRadio();
+    if (name === "stats" && window.DashStats) window.DashStats.show();
     if (name === "editor" && editor) setTimeout(function () { $("#postTitle").focus(); }, 0);
   }
 
@@ -218,9 +219,9 @@
     searchTimer = setTimeout(function () { filter.q = e.target.value.trim(); renderPosts(); }, 120);
   });
 
-  $$(".seg").forEach(function (b) {
+  $$("#panel-posts .seg").forEach(function (b) {
     b.addEventListener("click", function () {
-      $$(".seg").forEach(function (x) { x.classList.toggle("active", x === b); });
+      $$("#panel-posts .seg").forEach(function (x) { x.classList.toggle("active", x === b); });
       filter.cat = b.dataset.filter;
       renderPosts();
     });

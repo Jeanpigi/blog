@@ -120,6 +120,7 @@
         document.title = doc.title;
         if (push) history.pushState({ pjax: url }, doc.title, url);
         window.scrollTo({ top: 0, behavior: 'instant' });
+        document.dispatchEvent(new CustomEvent('pjax:navigated', { detail: { url: url } }));
       })
       .catch(function () {
         window.location.href = url;

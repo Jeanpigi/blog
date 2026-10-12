@@ -1,6 +1,18 @@
 {{define "title"}}{{.Post.Title}} — JbearP{{end}}
 
-{{block "extra_css" .}}
+{{define "meta"}}
+<meta name="description" content="{{.Post.Description}}">
+<link rel="canonical" href="https://blog.jbearp.com/post/{{.Post.ID}}">
+<meta property="og:site_name" content="JbearP Blog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{.Post.Title}}">
+<meta property="og:description" content="{{.Post.Description}}">
+<meta property="og:url" content="https://blog.jbearp.com/post/{{.Post.ID}}">
+<meta property="og:image" content="https://blog.jbearp.com/static/assets/Jean.webp">
+<meta name="twitter:card" content="summary">
+{{end}}
+
+{{define "extra_css"}}
 <link rel="stylesheet" href="/static/css/posts.css?v={{staticVer}}">
 {{end}}
 
@@ -28,9 +40,9 @@
           <i class="fab fa-facebook-f"></i>
         </a>
         <a class="social-btn twitter" target="_blank" rel="noopener"
-           href="https://twitter.com/intent/tweet?url={{printf "https://blog.jbearp.com/post/%d" .Post.ID}}&text={{.Post.Title}}"
-           aria-label="Compartir en Twitter">
-          <i class="fab fa-twitter"></i>
+           href="https://x.com/intent/post?url={{printf "https://blog.jbearp.com/post/%d" .Post.ID}}&text={{.Post.Title}}"
+           aria-label="Compartir en X">
+          <i class="fab fa-x-twitter"></i>
         </a>
         <a class="social-btn whatsapp" target="_blank" rel="noopener"
            href="https://api.whatsapp.com/send?text={{.Post.Title}}%20https://blog.jbearp.com/post/{{.Post.ID}}"

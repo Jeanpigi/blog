@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS Posts (
 CREATE TABLE IF NOT EXISTS Visits (
   id         INT AUTO_INCREMENT PRIMARY KEY,
   timestamp  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  ip         VARCHAR(45)  NOT NULL,
+  ip         VARCHAR(45)  NOT NULL, -- hash HMAC de la IP (VisitorID), nunca la IP real
   user_agent VARCHAR(512) NOT NULL DEFAULT '',
   page       VARCHAR(255) NOT NULL DEFAULT '',
   country    VARCHAR(100) NOT NULL DEFAULT '',
@@ -34,6 +34,13 @@ CREATE TABLE IF NOT EXISTS Visits (
   city       VARCHAR(100) NOT NULL DEFAULT '',
   latitude   DOUBLE       NOT NULL DEFAULT 0,
   longitude  DOUBLE       NOT NULL DEFAULT 0,
+  -- Medición desde el navegador (db/migrations/001_visits_analytics.sql)
+  view_id      CHAR(32)     NULL,
+  referrer     VARCHAR(100) NOT NULL DEFAULT '',
+  device       VARCHAR(10)  NOT NULL DEFAULT '',
+  duration_sec INT          NOT NULL DEFAULT 0,
+  UNIQUE KEY uq_visits_view_id (view_id),
+  KEY idx_visits_page (page),
   KEY idx_visits_timestamp (timestamp)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

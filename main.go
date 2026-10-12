@@ -56,6 +56,9 @@ func main() {
 	playlist.CreatePlaylist()
 	handlers.InitBroadcast()
 
+	// 🔹 Limpieza diaria de visitas (bots, IPs reales, retención)
+	handlers.StartVisitsMaintenance()
+
 	// 🔹 Versión de assets para cache-busting (?v=...). En producción conviene
 	// fijarla al hash de git: STATIC_VERSION=$(git rev-parse --short HEAD)
 	utils.SetStaticVersion(os.Getenv("STATIC_VERSION"))
@@ -129,19 +132,16 @@ func newRouter() *mux.Router {
 	authCSRF := func(h http.HandlerFunc) http.HandlerFunc {
 		return middleware.RequireAuth(middleware.RequireCSRF(h))
 	}
-	track := func(h http.HandlerFunc) http.Handler {
-		return middleware.TrackVisitMiddleware(h)
-	}
 	page := []string{http.MethodGet, http.MethodHead}
 
 	// 🔹 Estáticos y healthcheck
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	r.PathPrefix("/static/").Handler(middleware.StaticCache(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/")))))
 	r.HandleFunc("/healthz", handlers.HealthHandler).Methods(page...)
 
-	// 🔹 Páginas públicas (las tres primeras registran visitas)
-	r.Handle("/", track(handlers.HomeHandler)).Methods(page...)
-	r.Handle("/blog", track(handlers.BlogHandler)).Methods(page...)
-	r.Handle("/post/{id:[0-9]+}", track(handlers.PostHandler)).Methods(page...)
+	// 🔹 Páginas públicas (las visitas las mide static/js/track.js → /api/track)
+	r.HandleFunc("/", handlers.HomeHandler).Methods(page...)
+	r.HandleFunc("/blog", handlers.BlogHandler).Methods(page...)
+	r.HandleFunc("/post/{id:[0-9]+}", handlers.PostHandler).Methods(page...)
 	r.HandleFunc("/historias", handlers.HistoriasHandler).Methods(page...)
 	r.HandleFunc("/tecnologias", handlers.TecnologiasHandler).Methods(page...)
 	r.HandleFunc("/portafolio", handlers.PortafolioHandler).Methods(page...)
@@ -164,12 +164,17 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/api/histories", handlers.GetPostsByHistoryHandler).Methods(page...)
 	r.HandleFunc("/api/radio/now-playing", handlers.NowPlayingHandler).Methods(page...)
 	r.HandleFunc("/radio/stream", handlers.StreamHandler).Methods(page...)
+	// Medición de visitas desde el navegador (sendBeacon no envía cabeceras
+	// CSRF; son endpoints sin estado sensible, validados y con límite por IP).
+	r.HandleFunc("/api/track", handlers.TrackStartHandler).Methods(http.MethodPost)
+	r.HandleFunc("/api/track/end", handlers.TrackEndHandler).Methods(http.MethodPost)
 
 	// 🔹 API admin
 	r.HandleFunc("/api/posts", authCSRF(handlers.CreatePostHandler)).Methods(http.MethodPost)
 	r.HandleFunc("/api/posts/{id:[0-9]+}", authCSRF(handlers.UpdatePostHandler)).Methods(http.MethodPut, http.MethodPatch)
 	r.HandleFunc("/api/posts/{id:[0-9]+}", authCSRF(handlers.DeletePostHandler)).Methods(http.MethodDelete)
 	r.HandleFunc("/api/admin/stats", auth(handlers.DashboardStatsHandler)).Methods(page...)
+	r.HandleFunc("/api/admin/analytics", auth(handlers.AnalyticsHandler)).Methods(page...)
 	r.HandleFunc("/api/visits/location", auth(handlers.GetVisitsWithLocationHandler)).Methods(page...)
 	// Saltar canción afecta a todos los oyentes del broadcast global.
 	r.HandleFunc("/api/radio/advance", authCSRF(handlers.AdvanceSongHandler)).Methods(http.MethodPost)
