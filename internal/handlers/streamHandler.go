@@ -112,10 +112,28 @@ func advanceBroadcast() {
 	scheduleBroadcastAdvance(next)
 }
 
+// StreamHandler sirve la canción en emisión. Con ?s=<nombre> sirve esa canción
+// concreta (si existe en la carpeta): así las peticiones Range que hace el
+// navegador mientras reproduce no reciben bytes de otra canción cuando el
+// servidor ya avanzó.
 func StreamHandler(w http.ResponseWriter, r *http.Request) {
 	broadcast.mu.RLock()
 	songPath := broadcast.song
 	broadcast.mu.RUnlock()
+
+	if name := r.URL.Query().Get("s"); name != "" {
+		songPath = ""
+		for _, f := range music.Snapshot() {
+			if filepath.Base(f) == name {
+				songPath = f
+				break
+			}
+		}
+		if songPath == "" {
+			http.Error(w, "Canción no disponible", http.StatusNotFound)
+			return
+		}
+	}
 
 	if songPath == "" {
 		http.Error(w, "No hay canciones disponibles. Sube archivos MP3 primero.", http.StatusServiceUnavailable)

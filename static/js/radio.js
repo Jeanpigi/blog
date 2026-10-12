@@ -25,6 +25,10 @@
   let retryCount = 0;
   const MAX_RETRIES = 5;
 
+  // startedAt de la canción que está sonando en este cliente. Al terminar se
+  // compara con el del servidor para saber si ya avanzó.
+  let playingStartedAt = null;
+
   // Desfase entre el reloj del servidor y el del cliente (ms).
   // serverNow - Date.now() en el momento de la respuesta. Permite que la
   // sincronización no dependa de que el reloj del visitante esté en hora.
@@ -82,14 +86,7 @@
     // "siguiente" — solo admin puede forzar el avance vía API
     navigator.mediaSession.setActionHandler('nexttrack', function () {
       postAdvance().then(function (data) {
-        if (!data || !data.song) return;
-        updateTitle(data.song);
-        setMediaMetadata(data.song);
-        audio.src = '/radio/stream';
-        audio.play().then(function () {
-          applyState(true);
-          syncPosition(data.startedAt);
-        }).catch(function () {});
+        if (data && data.song) playSong(data);
       });
     });
   }
@@ -169,6 +166,29 @@
 
   // ── Reproducción ──────────────────────────────────────────────────────────
 
+  // Carga y reproduce la canción indicada por el servidor ({song, startedAt}).
+  // La URL fija la canción (?s=) para que las peticiones Range posteriores del
+  // navegador no reciban bytes de la siguiente cuando el servidor avance.
+  function playSong(data) {
+    updateTitle(data.song);
+    setMediaMetadata(data.song);
+    playingStartedAt = data.startedAt;
+
+    audio.src = '/radio/stream?s=' + encodeURIComponent(data.song);
+    audio.volume = volSlider ? parseFloat(volSlider.value) : 0.8;
+
+    var playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(function () {
+        applyState(true);
+        // Sincronizar posición con la emisión global (corrigiendo reloj)
+        syncPosition(data.startedAt);
+      }).catch(function () {
+        applyState(false);
+      });
+    }
+  }
+
   function startPlayback() {
     clearTimeout(retryTimer);
 
@@ -177,24 +197,8 @@
         scheduleRetry();
         return;
       }
-
-      updateTitle(data.song);
-      setMediaMetadata(data.song);
       retryCount = 0;
-
-      audio.src = '/radio/stream';
-      audio.volume = volSlider ? parseFloat(volSlider.value) : 0.8;
-
-      var playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.then(function () {
-          applyState(true);
-          // Sincronizar posición con la emisión global (corrigiendo reloj)
-          syncPosition(data.startedAt);
-        }).catch(function () {
-          applyState(false);
-        });
-      }
+      playSong(data);
     });
   }
 
@@ -208,11 +212,9 @@
     if (isPlaying) {
       audio.pause();
     } else {
-      if (!audio.src || audio.src === window.location.href) {
-        startPlayback();
-      } else {
-        audio.play().then(function () { applyState(true); }).catch(function () {});
-      }
+      // Es una emisión en vivo: al reanudar se vuelve a la canción y posición
+      // actuales en vez de seguir donde se pausó.
+      startPlayback();
     }
   }
 
@@ -223,19 +225,12 @@
 
   audio.addEventListener('ended', function () {
     applyState(false);
-    // Server auto-advances based on song duration; poll until it does.
-    fetchNowPlaying().then(function (current) {
-      var oldStartedAt = current ? current.startedAt : 0;
-      waitForNextSong(oldStartedAt, 0, function (data) {
-        updateTitle(data.song);
-        setMediaMetadata(data.song);
-        audio.src = '/radio/stream';
-        audio.play().then(function () {
-          applyState(true);
-          syncPosition(data.startedAt);
-        }).catch(function () { applyState(false); });
-      });
-    });
+    // El servidor avanza solo según la duración. Casi siempre ya lo hizo
+    // (el cliente va un poco por detrás por el buffering): en ese caso se
+    // reproduce la nueva de inmediato; si no, se sondea hasta que avance.
+    // Se compara con la canción que sonaba aquí, no con la del servidor al
+    // terminar: si no, se esperaría un cambio que ya ocurrió.
+    waitForNextSong(playingStartedAt, 0, playSong);
   });
 
   audio.addEventListener('error',   function () { applyState(false); scheduleRetry(); });
@@ -261,6 +256,9 @@
   // ── Inicialización ────────────────────────────────────────────────────────
 
   setupMediaSession();
+
+  // Permite al dashboard re-sincronizar el reproductor tras saltar canción.
+  window.radioResync = startPlayback;
 
   var savedVol = parseFloat(localStorage.getItem(LS_VOL_KEY));
   var initVol  = (savedVol >= 0 && savedVol <= 1) ? savedVol : 0.8;

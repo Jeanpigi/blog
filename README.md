@@ -98,7 +98,7 @@ The radio uses a **server-side broadcast model**:
 
 1. On startup, `InitBroadcast()` picks the first song and reads its duration via `music.Duration()` (parses Xing/Info VBR header or estimates from bitrate for CBR files).
 2. A `time.AfterFunc` timer fires when the song ends and automatically advances to the next one — completely independent of connected clients.
-3. Clients call `GET /api/radio/now-playing` to get `{song, startedAt}`, set `audio.src = /radio/stream`, and seek to `elapsed = (Date.now() - startedAt) / 1000` to synchronize with the broadcast.
+3. Clients call `GET /api/radio/now-playing` to get `{song, startedAt}`, set `audio.src = /radio/stream?s=<song>` (pins the file so later Range requests don't get the next song's bytes), and seek to `elapsed = (Date.now() - startedAt) / 1000` to synchronize with the broadcast.
 4. When a client's audio ends, it polls `now-playing` until `startedAt` changes (server advanced), then syncs to the new song.
 5. Admin can skip the current song via `POST /api/radio/advance`.
 

@@ -591,7 +591,7 @@
         toast.fire({ icon: "success", title: "Ahora suena: " + cleanSongName(d.song) });
         // Re-sincroniza el reproductor global si está sonando.
         var audio = document.getElementById("radioAudio");
-        if (audio && !audio.paused) { audio.src = "/radio/stream?t=" + Date.now(); audio.play().catch(function () {}); }
+        if (audio && !audio.paused && window.radioResync) window.radioResync();
       })
       .catch(showError)
       .then(function () { btn.disabled = false; });
