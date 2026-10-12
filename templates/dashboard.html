@@ -115,17 +115,12 @@
 
       <input type="hidden" id="postId">
 
-      <div class="field">
-        <label for="postTitle">Título</label>
-        <input type="text" id="postTitle" maxlength="255" placeholder="Un título claro y corto" required>
-      </div>
-
-      <div class="field-row">
-        <div class="field grow">
-          <label for="postDesc">Descripción <span class="counter" id="descCounter">0/500</span></label>
-          <input type="text" id="postDesc" maxlength="500" placeholder="Resumen que aparece en el listado" required>
+      <div class="editor-meta">
+        <div class="segmented lang-tabs" role="tablist" aria-label="Idioma del contenido">
+          <button type="button" class="seg active" role="tab" aria-selected="true" data-lang-tab="es">Español</button>
+          <button type="button" class="seg" role="tab" aria-selected="false" data-lang-tab="en">English <span class="lang-dot" id="enStatus" title="Sin versión en inglés"></span></button>
         </div>
-        <div class="field">
+        <div class="field field-inline">
           <label for="postCat">Categoría</label>
           <select id="postCat" required>
             <option value="Tech">Tech</option>
@@ -134,9 +129,37 @@
         </div>
       </div>
 
-      <div class="field">
-        <label>Contenido</label>
-        <div id="editor" class="editor"></div>
+      <!-- Versión en español (obligatoria) -->
+      <div class="lang-pane" data-lang-pane="es">
+        <div class="field">
+          <label for="postTitle">Título</label>
+          <input type="text" id="postTitle" maxlength="255" placeholder="Un título claro y corto" required>
+        </div>
+        <div class="field">
+          <label for="postDesc">Descripción <span class="counter" id="descCounter">0/500</span></label>
+          <input type="text" id="postDesc" maxlength="500" placeholder="Resumen que aparece en el listado" required>
+        </div>
+        <div class="field">
+          <label>Contenido</label>
+          <div id="editor" class="editor"></div>
+        </div>
+      </div>
+
+      <!-- Versión en inglés (opcional; vacía = solo español) -->
+      <div class="lang-pane" data-lang-pane="en" lang="en" hidden>
+        <p class="card-hint lang-hint"><i class="fa fa-language"></i> Opcional. Si la dejas vacía, en <code>/en</code> se muestra la versión en español con un aviso.</p>
+        <div class="field">
+          <label for="postTitleEn">Title</label>
+          <input type="text" id="postTitleEn" maxlength="255" placeholder="A clear, short title">
+        </div>
+        <div class="field">
+          <label for="postDescEn">Description <span class="counter" id="descCounterEn">0/500</span></label>
+          <input type="text" id="postDescEn" maxlength="500" placeholder="Summary shown in the post list">
+        </div>
+        <div class="field">
+          <label>Content</label>
+          <div id="editorEn" class="editor"></div>
+        </div>
       </div>
 
       <div class="form-actions">

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	db "github.com/Jeanpigi/blog/db"
+	"github.com/Jeanpigi/blog/internal/i18n"
 )
 
 // PaginatedResponse envuelve los items con metadatos de paginación.
@@ -17,8 +18,9 @@ type PaginatedResponse struct {
 	Offset int         `json:"offset"`
 }
 
-// GET /api/posts?limit=12&offset=0&paginated=1
+// GET /api/posts?limit=12&offset=0&paginated=1&lang=en
 func GetAllPostsHandler(w http.ResponseWriter, r *http.Request) {
+	lang := apiLang(r)
 	limit := clamp(parseInt(r.URL.Query().Get("limit"), 0), 0, 50)
 	offset := max0(parseInt(r.URL.Query().Get("offset"), 0))
 	paginated := parseBool(r.URL.Query().Get("paginated"))
@@ -26,7 +28,7 @@ func GetAllPostsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if limit > 0 {
-		items, err := db.GetPostsListPaged(limit, offset)
+		items, err := db.GetPostsListPaged(lang, limit, offset)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
@@ -40,7 +42,7 @@ func GetAllPostsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, err := db.GetAllPostsList()
+	items, err := db.GetAllPostsList(lang)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -49,6 +51,14 @@ func GetAllPostsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ===== helpers compartidos =====
+
+// apiLang lee ?lang= (es por defecto). Solo acepta idiomas conocidos.
+func apiLang(r *http.Request) string {
+	if r.URL.Query().Get("lang") == i18n.EN {
+		return i18n.EN
+	}
+	return i18n.ES
+}
 
 func parseInt(s string, def int) int {
 	if s == "" {

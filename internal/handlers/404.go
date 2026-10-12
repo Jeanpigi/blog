@@ -8,5 +8,5 @@ import (
 
 func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
-	utils.RenderTemplate(w, "templates/404.html", nil)
+	utils.RenderTemplate(w, r, "templates/404.html", nil)
 }

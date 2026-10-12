@@ -8,7 +8,9 @@
   var SAFE = ['/', '/blog', '/historias', '/tecnologias', '/portafolio'];
 
   function isSafe(pathname) {
-    return SAFE.indexOf(pathname) !== -1 || /^\/post\/\d+/.test(pathname);
+    // Las páginas en inglés son las mismas con prefijo /en
+    var p = pathname === '/en' ? '/' : pathname.replace(/^\/en(?=\/)/, '');
+    return SAFE.indexOf(p) !== -1 || /^\/post\/\d+/.test(p);
   }
 
   // ── CSS ───────────────────────────────────────────────────────────────────
@@ -135,6 +137,8 @@
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (link.target && link.target !== '_self') return;
     if (link.hasAttribute('download')) return;
+    // Cambio de idioma: recarga completa (cambian cabecera, menú y <html lang>)
+    if (link.hasAttribute('data-no-pjax')) return;
 
     var href = link.getAttribute('href');
     if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;

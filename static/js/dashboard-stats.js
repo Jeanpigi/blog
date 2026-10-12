@@ -13,7 +13,10 @@
   var INK_MUTED = "#64748b";
   var GRID = "#eef2f6";
 
-  var PAGE_LABELS = { "/": "Inicio", "/blog": "Blog", "/historias": "Historias", "/tecnologias": "Tecnología", "/portafolio": "Portafolio" };
+  var PAGE_LABELS = {
+    "/": "Inicio", "/blog": "Blog", "/historias": "Historias", "/tecnologias": "Tecnología", "/portafolio": "Portafolio",
+    "/en": "Inicio (EN)", "/en/blog": "Blog (EN)", "/en/historias": "Historias (EN)", "/en/tecnologias": "Tecnología (EN)", "/en/portafolio": "Portafolio (EN)",
+  };
   var DEVICE_LABELS = { mobile: "Móvil", desktop: "Computador", tablet: "Tablet", Desconocido: "Desconocido" };
 
   var days = 30;

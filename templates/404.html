@@ -1,14 +1,13 @@
-{{ define "title" }}Página no encontrada{{ end }}
+{{define "title"}}{{t "title.notFound"}}{{end}}
 
-{{ define "content" }}
-<head>
-    <link rel="stylesheet" type="text/css" href="/static/css/error.css?v={{staticVer}}">
-</head>
+{{define "extra_css"}}
+<link rel="stylesheet" href="/static/css/error.css?v={{staticVer}}">
+{{end}}
 
+{{define "content"}}
 <div class="error-page">
-    <h1>404</h1>
-    <p>Lo sentimos, la página que buscas no existe.</p>
-    <a href="/">Volver al inicio</a>
+  <h1>404</h1>
+  <p>{{t "notFound.text"}}</p>
+  <a href="{{url "/"}}">{{t "notFound.back"}}</a>
 </div>
-
-{{ end }}
+{{end}}

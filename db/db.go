@@ -50,10 +50,14 @@ func InitDB() {
 		log.Fatal("❌ Error al conectar a la base de datos:", err)
 	}
 
+	// El MySQL de Hostinger corta las conexiones inactivas antes de lo que el
+	// pool esperaba ("connection reset by peer" en los logs): una conexión
+	// reutilizada después de eso hace fallar la petición. Se descartan las
+	// inactivas a los 30s y se renuevan todas cada 2 min.
 	Db.SetMaxOpenConns(25)
-	Db.SetMaxIdleConns(10)
-	Db.SetConnMaxLifetime(5 * time.Minute)
-	Db.SetConnMaxIdleTime(3 * time.Minute)
+	Db.SetMaxIdleConns(5)
+	Db.SetConnMaxLifetime(2 * time.Minute)
+	Db.SetConnMaxIdleTime(30 * time.Second)
 
 	if err := Db.Ping(); err != nil {
 		log.Fatal("❌ No se pudo conectar a la base de datos:", err)
@@ -143,16 +147,25 @@ func scanPostRows(rows *sql.Rows) ([]*models.Post, error) {
 
 // -------- Posts: listados livianos (sin Content, reading_min en SQL) --------
 
+// lightSelect lista posts en el idioma pedido (primer parámetro ?): usa la
+// traducción si existe y si no el original en español. reading_min se calcula
+// sobre el contenido que realmente se va a leer.
 const lightSelect = `
-	SELECT ID, Title, Description, AuthorID,
-	       DATE_FORMAT(CreatedAt, '%Y-%m-%d %H:%i:%s'),
-	       Category,
-	       GREATEST(1, CEIL(CHAR_LENGTH(Content) / 1200)) AS reading_min
-	FROM Posts`
+	SELECT p.ID,
+	       COALESCE(t.title, p.Title),
+	       COALESCE(t.description, p.Description),
+	       p.AuthorID,
+	       DATE_FORMAT(p.CreatedAt, '%Y-%m-%d %H:%i:%s'),
+	       p.Category,
+	       GREATEST(1, CEIL(CHAR_LENGTH(COALESCE(t.content, p.Content)) / 1200)) AS reading_min,
+	       IF(t.post_id IS NULL, 'es', t.lang),
+	       EXISTS(SELECT 1 FROM post_translations x WHERE x.post_id = p.ID AND x.lang = 'en')
+	FROM Posts p
+	LEFT JOIN post_translations t ON t.post_id = p.ID AND t.lang = ?`
 
-func GetPostsListPaged(limit, offset int) ([]models.PostListItem, error) {
-	query := lightSelect + ` ORDER BY CreatedAt DESC, ID DESC LIMIT ? OFFSET ?`
-	rows, err := Db.Query(query, limit, offset)
+func GetPostsListPaged(lang string, limit, offset int) ([]models.PostListItem, error) {
+	query := lightSelect + ` ORDER BY p.CreatedAt DESC, p.ID DESC LIMIT ? OFFSET ?`
+	rows, err := Db.Query(query, lang, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -160,9 +173,9 @@ func GetPostsListPaged(limit, offset int) ([]models.PostListItem, error) {
 	return scanListRows(rows)
 }
 
-func GetAllPostsList() ([]models.PostListItem, error) {
-	query := lightSelect + ` ORDER BY CreatedAt DESC, ID DESC`
-	rows, err := Db.Query(query)
+func GetAllPostsList(lang string) ([]models.PostListItem, error) {
+	query := lightSelect + ` ORDER BY p.CreatedAt DESC, p.ID DESC`
+	rows, err := Db.Query(query, lang)
 	if err != nil {
 		return nil, err
 	}
@@ -170,9 +183,9 @@ func GetAllPostsList() ([]models.PostListItem, error) {
 	return scanListRows(rows)
 }
 
-func FindPostsByCategoryListPaged(category string, limit, offset int) ([]models.PostListItem, error) {
-	query := lightSelect + ` WHERE Category = ? ORDER BY CreatedAt DESC, ID DESC LIMIT ? OFFSET ?`
-	rows, err := Db.Query(query, category, limit, offset)
+func FindPostsByCategoryListPaged(category, lang string, limit, offset int) ([]models.PostListItem, error) {
+	query := lightSelect + ` WHERE p.Category = ? ORDER BY p.CreatedAt DESC, p.ID DESC LIMIT ? OFFSET ?`
+	rows, err := Db.Query(query, lang, category, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -184,12 +197,48 @@ func scanListRows(rows *sql.Rows) ([]models.PostListItem, error) {
 	var items []models.PostListItem
 	for rows.Next() {
 		var it models.PostListItem
-		if err := rows.Scan(&it.ID, &it.Title, &it.Description, &it.AuthorID, &it.CreatedAt, &it.Categoria, &it.ReadingMin); err != nil {
+		if err := rows.Scan(&it.ID, &it.Title, &it.Description, &it.AuthorID, &it.CreatedAt, &it.Categoria, &it.ReadingMin, &it.Lang, &it.HasEN); err != nil {
 			return nil, err
 		}
 		items = append(items, it)
 	}
 	return items, rows.Err()
+}
+
+// -------- Traducciones de posts --------
+
+// GetPostTranslations devuelve las traducciones de un post por idioma.
+func GetPostTranslations(postID int) (map[string]*models.PostTranslation, error) {
+	rows, err := Db.Query(`SELECT lang, title, description, content FROM post_translations WHERE post_id = ?`, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := map[string]*models.PostTranslation{}
+	for rows.Next() {
+		var lang string
+		t := &models.PostTranslation{}
+		if err := rows.Scan(&lang, &t.Title, &t.Description, &t.Content); err != nil {
+			return nil, err
+		}
+		out[lang] = t
+	}
+	return out, rows.Err()
+}
+
+// SavePostTranslation crea o reemplaza la traducción de un post.
+func SavePostTranslation(postID int, lang string, t *models.PostTranslation) error {
+	_, err := Db.Exec(`
+		INSERT INTO post_translations (post_id, lang, title, description, content) VALUES (?, ?, ?, ?, ?)
+		ON DUPLICATE KEY UPDATE title = VALUES(title), description = VALUES(description), content = VALUES(content)`,
+		postID, lang, t.Title, t.Description, t.Content)
+	return err
+}
+
+// DeletePostTranslation borra la traducción de un post en un idioma.
+func DeletePostTranslation(postID int, lang string) error {
+	_, err := Db.Exec(`DELETE FROM post_translations WHERE post_id = ? AND lang = ?`, postID, lang)
+	return err
 }
 
 // CountPosts devuelve el total de posts (para paginación).
@@ -263,6 +312,9 @@ func UpdatePost(postID int, post *models.Post) error {
 }
 
 func DeletePost(postID int) error {
+	if _, err := Db.Exec("DELETE FROM post_translations WHERE post_id = ?", postID); err != nil {
+		return err
+	}
 	_, err := Db.Exec("DELETE FROM Posts WHERE ID = ?", postID)
 	return err
 }
@@ -327,7 +379,9 @@ func GetVisitStats() (VisitStats, error) {
 // -------- Portafolio --------
 
 func GetAllExperiences() ([]models.Experience, error) {
-	rows, err := Db.Query("SELECT id, title, place, description, start_year, end_year FROM experiences ORDER BY (end_year = 0) DESC, end_year DESC, start_year DESC")
+	rows, err := Db.Query(`SELECT id, title, place, description, start_year, end_year,
+		title_en, place_en, COALESCE(description_en, '')
+		FROM experiences ORDER BY (end_year = 0) DESC, end_year DESC, start_year DESC`)
 	if err != nil {
 		return nil, err
 	}
@@ -335,7 +389,7 @@ func GetAllExperiences() ([]models.Experience, error) {
 	var list []models.Experience
 	for rows.Next() {
 		var e models.Experience
-		if err := rows.Scan(&e.ID, &e.Title, &e.Place, &e.Description, &e.StartYear, &e.EndYear); err != nil {
+		if err := rows.Scan(&e.ID, &e.Title, &e.Place, &e.Description, &e.StartYear, &e.EndYear, &e.TitleEN, &e.PlaceEN, &e.DescriptionEN); err != nil {
 			return nil, err
 		}
 		list = append(list, e)
@@ -344,7 +398,8 @@ func GetAllExperiences() ([]models.Experience, error) {
 }
 
 func GetAllEducation() ([]models.Education, error) {
-	rows, err := Db.Query("SELECT id, title, place, start_year, end_year FROM education ORDER BY (end_year = 0) DESC, end_year DESC, start_year DESC")
+	rows, err := Db.Query(`SELECT id, title, place, start_year, end_year, title_en, place_en
+		FROM education ORDER BY (end_year = 0) DESC, end_year DESC, start_year DESC`)
 	if err != nil {
 		return nil, err
 	}
@@ -352,7 +407,7 @@ func GetAllEducation() ([]models.Education, error) {
 	var list []models.Education
 	for rows.Next() {
 		var e models.Education
-		if err := rows.Scan(&e.ID, &e.Title, &e.Place, &e.StartYear, &e.EndYear); err != nil {
+		if err := rows.Scan(&e.ID, &e.Title, &e.Place, &e.StartYear, &e.EndYear, &e.TitleEN, &e.PlaceEN); err != nil {
 			return nil, err
 		}
 		list = append(list, e)
@@ -361,7 +416,8 @@ func GetAllEducation() ([]models.Education, error) {
 }
 
 func GetAllProjects() ([]models.Project, error) {
-	rows, err := Db.Query("SELECT id, title, description, image_url, project_url FROM projects ORDER BY id")
+	rows, err := Db.Query(`SELECT id, title, description, image_url, project_url, title_en, COALESCE(description_en, '')
+		FROM projects ORDER BY id`)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +425,7 @@ func GetAllProjects() ([]models.Project, error) {
 	var list []models.Project
 	for rows.Next() {
 		var p models.Project
-		if err := rows.Scan(&p.ID, &p.Title, &p.Description, &p.ImageURL, &p.ProjectURL); err != nil {
+		if err := rows.Scan(&p.ID, &p.Title, &p.Description, &p.ImageURL, &p.ProjectURL, &p.TitleEN, &p.DescriptionEN); err != nil {
 			return nil, err
 		}
 		list = append(list, p)

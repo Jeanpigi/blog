@@ -310,3 +310,17 @@
 @media (prefers-reduced-motion: reduce) {
   .social-btn { transition: none; }
 }
+
+/* Aviso de post sin traducir (versión /en) */
+.post-untranslated {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0 0 2.4rem;
+  padding: 1.2rem 1.6rem;
+  background: #fdf4ff;
+  border: 1px solid #f5d0fe;
+  border-radius: 10px;
+  color: #6b21a8;
+  font-size: 1.4rem;
+}

@@ -74,7 +74,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet, http.MethodHead:
 		csrfToken := utils.IssueCSRFToken(w)
-		utils.RenderTemplate(w, "templates/upload.html", struct {
+		utils.RenderTemplate(w, r, "templates/upload.html", struct {
 			Title     string
 			CsrfToken string
 		}{"Subir Música", csrfToken})

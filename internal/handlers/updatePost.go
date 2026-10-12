@@ -17,7 +17,7 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := decodePostInput(w, r)
+	post, translations, err := decodePostInput(w, r)
 	if err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
@@ -26,6 +26,12 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 	if err := db.UpdatePost(existing.ID, post); err != nil {
 		log.Println("❌ Error actualizando post:", err)
 		writeError(w, http.StatusInternalServerError, "No se pudo actualizar el post")
+		return
+	}
+
+	if err := saveTranslations(existing.ID, translations); err != nil {
+		log.Println("❌ Error guardando traducción:", err)
+		writeError(w, http.StatusInternalServerError, "Los cambios en español se guardaron, pero no la versión en inglés. Reintenta.")
 		return
 	}
 

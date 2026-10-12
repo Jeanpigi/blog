@@ -56,12 +56,12 @@ func TestReferrerHost(t *testing.T) {
 }
 
 func TestTrackablePath(t *testing.T) {
-	for _, p := range []string{"/", "/blog", "/historias", "/tecnologias", "/portafolio", "/post/42"} {
+	for _, p := range []string{"/", "/blog", "/historias", "/tecnologias", "/portafolio", "/post/42", "/en", "/en/blog", "/en/post/42"} {
 		if !TrackablePath(p) {
 			t.Errorf("TrackablePath(%q) = false", p)
 		}
 	}
-	for _, p := range []string{"/dashboard", "/visitas", "/login", "/post/abc", "/post/1/x", "/api/posts"} {
+	for _, p := range []string{"/dashboard", "/visitas", "/login", "/post/abc", "/post/1/x", "/api/posts", "/en/dashboard", "/english"} {
 		if TrackablePath(p) {
 			t.Errorf("TrackablePath(%q) = true", p)
 		}

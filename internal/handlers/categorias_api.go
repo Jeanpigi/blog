@@ -15,7 +15,7 @@ func GetPostsByCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	offset := max0(parseInt(r.URL.Query().Get("offset"), 0))
 	paginated := parseBool(r.URL.Query().Get("paginated"))
 
-	items, err := db.FindPostsByCategoryListPaged("Tech", limit, offset)
+	items, err := db.FindPostsByCategoryListPaged("Tech", apiLang(r), limit, offset)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -36,7 +36,7 @@ func GetPostsByHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	offset := max0(parseInt(r.URL.Query().Get("offset"), 0))
 	paginated := parseBool(r.URL.Query().Get("paginated"))
 
-	items, err := db.FindPostsByCategoryListPaged("Historias", limit, offset)
+	items, err := db.FindPostsByCategoryListPaged("Historias", apiLang(r), limit, offset)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

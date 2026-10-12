@@ -1,4 +1,4 @@
-{{define "title"}}Inicio — JbearP{{end}}
+{{define "title"}}{{t "title.home"}}{{end}}
 
 {{define "extra_css"}}
 <link rel="stylesheet" href="/static/css/home.css?v={{staticVer}}">
@@ -8,6 +8,33 @@
 <div class="container-home">
   <section class="About">
 
+  {{if eq lang "en"}}
+    <!-- HERO -->
+    <header class="About-hero">
+      <h1><strong>Stories that hook you. Technology that transforms.</strong></h1>
+      <p class="About-sub">
+        Welcome to <strong>Jbearp</strong>, my creative lab where I mix
+        <em>gripping stories</em> and <em>tech experiments</em>. Come in, get inspired and leave with ideas ready to put into action.
+      </p>
+      <div class="About-ctas">
+        <a class="btn btn-primary" href="{{url "/historias"}}"><i class="fa fa-book"></i> Read stories</a>
+        <a class="btn btn-outline" href="{{url "/tecnologias"}}"><i class="fa fa-code"></i> Explore tech</a>
+      </div>
+    </header>
+
+    <!-- INTRO -->
+    <div class="About-parrafo">
+      <p>
+        Two worlds live side by side here: <em>Stories</em>, with original series and fiction
+        that grab you from the first line; and <em>Tech</em>, with guides, hacks, programming,
+        design, video games and trends that actually help in real life.
+      </p>
+      <p>
+        My goal is simple: that you learn something new, feel motivated to create and have fun along the way.
+        Thanks for stopping by <strong>Jbearp</strong>—stick around and I promise to surprise you.
+      </p>
+    </div>
+  {{else}}
     <!-- HERO -->
     <header class="About-hero">
       <h1><strong>Historias que enganchan. Tecnología que transforma.</strong></h1>
@@ -16,8 +43,8 @@
         <em>relatos intensos</em> y <em>experimentos tech</em>. Entra, inspírate y llévate ideas listas para poner en marcha.
       </p>
       <div class="About-ctas">
-        <a class="btn btn-primary" href="/historias"><i class="fa fa-book"></i> Leer historias</a>
-        <a class="btn btn-outline" href="/tecnologias"><i class="fa fa-code"></i> Explorar tecnología</a>
+        <a class="btn btn-primary" href="{{url "/historias"}}"><i class="fa fa-book"></i> Leer historias</a>
+        <a class="btn btn-outline" href="{{url "/tecnologias"}}"><i class="fa fa-code"></i> Explorar tecnología</a>
       </div>
     </header>
 
@@ -33,6 +60,7 @@
         Gracias por pasarte por <strong>Jbearp</strong>—si te quedas, prometo sorprenderte.
       </p>
     </div>
+  {{end}}
 
     <!-- AVATAR + CLAIM -->
     <div class="About-content">
@@ -44,6 +72,36 @@
       </div>
     </div>
 
+  {{if eq lang "en"}}
+    <!-- WHO AM I -->
+    <div class="About-parrafo">
+      <p>
+        <strong>Who am I?</strong><br/>
+        I'm <strong>Jean Pierre</strong>: systems engineer, ICT specialist and developer.
+        I live between <strong>technology</strong>, <strong>AI</strong>, <strong>mathematics</strong> and
+        <strong>cybersecurity</strong>. I'm passionate about Linux, ethical hacking and anything that pushes the limits of what's possible.
+      </p>
+      <p>
+        I want to build projects that leave a mark. Years of experience, achievements and certifications back me up,
+        but what really drives me is <em>learning, sharing and creating</em>. If this world resonates with you,
+        this blog is your home.
+      </p>
+    </div>
+
+    <!-- Highlights -->
+    <ul class="About-highlights">
+      <li><i class="fa fa-check"></i> Original stories with a cinematic pace</li>
+      <li><i class="fa fa-check"></i> Clear, actionable tech guides</li>
+      <li><i class="fa fa-check"></i> Hacking, Linux and AI without the hype</li>
+    </ul>
+
+    <div class="About-span">
+      <span><strong>Want to see my work in action?</strong></span>
+      <a class="btn-link" href="{{url "/portafolio"}}" aria-label="See portfolio">
+        <i class="fa fa-globe"></i> Portfolio
+      </a>
+    </div>
+  {{else}}
     <!-- QUIÉN SOY -->
     <div class="About-parrafo">
       <p>
@@ -68,10 +126,11 @@
 
     <div class="About-span">
       <span><strong>¿Quieres ver mi trabajo en acción?</strong></span>
-      <a class="btn-link" href="/portafolio" aria-label="Ver portafolio">
+      <a class="btn-link" href="{{url "/portafolio"}}" aria-label="Ver portafolio">
         <i class="fa fa-globe"></i> Portafolio
       </a>
     </div>
+  {{end}}
 
   </section>
 </div>

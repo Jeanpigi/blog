@@ -1,14 +1,16 @@
 {{define "title"}}{{.Post.Title}} — JbearP{{end}}
 
 {{define "meta"}}
+{{$path := printf "/post/%d" .Post.ID}}
 <meta name="description" content="{{.Post.Description}}">
-<link rel="canonical" href="https://blog.jbearp.com/post/{{.Post.ID}}">
+{{/* Sin traducción, la versión /en duplica la española: el canonical apunta a la original. */}}
+<link rel="canonical" href="{{if .Untranslated}}{{absURL $path}}{{else}}{{absURL (url $path)}}{{end}}">
 <meta property="og:site_name" content="JbearP Blog">
 <meta property="og:type" content="article">
 <meta property="og:title" content="{{.Post.Title}}">
 <meta property="og:description" content="{{.Post.Description}}">
-<meta property="og:url" content="https://blog.jbearp.com/post/{{.Post.ID}}">
-<meta property="og:image" content="https://blog.jbearp.com/static/assets/Jean.webp">
+<meta property="og:url" content="{{absURL (url $path)}}">
+<meta property="og:image" content="{{absURL "/static/assets/Jean.webp"}}">
 <meta name="twitter:card" content="summary">
 {{end}}
 
@@ -18,11 +20,14 @@
 
 {{define "content"}}
 <div class="container-post">
-  <article class="post-article">
+  <article class="post-article" lang="{{.ContentLang}}">
+    {{if .Untranslated}}
+    <p class="post-untranslated" lang="{{lang}}"><i class="fa fa-language"></i> {{t "post.untranslated"}}</p>
+    {{end}}
 
     <header class="post-header">
       <div class="post-meta">
-        <span class="post-categoria">{{.Post.Categoria}}</span>
+        <span class="post-categoria">{{t (printf "cat.%s" .Post.Categoria)}}</span>
         <span class="post-created-at" data-created-at="{{.Post.CreatedAt}}"></span>
       </div>
       <h1 class="post-title">{{.Post.Title}}</h1>
@@ -32,26 +37,27 @@
     <div class="post-content">{{.ContentHTML}}</div>
 
     <footer class="post-footer">
-      <div class="share-buttons">
-        <span class="share-label">Compartir:</span>
+      {{$share := absURL (url (printf "/post/%d" .Post.ID))}}
+      <div class="share-buttons" lang="{{lang}}">
+        <span class="share-label">{{t "post.share"}}</span>
         <a class="social-btn facebook" target="_blank" rel="noopener"
-           href="https://www.facebook.com/sharer/sharer.php?u={{printf "https://blog.jbearp.com/post/%d" .Post.ID}}"
-           aria-label="Compartir en Facebook">
+           href="https://www.facebook.com/sharer/sharer.php?u={{$share}}"
+           aria-label="{{t "post.shareOn" "Facebook"}}">
           <i class="fab fa-facebook-f"></i>
         </a>
         <a class="social-btn twitter" target="_blank" rel="noopener"
-           href="https://x.com/intent/post?url={{printf "https://blog.jbearp.com/post/%d" .Post.ID}}&text={{.Post.Title}}"
-           aria-label="Compartir en X">
+           href="https://x.com/intent/post?url={{$share}}&text={{.Post.Title}}"
+           aria-label="{{t "post.shareOn" "X"}}">
           <i class="fab fa-x-twitter"></i>
         </a>
         <a class="social-btn whatsapp" target="_blank" rel="noopener"
-           href="https://api.whatsapp.com/send?text={{.Post.Title}}%20https://blog.jbearp.com/post/{{.Post.ID}}"
-           aria-label="Compartir en WhatsApp">
+           href="https://api.whatsapp.com/send?text={{.Post.Title}}%20{{$share}}"
+           aria-label="{{t "post.shareOn" "WhatsApp"}}">
           <i class="fab fa-whatsapp"></i>
         </a>
         <a class="social-btn telegram" target="_blank" rel="noopener"
-           href="https://t.me/share/url?url=https://blog.jbearp.com/post/{{.Post.ID}}&text={{.Post.Title}}"
-           aria-label="Compartir en Telegram">
+           href="https://t.me/share/url?url={{$share}}&text={{.Post.Title}}"
+           aria-label="{{t "post.shareOn" "Telegram"}}">
           <i class="fab fa-telegram-plane"></i>
         </a>
       </div>

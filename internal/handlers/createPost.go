@@ -13,7 +13,7 @@ import (
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	user := middleware.CurrentUser(r)
 
-	post, err := decodePostInput(w, r)
+	post, translations, err := decodePostInput(w, r)
 	if err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
@@ -29,6 +29,12 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	post.ID = int(id)
+
+	if err := saveTranslations(post.ID, translations); err != nil {
+		log.Println("❌ Error guardando traducción:", err)
+		writeError(w, http.StatusInternalServerError, "El post se creó, pero no se pudo guardar la versión en inglés. Edítalo para reintentar.")
+		return
+	}
 
 	writeJSON(w, http.StatusCreated, post)
 }

@@ -19,7 +19,7 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	// de logout la manda como campo oculto.
 	csrfToken := utils.IssueCSRFToken(w)
 
-	utils.RenderTemplate(w, "templates/dashboard.html", struct {
+	utils.RenderTemplate(w, r, "templates/dashboard.html", struct {
 		Username  string
 		CsrfToken string
 	}{

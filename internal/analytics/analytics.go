@@ -9,6 +9,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/Jeanpigi/blog/internal/i18n"
 )
 
 // botPattern detecta rastreadores y clientes no humanos por su User-Agent.
@@ -75,17 +77,11 @@ func stripPort(h string) string {
 	return h
 }
 
-var (
-	postPathRx  = regexp.MustCompile(`^/post/[0-9]{1,9}$`)
-	publicPaths = map[string]bool{
-		"/": true, "/blog": true, "/historias": true, "/tecnologias": true, "/portafolio": true,
-	}
-)
-
-// TrackablePath indica si una ruta es una página pública que se mide.
-// Las páginas de admin (/dashboard, /visitas, /login...) nunca se cuentan.
+// TrackablePath indica si una ruta es una página pública que se mide, en
+// cualquier idioma (/blog, /en/blog…). Las páginas de admin nunca se cuentan.
 func TrackablePath(p string) bool {
-	return publicPaths[p] || postPathRx.MatchString(p)
+	_, rest := i18n.SplitLang(p)
+	return i18n.IsPublicPage(rest)
 }
 
 // ── Límite de eventos por IP ───────────────────────────────────────────────

@@ -44,14 +44,28 @@ CREATE TABLE IF NOT EXISTS Visits (
   KEY idx_visits_timestamp (timestamp)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Portafolio
-CREATE TABLE IF NOT EXISTS experiences (
-  id          INT AUTO_INCREMENT PRIMARY KEY,
+-- Traducciones de posts (db/migrations/004_i18n.sql)
+CREATE TABLE IF NOT EXISTS post_translations (
+  post_id     INT          NOT NULL,
+  lang        VARCHAR(5)   NOT NULL,
   title       VARCHAR(255) NOT NULL,
-  place       VARCHAR(255) NOT NULL,
-  description TEXT         NOT NULL,
-  start_year  INT          NOT NULL,
-  end_year    INT          NOT NULL
+  description VARCHAR(500) NOT NULL,
+  content     MEDIUMTEXT   NOT NULL,
+  updated_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (post_id, lang)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Portafolio (las columnas *_en vienen de 004_i18n.sql)
+CREATE TABLE IF NOT EXISTS experiences (
+  id             INT AUTO_INCREMENT PRIMARY KEY,
+  title          VARCHAR(255) NOT NULL,
+  place          VARCHAR(255) NOT NULL,
+  description    TEXT         NOT NULL,
+  start_year     INT          NOT NULL,
+  end_year       INT          NOT NULL,
+  title_en       VARCHAR(255) NOT NULL DEFAULT '',
+  place_en       VARCHAR(255) NOT NULL DEFAULT '',
+  description_en TEXT         NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS education (
@@ -59,13 +73,17 @@ CREATE TABLE IF NOT EXISTS education (
   title      VARCHAR(255) NOT NULL,
   place      VARCHAR(255) NOT NULL,
   start_year INT          NOT NULL,
-  end_year   INT          NOT NULL
+  end_year   INT          NOT NULL,
+  title_en   VARCHAR(255) NOT NULL DEFAULT '',
+  place_en   VARCHAR(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS projects (
   id          INT AUTO_INCREMENT PRIMARY KEY,
   title       VARCHAR(255) NOT NULL,
   description TEXT         NOT NULL,
-  image_url   VARCHAR(512) NOT NULL DEFAULT '',
-  project_url VARCHAR(512) NOT NULL DEFAULT ''
+  image_url      VARCHAR(512) NOT NULL DEFAULT '',
+  project_url    VARCHAR(512) NOT NULL DEFAULT '',
+  title_en       VARCHAR(255) NOT NULL DEFAULT '',
+  description_en TEXT         NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

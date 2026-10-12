@@ -7,6 +7,11 @@
   "use strict";
 
   var TRACKABLE = /^\/(blog|historias|tecnologias|portafolio|post\/\d+)?$/;
+
+  // Las páginas en inglés son las mismas con prefijo /en.
+  function trackable(path) {
+    return TRACKABLE.test(path.replace(/^\/en(?=\/|$)/, "") || "/");
+  }
   var current = null;
 
   function newId() {
@@ -31,7 +36,7 @@
 
   function begin(referrer) {
     current = null;
-    if (!TRACKABLE.test(location.pathname)) return;
+    if (!trackable(location.pathname)) return;
     current = {
       id: newId(),
       visibleMs: 0,

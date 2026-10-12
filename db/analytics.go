@@ -99,7 +99,7 @@ func GetTopPosts(days, limit int) ([]TopPost, error) {
 	rows, err := Db.Query(`
 		SELECT p.ID, p.Title, COUNT(*) views, COUNT(DISTINCT v.ip),
 		       COALESCE(AVG(NULLIF(v.duration_sec, 0)), 0)
-		FROM Visits v JOIN Posts p ON v.page = CONCAT('/post/', p.ID)
+		FROM Visits v JOIN Posts p ON v.page IN (CONCAT('/post/', p.ID), CONCAT('/en/post/', p.ID))
 		WHERE v.`+humanVisits+`
 		GROUP BY p.ID, p.Title ORDER BY views DESC LIMIT ?`, days, analytics.BotSQLPattern, limit)
 	if err != nil {
@@ -140,7 +140,7 @@ func GetBreakdown(dim string, days, limit int) ([]LabelCount, error) {
 		where += measured
 	}
 	if dim == "page" {
-		where += ` AND page NOT LIKE '/post/%'`
+		where += ` AND page NOT LIKE '/post/%' AND page NOT LIKE '/en/post/%'`
 	}
 	q := `SELECT ` + col.expr + ` label, COUNT(*) n FROM Visits WHERE ` + where +
 		` GROUP BY label ORDER BY n DESC LIMIT ?`

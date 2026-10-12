@@ -98,7 +98,7 @@
     if (!(opts && opts.silent)) history.replaceState(history.state, "", "#" + name);
     if (name === "radio") loadRadio();
     if (name === "stats" && window.DashStats) window.DashStats.show();
-    if (name === "editor" && editor) setTimeout(function () { $("#postTitle").focus(); }, 0);
+    if (name === "editor" && editor) setTimeout(function () { fields[activeLang].title.focus(); }, 0);
   }
 
   $$(".dash-tab").forEach(function (tab) {
@@ -182,6 +182,7 @@
             '<p class="post-row-desc">' + escapeHtml(p.description) + '</p>' +
             '<div class="post-row-meta">' +
               '<span class="badge ' + catClass + '">' + escapeHtml(p.categoria || "—") + '</span>' +
+              (p.has_en ? '<span class="badge badge-en" title="Tiene versión en inglés">EN</span>' : '') +
               '<span><i class="fa fa-calendar"></i> ' + formatDate(p.created_at) + '</span>' +
               '<span><i class="fa fa-clock"></i> ' + (p.reading_min || 1) + ' min</span>' +
             '</div>' +
@@ -253,63 +254,94 @@
     }).catch(showError);
   }
 
-  // ── Editor (crear y editar con el mismo formulario) ───────────────────────
+  // ── Editor (crear y editar con el mismo formulario, ES + EN) ──────────────
 
-  var editor = null;
   var form = $("#postForm");
   var fields = {
     id: $("#postId"),
-    title: $("#postTitle"),
-    desc: $("#postDesc"),
     cat: $("#postCat"),
+    es: { title: $("#postTitle"), desc: $("#postDesc"), counter: $("#descCounter"), box: $("#editor") },
+    en: { title: $("#postTitleEn"), desc: $("#postDescEn"), counter: $("#descCounterEn"), box: $("#editorEn") },
   };
+  var editors = { es: null, en: null };
+  var editor = null; // alias de editors.es (lo usa showTab para saber si el editor cargó)
+  var activeLang = "es";
   var savedSnapshot = "";
   var draftTimer;
 
+  var TOOLBAR = [
+    [{ header: [2, 3, false] }],
+    ["bold", "italic", "underline", "strike"],
+    ["blockquote", "code-block"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link", "image"],
+    ["clean"],
+  ];
+
   function initEditor() {
     if (typeof Quill === "undefined") {
-      $("#editor").innerHTML = '<p class="card-hint">No se pudo cargar el editor (Quill). Revisa tu conexión y recarga.</p>';
+      fields.es.box.innerHTML = '<p class="card-hint">No se pudo cargar el editor (Quill). Revisa tu conexión y recarga.</p>';
       return;
     }
-    editor = new Quill("#editor", {
-      theme: "snow",
-      placeholder: "Escribe tu historia…",
-      modules: {
-        toolbar: [
-          [{ header: [2, 3, false] }],
-          ["bold", "italic", "underline", "strike"],
-          ["blockquote", "code-block"],
-          [{ list: "ordered" }, { list: "bullet" }],
-          ["link", "image"],
-          ["clean"],
-        ],
-      },
-    });
-    editor.on("text-change", onEditorChange);
+    editors.es = new Quill("#editor", { theme: "snow", placeholder: "Escribe tu historia…", modules: { toolbar: TOOLBAR } });
+    editors.en = new Quill("#editorEn", { theme: "snow", placeholder: "Write your story…", modules: { toolbar: TOOLBAR } });
+    editor = editors.es;
+    editors.es.on("text-change", onEditorChange);
+    editors.en.on("text-change", onEditorChange);
   }
 
-  function editorHTML() {
-    if (!editor) return "";
-    return editor.getText().trim() === "" && !editor.root.querySelector("img") ? "" : editor.root.innerHTML;
+  function editorHTML(lang) {
+    var q = editors[lang || "es"];
+    if (!q) return "";
+    return q.getText().trim() === "" && !q.root.querySelector("img") ? "" : q.root.innerHTML;
   }
 
-  function setEditorHTML(html) {
-    if (!editor) return;
-    editor.setContents([], "silent");
-    if (html) editor.clipboard.dangerouslyPasteHTML(html, "silent");
-    editor.history.clear();
+  function setEditorHTML(lang, html) {
+    var q = editors[lang];
+    if (!q) return;
+    q.setContents([], "silent");
+    if (html) q.clipboard.dangerouslyPasteHTML(html, "silent");
+    q.history.clear();
+  }
+
+  function enValues() {
+    return { title: fields.en.title.value.trim(), description: fields.en.desc.value.trim(), content: editorHTML("en") };
+  }
+
+  function hasEnglish() {
+    var v = enValues();
+    return !!(v.title || v.description || v.content);
   }
 
   function snapshot() {
-    return JSON.stringify([fields.title.value, fields.desc.value, fields.cat.value, editorHTML()]);
+    var v = enValues();
+    return JSON.stringify([fields.es.title.value, fields.es.desc.value, fields.cat.value, editorHTML("es"), v.title, v.description, v.content]);
   }
 
-  function isDirty() { return editor !== null && snapshot() !== savedSnapshot; }
+  function isDirty() { return editors.es !== null && snapshot() !== savedSnapshot; }
   function isEditing() { return fields.id.value !== ""; }
 
-  function updateCounter() {
-    $("#descCounter").textContent = fields.desc.value.length + "/500";
+  function updateCounters() {
+    ["es", "en"].forEach(function (l) { fields[l].counter.textContent = fields[l].desc.value.length + "/500"; });
+    var dot = $("#enStatus");
+    var on = hasEnglish();
+    dot.classList.toggle("on", on);
+    dot.title = on ? "Tiene versión en inglés" : "Sin versión en inglés";
   }
+
+  function showLang(lang) {
+    activeLang = lang;
+    $$("[data-lang-tab]").forEach(function (b) {
+      var on = b.dataset.langTab === lang;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    $$("[data-lang-pane]").forEach(function (p) { p.hidden = p.dataset.langPane !== lang; });
+  }
+
+  $$("[data-lang-tab]").forEach(function (b) {
+    b.addEventListener("click", function () { showLang(b.dataset.langTab); });
+  });
 
   function setMode(editing, post) {
     $("#editorTitle").textContent = editing ? "Editar post" : "Nuevo post";
@@ -323,18 +355,23 @@
   }
 
   function fillForm(post) {
+    var en = (post.translations && post.translations.en) || {};
     fields.id.value = post.id || "";
-    fields.title.value = post.title || "";
-    fields.desc.value = post.description || "";
     fields.cat.value = post.categoria === "Historias" ? "Historias" : "Tech";
-    setEditorHTML(post.content || "");
-    updateCounter();
+    fields.es.title.value = post.title || "";
+    fields.es.desc.value = post.description || "";
+    setEditorHTML("es", post.content || "");
+    fields.en.title.value = en.title || "";
+    fields.en.desc.value = en.description || "";
+    setEditorHTML("en", en.content || "");
+    updateCounters();
     clearInvalid();
   }
 
   function resetEditor() {
     fillForm({});
     setMode(false);
+    showLang("es");
     savedSnapshot = snapshot();
   }
 
@@ -369,18 +406,21 @@
       return api("GET", "/api/posts/" + id).then(function (post) {
         fillForm(post);
         setMode(true, post);
+        showLang("es");
         savedSnapshot = snapshot();
         showTab("editor");
       });
     }).catch(showError);
   }
 
-  // Borrador local solo para posts nuevos: evita perder lo escrito si se cierra
-  // la pestaña o expira la sesión. Se borra al publicar.
+  // Borrador local solo para posts nuevos (incluye la versión en inglés).
   function saveDraft() {
     if (isEditing()) return;
-    var data = { title: fields.title.value, description: fields.desc.value, categoria: fields.cat.value, content: editorHTML() };
-    var empty = !data.title && !data.description && !data.content;
+    var data = {
+      title: fields.es.title.value, description: fields.es.desc.value, categoria: fields.cat.value, content: editorHTML("es"),
+      translations: { en: enValues() },
+    };
+    var empty = !data.title && !data.description && !data.content && !hasEnglish();
     storage(function (s) { empty ? s.removeItem(DRAFT_KEY) : s.setItem(DRAFT_KEY, JSON.stringify(data)); });
     $("#draftStatus").textContent = empty ? "" : "Borrador guardado en este navegador";
   }
@@ -389,8 +429,7 @@
     var raw = storage(function (s) { return s.getItem(DRAFT_KEY); });
     if (!raw) return;
     try {
-      var d = JSON.parse(raw);
-      fillForm({ title: d.title, description: d.description, categoria: d.categoria, content: d.content });
+      fillForm(JSON.parse(raw));
       $("#draftStatus").textContent = "Borrador recuperado";
     } catch (_) { /* borrador corrupto: se ignora */ }
   }
@@ -400,13 +439,14 @@
   function onEditorChange() {
     clearTimeout(draftTimer);
     draftTimer = setTimeout(saveDraft, 600);
-    $("#editor").classList.remove("invalid");
+    fields.es.box.classList.remove("invalid");
+    fields.en.box.classList.remove("invalid");
+    updateCounters();
   }
 
-  [fields.title, fields.desc, fields.cat].forEach(function (el) {
+  [fields.es.title, fields.es.desc, fields.en.title, fields.en.desc, fields.cat].forEach(function (el) {
     el.addEventListener("input", function () {
       el.classList.remove("invalid");
-      if (el === fields.desc) updateCounter();
       onEditorChange();
     });
   });
@@ -415,34 +455,46 @@
     $$(".invalid").forEach(function (el) { el.classList.remove("invalid"); });
   }
 
+  // El español es obligatorio. El inglés es opcional, pero si se empieza hay
+  // que completarlo (título, descripción y contenido).
   function validate() {
     clearInvalid();
-    var missing = [];
-    if (!fields.title.value.trim()) missing.push(fields.title);
-    if (!fields.desc.value.trim()) missing.push(fields.desc);
-    if (!editorHTML()) missing.push($("#editor"));
-    missing.forEach(function (el) { el.classList.add("invalid"); });
-    if (missing.length) {
-      missing[0] === $("#editor") ? editor.focus() : missing[0].focus();
+    var missing = { es: [], en: [] };
+    if (!fields.es.title.value.trim()) missing.es.push(fields.es.title);
+    if (!fields.es.desc.value.trim()) missing.es.push(fields.es.desc);
+    if (!editorHTML("es")) missing.es.push(fields.es.box);
+    if (hasEnglish()) {
+      var v = enValues();
+      if (!v.title) missing.en.push(fields.en.title);
+      if (!v.description) missing.en.push(fields.en.desc);
+      if (!v.content) missing.en.push(fields.en.box);
     }
-    return missing.length === 0;
+    var lang = missing.es.length ? "es" : missing.en.length ? "en" : null;
+    if (!lang) return true;
+    missing.es.concat(missing.en).forEach(function (el) { el.classList.add("invalid"); });
+    showLang(lang);
+    var first = missing[lang][0];
+    first === fields[lang].box ? editors[lang].focus() : first.focus();
+    toast.fire({
+      icon: "warning",
+      title: lang === "es" ? "Completa título, descripción y contenido" : "Completa la versión en inglés o déjala vacía",
+    });
+    return false;
   }
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    if (!editor) return;
-    if (!validate()) {
-      toast.fire({ icon: "warning", title: "Completa título, descripción y contenido" });
-      return;
-    }
+    if (!editors.es || !validate()) return;
 
     var editing = isEditing();
     var id = fields.id.value;
     var body = {
-      title: fields.title.value.trim(),
-      description: fields.desc.value.trim(),
+      title: fields.es.title.value.trim(),
+      description: fields.es.desc.value.trim(),
       categoria: fields.cat.value,
-      content: editorHTML(),
+      content: editorHTML("es"),
+      // Siempre se envía: vacía = el servidor borra la versión en inglés.
+      translations: { en: enValues() },
     };
 
     var submit = $("#submitPost");
@@ -454,12 +506,14 @@
           savedSnapshot = snapshot();
           toast.fire({ icon: "success", title: "Cambios guardados" });
         } else {
+          var withEn = hasEnglish();
           clearDraft();
           resetEditor();
           Swal.fire({
             icon: "success",
             title: "¡Publicado!",
-            html: '<a href="/post/' + post.id + '" target="_blank" rel="noopener">Ver el post →</a>',
+            html: '<a href="/post/' + post.id + '" target="_blank" rel="noopener">Ver el post →</a>' +
+              (withEn ? '<br><a href="/en/post/' + post.id + '" target="_blank" rel="noopener">View in English →</a>' : ""),
             confirmButtonColor: "#a10395",
           });
           showTab("posts");
@@ -481,7 +535,7 @@
       });
       return;
     }
-    if (!fields.title.value && !fields.desc.value && !editorHTML()) return;
+    if (!fields.es.title.value && !fields.es.desc.value && !editorHTML("es") && !hasEnglish()) return;
     Swal.fire({
       title: "¿Descartar borrador?",
       icon: "question",

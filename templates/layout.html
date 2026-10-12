@@ -1,15 +1,21 @@
 {{define "layout"}}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{lang}}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{template "title" .}}</title>
   {{block "meta" .}}
-  <meta name="description" content="Historias que enganchan y tecnología que transforma: relatos, guías, programación, Linux, IA y seguridad informática.">
+  <meta name="description" content="{{t "site.description"}}">
   <meta property="og:site_name" content="JbearP Blog">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="https://blog.jbearp.com/static/assets/Jean.webp">
+  <meta property="og:image" content="{{absURL "/static/assets/Jean.webp"}}">
+  {{end}}
+  {{if isPublic}}
+  <meta property="og:locale" content="{{if eq lang "en"}}en_US{{else}}es_ES{{end}}">
+  <link rel="alternate" hreflang="es" href="{{absURL (langURL "es")}}">
+  <link rel="alternate" hreflang="en" href="{{absURL (langURL "en")}}">
+  <link rel="alternate" hreflang="x-default" href="{{absURL (langURL "es")}}">
   {{end}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +41,7 @@
     </div>
     <div class="Header-title">
       <h1>JbearP Blog</h1>
-      <span>Tecnología · Historias</span>
+      <span>{{t "site.tagline"}}</span>
     </div>
     <div class="Header-social">
       <ul>
@@ -46,15 +52,21 @@
     </div>
   </header>
 
-  <nav class="Nav-container" aria-label="Navegación principal">
-    <button class="hamburger" aria-label="Abrir menú" aria-expanded="false">&#9776;</button>
+  <nav class="Nav-container" aria-label="{{t "nav.label"}}">
+    <button class="hamburger" aria-label="{{t "nav.open"}}" aria-expanded="false">&#9776;</button>
     <ul role="list">
-      <li><a href="/">Inicio</a></li>
-      <li><a href="/blog">Blog</a></li>
-      <li><a href="/historias">Historias</a></li>
-      <li><a href="/tecnologias">Tecnología</a></li>
-      <li><a href="/portafolio">Portafolio</a></li>
+      <li><a href="{{url "/"}}">{{t "nav.home"}}</a></li>
+      <li><a href="{{url "/blog"}}">{{t "nav.blog"}}</a></li>
+      <li><a href="{{url "/historias"}}">{{t "nav.stories"}}</a></li>
+      <li><a href="{{url "/tecnologias"}}">{{t "nav.tech"}}</a></li>
+      <li><a href="{{url "/portafolio"}}">{{t "nav.portfolio"}}</a></li>
     </ul>
+    {{if isPublic}}
+    <div class="lang-switch" role="group" aria-label="{{t "lang.label"}}">
+      <a href="{{langURL "es"}}" hreflang="es" lang="es" data-no-pjax {{if eq lang "es"}}aria-current="true"{{end}}>ES</a>
+      <a href="{{langURL "en"}}" hreflang="en" lang="en" data-no-pjax {{if eq lang "en"}}aria-current="true"{{end}} title="{{t "lang.switch"}}">EN</a>
+    </div>
+    {{end}}
   </nav>
 
   <main class="main-content">
@@ -64,7 +76,7 @@
   <footer class="Footer">
     <div class="Footer-container">
       <div class="Footer-content">
-        <div class="Footer-copy">Hecho con 💜 por JbearP</div>
+        <div class="Footer-copy">{{t "footer.made"}}</div>
         <div class="Footer-go">Full Power by Go 🐹</div>
       </div>
     </div>
@@ -84,8 +96,8 @@
 
       <!-- Player expandido -->
       <div class="radio-full" id="radioFull">
-        <button class="radio-btn-collapse" id="radioCollapseBtn" aria-label="Minimizar player">
-          <i class="fa fa-chevron-down"></i> Minimizar
+        <button class="radio-btn-collapse" id="radioCollapseBtn" aria-label="{{t "radio.minimizeAria"}}">
+          <i class="fa fa-chevron-down"></i> {{t "radio.minimize"}}
         </button>
 
         <div class="radio-disc">
@@ -97,14 +109,14 @@
         <div class="radio-full-info">
           <div class="radio-full-live">
             <div class="radio-live-dot"></div>
-            <span>En vivo</span>
+            <span>{{t "radio.live"}}</span>
           </div>
           <div class="radio-full-song" id="radioFullSong">JbearP Radio</div>
-          <div class="radio-full-station">Transmisión en tiempo real</div>
+          <div class="radio-full-station">{{t "radio.station"}}</div>
         </div>
 
         <div class="radio-full-controls">
-          <button class="radio-btn-main" id="radioBtnMain" aria-label="Reproducir / Pausar">
+          <button class="radio-btn-main" id="radioBtnMain" aria-label="{{t "radio.playPause"}}">
             <i class="fa fa-play" id="radioPlayIconMain"></i>
           </button>
         </div>
@@ -112,7 +124,7 @@
         <div class="radio-volume-row">
           <i class="fa fa-volume-down"></i>
           <input type="range" class="radio-volume-slider" id="radioVolume"
-                 min="0" max="1" step="0.05" value="0.8" aria-label="Volumen">
+                 min="0" max="1" step="0.05" value="0.8" aria-label="{{t "radio.volume"}}">
           <i class="fa fa-volume-up"></i>
         </div>
       </div>
@@ -124,10 +136,10 @@
           <span></span><span></span><span></span><span></span><span></span>
         </div>
         <span class="radio-mini-title" id="radioMiniTitle">JbearP Radio</span>
-        <button class="radio-btn" id="radioBtnMini" aria-label="Reproducir / Pausar radio">
+        <button class="radio-btn" id="radioBtnMini" aria-label="{{t "radio.playPause"}}">
           <i class="fa fa-play" id="radioPlayIconMini"></i>
         </button>
-        <button class="radio-btn radio-btn-expand" id="radioExpandBtn" aria-label="Abrir player completo">
+        <button class="radio-btn radio-btn-expand" id="radioExpandBtn" aria-label="{{t "radio.expand"}}">
           <i class="fa fa-chevron-up"></i>
         </button>
       </div>

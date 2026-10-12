@@ -14,5 +14,10 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusNotFound, "Post no encontrado")
 		return
 	}
+	// Incluye las traducciones: el editor del dashboard las necesita.
+	if post.Translations, err = db.GetPostTranslations(post.ID); err != nil {
+		writeError(w, http.StatusInternalServerError, "No se pudieron cargar las traducciones")
+		return
+	}
 	writeJSON(w, http.StatusOK, post)
 }

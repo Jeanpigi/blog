@@ -15,7 +15,7 @@ import (
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		csrfToken := utils.IssueCSRFToken(w)
-		utils.RenderTemplate(w, "templates/signup.html", map[string]interface{}{
+		utils.RenderTemplate(w, r, "templates/signup.html", map[string]interface{}{
 			"CsrfToken": csrfToken,
 		})
 		return

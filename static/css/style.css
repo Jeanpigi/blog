@@ -313,3 +313,43 @@ body {
     order: 1;
   }
 }
+
+/* ===== Selector de idioma ===== */
+.lang-switch {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  padding: 0.3rem;
+  background: #f1f5f9;
+  border-radius: 999px;
+}
+
+.lang-switch a {
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.lang-switch a:hover { color: #0f172a; }
+
+.lang-switch a[aria-current="true"] {
+  background: #ffffff;
+  color: #a10395;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.1);
+}
+
+.lang-switch a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(161, 3, 149, 0.3);
+}
+
+@media (max-width: 768px) {
+  .lang-switch { right: 1.6rem; }
+}

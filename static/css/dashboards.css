@@ -591,3 +591,39 @@
   .dash-tabs { display: grid; grid-template-columns: 1fr 1fr; }
   .legend { gap: 1rem; font-size: 1.2rem; }
 }
+
+/* ===== Editor bilingüe ===== */
+.editor-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+.editor-meta .field { margin-bottom: 0; }
+.field-inline { min-width: 180px; }
+
+.lang-tabs .seg { display: inline-flex; align-items: center; gap: 0.6rem; }
+.lang-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  border: 1.5px solid #94a3b8;
+  display: inline-block;
+}
+.lang-dot.on { background: #16a34a; border-color: #16a34a; }
+
+.lang-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.6rem;
+  padding: 1rem 1.2rem;
+  background: var(--surface-2);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+}
+.lang-hint code { font-size: 1.25rem; }
+
+.badge-en { background: #ecfdf5; color: #047857; }

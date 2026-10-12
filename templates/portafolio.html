@@ -1,4 +1,4 @@
-{{define "title"}}Portafolio — JbearP{{end}}
+{{define "title"}}{{t "title.portfolio"}}{{end}}
 
 {{define "extra_css"}}
 <link rel="stylesheet" href="/static/css/portafolio.css?v={{staticVer}}">
@@ -10,18 +10,18 @@
   <!-- HERO -->
   <header class="pf-hero">
     <img class="pf-hero__avatar" src="/static/assets/Jean.webp" alt="Jean Pierre Arenas" width="96" height="96">
-    <p class="pf-eyebrow">Portafolio</p>
+    <p class="pf-eyebrow">{{t "pf.eyebrow"}}</p>
     <h1 class="pf-hero__title">Jean Pierre Arenas</h1>
-    <p class="pf-hero__lead">Ingeniero de sistemas y developer. Construyo aplicaciones web, enseño con tecnología y me apasionan Linux, la seguridad y la IA.</p>
+    <p class="pf-hero__lead">{{t "pf.lead"}}</p>
 
-    <ul class="pf-stats" aria-label="Resumen">
-      {{if .YearsExp}}<li><strong>{{.YearsExp}}+</strong><span>años de experiencia</span></li>{{end}}
-      <li><strong>{{len .Projects}}</strong><span>proyectos</span></li>
-      <li><strong>{{len .Education}}</strong><span>títulos y cursos</span></li>
+    <ul class="pf-stats" aria-label="{{t "pf.summary"}}">
+      {{if .YearsExp}}<li><strong>{{.YearsExp}}+</strong><span>{{t "pf.years"}}</span></li>{{end}}
+      <li><strong>{{len .Projects}}</strong><span>{{t "pf.projects"}}</span></li>
+      <li><strong>{{len .Education}}</strong><span>{{t "pf.degrees"}}</span></li>
     </ul>
 
     <div class="pf-hero__ctas">
-      <a class="pf-btn pf-btn--primary" href="#proyectos"><i class="fa fa-rocket"></i> Ver proyectos</a>
+      <a class="pf-btn pf-btn--primary" href="#proyectos"><i class="fa fa-rocket"></i> {{t "pf.seeProjects"}}</a>
       <a class="pf-btn" href="https://github.com/Jeanpigi" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub</a>
     </div>
   </header>
@@ -31,7 +31,7 @@
   <section class="pf-section" id="proyectos" aria-labelledby="pf-projects-title">
     <div class="pf-section__head">
       <span class="pf-section__icon"><i class="fa fa-rocket"></i></span>
-      <h2 id="pf-projects-title">Proyectos</h2>
+      <h2 id="pf-projects-title">{{t "pf.projectsH"}}</h2>
     </div>
     <div class="projects-grid">
       {{range .Projects}}
@@ -50,7 +50,7 @@
           <h3 class="project-card__title">{{.Title}}</h3>
           {{if .Description}}<p class="project-card__desc">{{.Description}}</p>{{end}}
           <a href="{{.ProjectURL}}" target="_blank" rel="noopener noreferrer" class="project-card__link">
-            Ver proyecto <span class="project-card__host">{{hostOf .ProjectURL}}</span> <i class="fa fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            {{t "pf.viewProject"}} <span class="project-card__host">{{hostOf .ProjectURL}}</span> <i class="fa fa-arrow-up-right-from-square" aria-hidden="true"></i>
           </a>
         </div>
       </article>
@@ -64,12 +64,12 @@
     <section class="pf-section" aria-labelledby="pf-exp-title">
       <div class="pf-section__head">
         <span class="pf-section__icon"><i class="fa fa-briefcase"></i></span>
-        <h2 id="pf-exp-title">Experiencia</h2>
+        <h2 id="pf-exp-title">{{t "pf.experience"}}</h2>
       </div>
       <ol class="timeline">
         {{range .Experiences}}
         <li class="timeline__item">
-          <div class="timeline__period">{{.StartYear}} — {{if .EndYear}}{{.EndYear}}{{else}}Actualidad{{end}}</div>
+          <div class="timeline__period">{{.StartYear}} — {{if .EndYear}}{{.EndYear}}{{else}}{{t "pf.present"}}{{end}}</div>
           <h3 class="timeline__title">{{.Title}}</h3>
           <div class="timeline__place">{{.Place}}</div>
           {{if .Description}}<p class="timeline__desc">{{.Description}}</p>{{end}}
@@ -82,12 +82,12 @@
     <section class="pf-section" aria-labelledby="pf-edu-title">
       <div class="pf-section__head">
         <span class="pf-section__icon"><i class="fa fa-graduation-cap"></i></span>
-        <h2 id="pf-edu-title">Educación</h2>
+        <h2 id="pf-edu-title">{{t "pf.education"}}</h2>
       </div>
       <ol class="timeline">
         {{range .Education}}
         <li class="timeline__item">
-          <div class="timeline__period">{{.StartYear}} — {{if .EndYear}}{{.EndYear}}{{else}}Actualidad{{end}}</div>
+          <div class="timeline__period">{{.StartYear}} — {{if .EndYear}}{{.EndYear}}{{else}}{{t "pf.present"}}{{end}}</div>
           <h3 class="timeline__title">{{.Title}}</h3>
           <div class="timeline__place">{{.Place}}</div>
         </li>

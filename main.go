@@ -15,6 +15,7 @@ import (
 
 	"github.com/Jeanpigi/blog/db"
 	"github.com/Jeanpigi/blog/internal/handlers"
+	"github.com/Jeanpigi/blog/internal/i18n"
 	"github.com/Jeanpigi/blog/internal/middleware"
 	"github.com/Jeanpigi/blog/internal/music"
 	"github.com/Jeanpigi/blog/internal/playlist"
@@ -77,8 +78,9 @@ func main() {
 		myHandler.AllowedHeaders([]string{"Content-Type", "Authorization", "X-CSRF-Token"}),
 	)
 
-	// 🔹 Cadena de middleware global: security headers → CORS → router
-	rootHandler := middleware.SecurityHeaders(corsHandler(router))
+	// 🔹 Cadena de middleware global: security headers → CORS → idioma → router
+	// i18n va antes del router: quita el prefijo /en para que ambos idiomas usen las mismas rutas.
+	rootHandler := middleware.SecurityHeaders(corsHandler(i18n.Middleware(router)))
 
 	// 🔹 Configurar servidor con timeouts (defensa contra Slowloris).
 	// WriteTimeout se deja en 0 a propósito: el stream de la radio es una

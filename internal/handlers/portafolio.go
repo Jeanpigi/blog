@@ -6,6 +6,7 @@ import (
 	"time"
 
 	db "github.com/Jeanpigi/blog/db"
+	"github.com/Jeanpigi/blog/internal/i18n"
 	"github.com/Jeanpigi/blog/internal/utils"
 )
 
@@ -31,6 +32,17 @@ func PortafolioHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	lang := i18n.FromRequest(r)
+	for i := range experiences {
+		experiences[i] = experiences[i].Localize(lang)
+	}
+	for i := range education {
+		education[i] = education[i].Localize(lang)
+	}
+	for i := range projects {
+		projects[i] = projects[i].Localize(lang)
+	}
+
 	// Años desde la primera experiencia (para el resumen del encabezado).
 	years := 0
 	for _, e := range experiences {
@@ -39,7 +51,7 @@ func PortafolioHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	utils.RenderTemplate(w, "templates/portafolio.html", map[string]interface{}{
+	utils.RenderTemplate(w, r, "templates/portafolio.html", map[string]interface{}{
 		"Experiences": experiences,
 		"Education":   education,
 		"Projects":    projects,

@@ -76,7 +76,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Mostrar formulario (GET/HEAD)
 	if r.Method != http.MethodPost {
 		csrfToken := utils.IssueCSRFToken(w)
-		utils.RenderTemplate(w, "templates/login.html", map[string]interface{}{
+		utils.RenderTemplate(w, r, "templates/login.html", map[string]interface{}{
 			"CsrfToken": csrfToken,
 		})
 		return

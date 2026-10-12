@@ -7,5 +7,5 @@ import (
 )
 
 func BlogHandler(w http.ResponseWriter, r *http.Request) {
-	utils.RenderTemplate(w, "templates/blog.html", nil)
+	utils.RenderTemplate(w, r, "templates/blog.html", nil)
 }
