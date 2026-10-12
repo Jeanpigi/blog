@@ -18,6 +18,12 @@ import (
 // que se registraban desde el servidor e incluían bots.
 const BotSQLPattern = `bot|crawl|spider|slurp|scrap|fetch|monitor|uptime|preview|headless|lighthouse|pingdom|curl|wget|python|go-http|java/|okhttp|axios|node-fetch|libwww|httpclient|facebookexternalhit|whatsapp|telegram|discord|semrush|ahrefs|mj12|bytespider|gptbot|claudebot`
 
+// BotSQLRegex es el patrón listo para `user_agent REGEXP ?`. Se usa el
+// operador REGEXP (no REGEXP_LIKE, que no existe en MariaDB, la base de
+// producción) y (?i) para no depender de la collation; MySQL 8 y MariaDB
+// lo aceptan.
+const BotSQLRegex = `(?i)(` + BotSQLPattern + `)`
+
 var botRx = regexp.MustCompile(`(?i)` + BotSQLPattern)
 
 // IsBot devuelve true si el User-Agent parece de un bot (o está vacío).

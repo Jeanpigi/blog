@@ -10,7 +10,7 @@ import (
 // Todas las consultas de estadísticas excluyen bots por User-Agent. Los datos
 // históricos se registraban desde el servidor e incluían rastreadores; con este
 // filtro también quedan limpios.
-const humanVisits = `timestamp >= NOW() - INTERVAL ? DAY AND NOT REGEXP_LIKE(user_agent, ?, 'i')`
+const humanVisits = `timestamp >= NOW() - INTERVAL ? DAY AND user_agent NOT REGEXP ?`
 
 // measured limita a las vistas registradas con la medición client-side (tienen
 // view_id): son las únicas con referrer, dispositivo y duración fiables.
@@ -59,7 +59,7 @@ func GetAnalyticsSummary(days int) (AnalyticsSummary, error) {
 	var s AnalyticsSummary
 	err := Db.QueryRow(`
 		SELECT COUNT(*), COUNT(DISTINCT ip), COALESCE(AVG(NULLIF(duration_sec, 0)), 0)
-		FROM Visits WHERE `+humanVisits, days, analytics.BotSQLPattern,
+		FROM Visits WHERE `+humanVisits, days, analytics.BotSQLRegex,
 	).Scan(&s.Views, &s.Visitors, &s.AvgDurationSec)
 	if err != nil {
 		return s, err
@@ -67,7 +67,7 @@ func GetAnalyticsSummary(days int) (AnalyticsSummary, error) {
 	err = Db.QueryRow(`
 		SELECT COUNT(*), COUNT(DISTINCT ip) FROM Visits
 		WHERE timestamp >= NOW() - INTERVAL ? DAY AND timestamp < NOW() - INTERVAL ? DAY
-		  AND NOT REGEXP_LIKE(user_agent, ?, 'i')`, days*2, days, analytics.BotSQLPattern,
+		  AND user_agent NOT REGEXP ?`, days*2, days, analytics.BotSQLRegex,
 	).Scan(&s.PrevViews, &s.PrevVisitors)
 	return s, err
 }
@@ -78,7 +78,7 @@ func GetDailyViews(days int) ([]DailyPoint, error) {
 	rows, err := Db.Query(`
 		SELECT DATE_FORMAT(timestamp, '%Y-%m-%d') d, COUNT(*), COUNT(DISTINCT ip)
 		FROM Visits WHERE `+humanVisits+`
-		GROUP BY d ORDER BY d`, days, analytics.BotSQLPattern)
+		GROUP BY d ORDER BY d`, days, analytics.BotSQLRegex)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func GetTopPosts(days, limit int) ([]TopPost, error) {
 		       COALESCE(AVG(NULLIF(v.duration_sec, 0)), 0)
 		FROM Visits v JOIN Posts p ON v.page IN (CONCAT('/post/', p.ID), CONCAT('/en/post/', p.ID))
 		WHERE v.`+humanVisits+`
-		GROUP BY p.ID, p.Title ORDER BY views DESC LIMIT ?`, days, analytics.BotSQLPattern, limit)
+		GROUP BY p.ID, p.Title ORDER BY views DESC LIMIT ?`, days, analytics.BotSQLRegex, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func GetBreakdown(dim string, days, limit int) ([]LabelCount, error) {
 	}
 	q := `SELECT ` + col.expr + ` label, COUNT(*) n FROM Visits WHERE ` + where +
 		` GROUP BY label ORDER BY n DESC LIMIT ?`
-	rows, err := Db.Query(q, days, analytics.BotSQLPattern, limit)
+	rows, err := Db.Query(q, days, analytics.BotSQLRegex, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +183,7 @@ func Today() (string, error) {
 // DeleteBotVisits borra visitas de bots (registradas por la medición antigua,
 // que contaba desde el servidor). Devuelve cuántas filas borró.
 func DeleteBotVisits() (int64, error) {
-	res, err := Db.Exec(`DELETE FROM Visits WHERE REGEXP_LIKE(user_agent, ?, 'i') OR user_agent = ''`, analytics.BotSQLPattern)
+	res, err := Db.Exec(`DELETE FROM Visits WHERE user_agent REGEXP ? OR user_agent = ''`, analytics.BotSQLRegex)
 	if err != nil {
 		return 0, err
 	}

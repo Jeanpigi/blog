@@ -370,9 +370,9 @@ func GetVisitStats() (VisitStats, error) {
 		       COALESCE(SUM(timestamp >= NOW() - INTERVAL 7 DAY), 0),
 		       COALESCE(SUM(timestamp >= CURDATE()), 0),
 		       COUNT(DISTINCT ip)
-		FROM Visits WHERE NOT REGEXP_LIKE(user_agent, ?, 'i')`
+		FROM Visits WHERE user_agent NOT REGEXP ?`
 	var st VisitStats
-	err := Db.QueryRow(query, analytics.BotSQLPattern).Scan(&st.Total, &st.Last7Days, &st.Today, &st.UniqueIPs)
+	err := Db.QueryRow(query, analytics.BotSQLRegex).Scan(&st.Total, &st.Last7Days, &st.Today, &st.UniqueIPs)
 	return st, err
 }
 
