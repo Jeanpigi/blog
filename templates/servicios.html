@@ -50,8 +50,8 @@
     {{if .Links.ContactEnabled}}
     <p>{{t "services.ctaText"}}</p>
     <div class="cta-actions">
-      {{with .Links.Email}}
-      <a class="page-btn page-btn--primary" href="mailto:{{.}}?subject={{t "services.mailSubject"}}"><i class="fa fa-envelope"></i> {{t "services.email"}}</a>
+      {{if .Links.Email}}
+      <a class="page-btn page-btn--primary" href="#" data-mail-user="{{.Links.EmailUser}}" data-mail-domain="{{.Links.EmailDomain}}" data-mail-subject="{{t "services.mailSubject"}}"><i class="fa fa-envelope"></i> {{t "services.email"}}</a>
       {{end}}
       {{with .Links.WhatsApp}}
       <a class="page-btn page-btn--whatsapp" href="https://wa.me/{{.}}?text={{t "services.waText"}}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> {{t "services.whatsapp"}}</a>
@@ -67,4 +67,6 @@
     {{end}}
   </section>
 </div>
+
+<script src="/static/js/contact.js?v={{staticVer}}"></script>
 {{end}}

@@ -52,6 +52,24 @@ func Load() Links {
 	return l
 }
 
+// EmailUser y EmailDomain separan el correo para no escribirlo completo en el
+// HTML: static/js/contact.js lo arma en el navegador. Así no lo leen los bots
+// ni lo reescribe la "Email Obfuscation" de Cloudflare (que rompía el enlace
+// al navegar con PJAX, porque su script decodificador no se vuelve a ejecutar).
+func (l Links) EmailUser() string {
+	if i := strings.LastIndex(l.Email, "@"); i > 0 {
+		return l.Email[:i]
+	}
+	return ""
+}
+
+func (l Links) EmailDomain() string {
+	if i := strings.LastIndex(l.Email, "@"); i > 0 {
+		return l.Email[i+1:]
+	}
+	return ""
+}
+
 // SupportEnabled indica si hay al menos un método de apoyo configurado.
 func (l Links) SupportEnabled() bool {
 	return l.BreBKey != "" || l.PayURL != "" || l.PayPalURL != ""

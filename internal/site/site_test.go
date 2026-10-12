@@ -33,3 +33,13 @@ func TestLoadEmpty(t *testing.T) {
 		t.Errorf("sin configuración no debe haber métodos: %+v", l)
 	}
 }
+
+func TestEmailParts(t *testing.T) {
+	l := Links{Email: "pierre.handshake924@passmail.net"}
+	if l.EmailUser() != "pierre.handshake924" || l.EmailDomain() != "passmail.net" {
+		t.Errorf("partes = %q %q", l.EmailUser(), l.EmailDomain())
+	}
+	if (Links{}).EmailUser() != "" {
+		t.Error("sin correo no debe haber partes")
+	}
+}
