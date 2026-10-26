@@ -17,22 +17,12 @@
   <link rel="alternate" hreflang="en" href="{{absURL (langURL "en")}}">
   <link rel="alternate" hreflang="x-default" href="{{absURL (langURL "es")}}">
   {{end}}
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="preload" href="/static/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/static/css/style.css?v={{staticVer}}">
   <link rel="stylesheet" href="/static/css/radio.css?v={{staticVer}}">
   <link rel="shortcut icon" href="/static/assets/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   {{block "extra_css" .}}{{end}}
-  <!-- GA -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TLE4DOSLVG"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-TLE4DOSLVG', { anonymize_ip: true });
-  </script>
 </head>
 <body>
   <header class="Header">

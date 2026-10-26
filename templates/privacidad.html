@@ -10,47 +10,51 @@
   <header class="page-hero">
     <p class="page-eyebrow">Privacy</p>
     <h1 class="page-title">Privacy policy</h1>
-    <p class="page-lead">What data this blog collects, why, and what you can do about it. Last updated: October 12, 2026.</p>
+    <p class="page-lead">What data this blog collects, why, and what you can do about it. Last updated: October 25, 2026.</p>
   </header>
 
   <section>
     <h2>Who is responsible</h2>
-    <p>This blog (blog.jbearp.com) is run by Jean Pierre Arenas (“JbearP”), in Colombia. For anything related to your data, write to me{{if .Links.Email}} at <a href="#" data-mail-user="{{.Links.EmailUser}}" data-mail-domain="{{.Links.EmailDomain}}" data-mail-subject="Privacy" data-mail-show>this email address</a>{{end}}.</p>
+    <p>This blog (blog.jbearp.com) is run by Jean Pierre Arenas (“JbearP”), in Colombia. For anything related to your data, write to me{{if .Links.Email}} at <a href="#" data-mail-user="{{.Links.EmailUser}}" data-mail-domain="{{.Links.EmailDomain}}" data-mail-subject="Privacy" data-mail-show>this email address</a>{{else if .Links.WhatsApp}} on <a href="https://wa.me/{{.Links.WhatsApp}}" target="_blank" rel="noopener noreferrer">WhatsApp</a>{{end}}.</p>
   </section>
 
   <section>
     <h2>What I collect and why</h2>
-    <h3>1. Visit statistics (my own)</h3>
+    <h3>1. Visit statistics</h3>
     <p>To know which articles are read and improve the blog, when you open a public page your browser sends me:</p>
     <ul>
       <li>the page you visit, the date and how long it stayed visible;</li>
       <li>the website you came from (only its domain, e.g. “google.com”);</li>
       <li>your device type (mobile, tablet or computer) and browser;</li>
-      <li>your approximate location (country, region and city), estimated from your IP address with the ip-api.com service.</li>
+      <li>your approximate location (country, region, city and that city's approximate coordinates), estimated from your IP address with the ip-api.com service.</li>
     </ul>
-    <p><strong>Your IP address is not stored</strong>: only an irreversible encrypted identifier derived from it, used to count unique visitors. These statistics use no cookies, exclude bots, and are automatically deleted after about 13 months.</p>
+    <p><strong>Your IP address is not stored</strong>: only a pseudonymous identifier (a hash) derived from it, from which the IP cannot be recovered, used to count unique visitors. These statistics are my own (no Google Analytics or other trackers), use no cookies, exclude bots, and are automatically deleted after about 13 months.</p>
 
-    <h3>2. Google Analytics</h3>
-    <p>The blog uses Google Analytics, which places cookies in your browser to measure audience. Google processes that data under its own <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a>. You can block it with the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics opt-out add-on</a> or your browser's privacy settings.</p>
-
-    <h3>3. Cloudflare</h3>
+    <h3>2. Cloudflare and content delivery networks</h3>
     <p>All traffic goes through Cloudflare, which protects the site against attacks and speeds it up. It may process your IP address and set strictly technical security cookies. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare's privacy policy</a>.</p>
+    <p>Some libraries (icons, alerts) are loaded from the public CDNs jsDelivr and cdnjs. When your browser downloads them, those services receive your IP address, as with any website.</p>
 
-    <h3>4. When you contact me or support the blog</h3>
-    <p>If you email me, I receive your address and message and use them only to reply. If you support the blog via Bre-B, your bank shows me the name associated with the transfer. I never sell or share this information.</p>
+    <h3>3. When you contact me or support the blog</h3>
+    <p>If you write to me, I receive your address or number and your message, and use them only to reply. If you support the blog via Bre-B, your bank shows me the name associated with the transfer. I never sell or share this information.</p>
 
-    <h3>5. Radio</h3>
+    <h3>4. Radio</h3>
     <p>The radio only sends the song being played. It does not collect personal data.</p>
   </section>
 
   <section>
+    <h2>Cookies and local storage</h2>
+    <p>The blog uses no advertising or tracking cookies. The only ones are Cloudflare's technical security cookies and, only for the administrator, the login session cookie. The radio remembers whether it was playing and its volume in your browser's local storage; that information stays on your device and is never sent to me.</p>
+  </section>
+
+  <section>
     <h2>Where the data lives</h2>
-    <p>The blog relies on hosting, database and network providers (in addition to the Cloudflare, Google and ip-api.com services mentioned above) whose servers may be located outside Colombia, mainly in the United States. They only process the data to run the blog.</p>
+    <p>The blog relies on hosting, database and network providers (in addition to Cloudflare, jsDelivr, cdnjs and ip-api.com, mentioned above) whose servers may be located outside Colombia, mainly in the United States. They only process the data to run the blog.</p>
   </section>
 
   <section>
     <h2>Your rights</h2>
-    <p>Under Colombian data protection law (Law 1581 of 2012) and, if you are in the European Union, the GDPR, you can ask to know, update, correct or delete your data, and withdraw your consent. Since I don't store IP addresses, statistics can't be linked to a specific person; for anything else, just write to me.</p>
+    <p>Under Colombian data protection law (Law 1581 of 2012) and, if you are in the European Union, the GDPR, you can ask to know, update, correct or delete your data, and withdraw your consent. Since I don't store IP addresses, statistics are not linked to your name or any data that directly identifies you; for anything else, just write to me.</p>
+    <p>I answer inquiries within 10 business days and claims within 15 business days. If you are not satisfied with the answer, you can file a complaint with Colombia's data protection authority, the <a href="https://www.sic.gov.co" target="_blank" rel="noopener noreferrer">Superintendencia de Industria y Comercio (SIC)</a>.</p>
   </section>
 
   <section>
@@ -61,47 +65,51 @@
   <header class="page-hero">
     <p class="page-eyebrow">Privacidad</p>
     <h1 class="page-title">Política de privacidad</h1>
-    <p class="page-lead">Qué datos recoge este blog, para qué y qué puedes hacer al respecto. Última actualización: 12 de octubre de 2026.</p>
+    <p class="page-lead">Qué datos recoge este blog, para qué y qué puedes hacer al respecto. Última actualización: 25 de octubre de 2026.</p>
   </header>
 
   <section>
     <h2>Responsable</h2>
-    <p>Este blog (blog.jbearp.com) lo administra Jean Pierre Arenas (“JbearP”), en Colombia. Para cualquier asunto sobre tus datos, escríbeme{{if .Links.Email}} a <a href="#" data-mail-user="{{.Links.EmailUser}}" data-mail-domain="{{.Links.EmailDomain}}" data-mail-subject="Privacidad" data-mail-show>este correo</a>{{end}}.</p>
+    <p>Este blog (blog.jbearp.com) lo administra Jean Pierre Arenas (“JbearP”), en Colombia. Para cualquier asunto sobre tus datos, escríbeme{{if .Links.Email}} a <a href="#" data-mail-user="{{.Links.EmailUser}}" data-mail-domain="{{.Links.EmailDomain}}" data-mail-subject="Privacidad" data-mail-show>este correo</a>{{else if .Links.WhatsApp}} por <a href="https://wa.me/{{.Links.WhatsApp}}" target="_blank" rel="noopener noreferrer">WhatsApp</a>{{end}}.</p>
   </section>
 
   <section>
     <h2>Qué datos recojo y para qué</h2>
-    <h3>1. Estadísticas de visitas (propias)</h3>
+    <h3>1. Estadísticas de visitas</h3>
     <p>Para saber qué artículos se leen y mejorar el blog, cuando abres una página pública tu navegador me envía:</p>
     <ul>
       <li>la página que visitas, la fecha y cuánto tiempo estuvo visible;</li>
       <li>el sitio desde el que llegaste (solo su dominio, por ejemplo “google.com”);</li>
       <li>el tipo de dispositivo (celular, tablet o computador) y el navegador;</li>
-      <li>tu ubicación aproximada (país, región y ciudad), estimada a partir de tu dirección IP con el servicio ip-api.com.</li>
+      <li>tu ubicación aproximada (país, región, ciudad y las coordenadas aproximadas de esa ciudad), estimada a partir de tu dirección IP con el servicio ip-api.com.</li>
     </ul>
-    <p><strong>Tu dirección IP no se guarda</strong>: solo un identificador cifrado e irreversible derivado de ella, que sirve para contar visitantes únicos. Estas estadísticas no usan cookies, excluyen a los bots y se borran automáticamente pasados unos 13 meses.</p>
+    <p><strong>Tu dirección IP no se guarda</strong>: solo un identificador seudónimo (un hash) derivado de ella, que no permite recuperar la IP y sirve para contar visitantes únicos. Estas estadísticas son propias (sin Google Analytics ni otros rastreadores), no usan cookies, excluyen a los bots y se borran automáticamente pasados unos 13 meses.</p>
 
-    <h3>2. Google Analytics</h3>
-    <p>El blog usa Google Analytics, que instala cookies en tu navegador para medir la audiencia. Google trata esos datos según su propia <a href="https://policies.google.com/privacy?hl=es" target="_blank" rel="noopener noreferrer">política de privacidad</a>. Puedes bloquearlo con el <a href="https://tools.google.com/dlpage/gaoptout?hl=es" target="_blank" rel="noopener noreferrer">complemento de inhabilitación de Google Analytics</a> o con la configuración de privacidad de tu navegador.</p>
-
-    <h3>3. Cloudflare</h3>
+    <h3>2. Cloudflare y redes de distribución de contenido</h3>
     <p>Todo el tráfico pasa por Cloudflare, que protege el sitio contra ataques y lo hace más rápido. Puede tratar tu dirección IP y usar cookies técnicas de seguridad. Consulta la <a href="https://www.cloudflare.com/es-es/privacypolicy/" target="_blank" rel="noopener noreferrer">política de privacidad de Cloudflare</a>.</p>
+    <p>Algunas librerías (iconos, alertas) se cargan desde las redes públicas jsDelivr y cdnjs. Al descargarlas, tu navegador les envía tu dirección IP, como ocurre con cualquier sitio web.</p>
 
-    <h3>4. Si me escribes o apoyas el blog</h3>
-    <p>Si me escribes por correo, recibo tu dirección y tu mensaje, y los uso solo para responderte. Si apoyas el blog por Bre-B, tu banco me muestra el nombre asociado a la transferencia. Nunca vendo ni comparto esta información.</p>
+    <h3>3. Si me escribes o apoyas el blog</h3>
+    <p>Si me escribes, recibo tu dirección o tu número y tu mensaje, y los uso solo para responderte. Si apoyas el blog por Bre-B, tu banco me muestra el nombre asociado a la transferencia. Nunca vendo ni comparto esta información.</p>
 
-    <h3>5. Radio</h3>
+    <h3>4. Radio</h3>
     <p>La radio solo envía la canción que suena. No recoge datos personales.</p>
   </section>
 
   <section>
+    <h2>Cookies y almacenamiento local</h2>
+    <p>El blog no usa cookies de publicidad ni de seguimiento. Las únicas son las cookies técnicas de seguridad de Cloudflare y, solo para el administrador, la cookie de sesión al iniciar sesión. La radio recuerda en el almacenamiento local de tu navegador si estaba sonando y su volumen; esa información se queda en tu dispositivo y nunca me llega.</p>
+  </section>
+
+  <section>
     <h2>Dónde se guardan</h2>
-    <p>El blog funciona con proveedores de alojamiento, base de datos y red (además de Cloudflare, Google e ip-api.com, ya mencionados) cuyos servidores pueden estar fuera de Colombia, principalmente en Estados Unidos. Solo tratan los datos para que el blog funcione.</p>
+    <p>El blog funciona con proveedores de alojamiento, base de datos y red (además de Cloudflare, jsDelivr, cdnjs e ip-api.com, ya mencionados) cuyos servidores pueden estar fuera de Colombia, principalmente en Estados Unidos. Solo tratan los datos para que el blog funcione.</p>
   </section>
 
   <section>
     <h2>Tus derechos</h2>
-    <p>Según la Ley 1581 de 2012 de protección de datos personales y, si estás en la Unión Europea, el RGPD, puedes pedir conocer, actualizar, rectificar o suprimir tus datos, y revocar tu autorización. Como no guardo direcciones IP, las estadísticas no se pueden asociar a una persona concreta; para lo demás, solo escríbeme.</p>
+    <p>Según la Ley 1581 de 2012 de protección de datos personales y, si estás en la Unión Europea, el RGPD, puedes pedir conocer, actualizar, rectificar o suprimir tus datos, y revocar tu autorización. Como no guardo direcciones IP, las estadísticas no están ligadas a tu nombre ni a ningún dato que te identifique directamente; para lo demás, solo escríbeme.</p>
+    <p>Respondo las consultas en un máximo de 10 días hábiles y los reclamos en un máximo de 15 días hábiles. Si no quedas conforme con la respuesta, puedes acudir a la <a href="https://www.sic.gov.co" target="_blank" rel="noopener noreferrer">Superintendencia de Industria y Comercio (SIC)</a>, la autoridad de protección de datos en Colombia.</p>
   </section>
 
   <section>

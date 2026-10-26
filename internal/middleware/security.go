@@ -8,16 +8,16 @@ import (
 )
 
 // contentSecurityPolicy está afinada a los recursos externos que realmente usa
-// el sitio: Google Analytics, SweetAlert2 y Leaflet (jsdelivr), Quill (quilljs), Google
-// Fonts y Font Awesome (cdnjs). nginx NO setea CSP, así que este es el único
-// lugar donde vive — NO agregarlo también en nginx (quedaría duplicado).
+// el sitio: SweetAlert2 y Leaflet (jsdelivr), Quill (quilljs) y Font Awesome
+// (cdnjs). La fuente Inter se sirve desde /static/fonts. nginx NO setea CSP,
+// así que este es el único lugar donde vive — NO agregarlo también en nginx (quedaría duplicado).
 const contentSecurityPolicy = "default-src 'self'; " +
-	"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://cdn.jsdelivr.net https://cdn.quilljs.com; " +
-	"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.quilljs.com; " +
-	"font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+	"script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.quilljs.com; " +
+	"style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.quilljs.com; " +
+	"font-src 'self' https://cdnjs.cloudflare.com; " +
 	"img-src 'self' data: https:; " + // https: permite imágenes embebidas en posts (pasivas, no ejecutan JS)
 	"media-src 'self'; " +
-	"connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; " +
+	"connect-src 'self'; " +
 	"object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
 
 // SecurityHeaders añade el CSP a cada respuesta.

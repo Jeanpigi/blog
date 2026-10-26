@@ -1,3 +1,12 @@
+/* Inter (variable, solo latin) servida desde el propio sitio: sin Google Fonts */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url(/static/fonts/inter-latin-wght-normal.woff2) format('woff2');
+}
+
 /* ===== Reset y base ===== */
 *, *::before, *::after {
   margin: 0;
